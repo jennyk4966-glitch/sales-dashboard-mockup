@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>영업사원 대시보드 v8</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
+/* GNB */
+.gnb{height:56px;background:#fff;border-bottom:1px solid #d9dde2;display:flex;align-items:center;padding:0 20px}
+.gnb .logo{font-weight:700;font-size:18px;color:#1a3a5f;margin-right:30px}
+.gnb .logo span{color:#7b4dff}
+.gnb-menu{display:flex;gap:4px;flex:1}
+.gnb-menu a{padding:8px 16px;color:#555;text-decoration:none;font-size:13px;border-radius:3px}
+.gnb-menu a.active{background:#1a3a5f;color:#fff;font-weight:600}
+.gnb-right{color:#666;font-size:12px}
+.gnb-right span{margin-left:12px}
+/* Subbar */
+.subbar{height:34px;background:linear-gradient(90deg,#5a4fcf,#7b4dff);display:flex;align-items:center;padding:0 20px;color:#fff;font-size:12px;gap:18px}
+.subbar a{color:#fff;text-decoration:none;opacity:0.9}
+/* Layout */
+.wrap{display:flex;min-height:calc(100vh - 90px)}
+.lnb{width:200px;background:#fff;border-right:1px solid #d9dde2;padding:14px 0}
+.lnb-title{padding:8px 16px;font-weight:700;color:#1a3a5f;font-size:13px;border-bottom:1px solid #e5e8ec;margin-bottom:6px}
+.lnb-item{padding:9px 16px;color:#444;cursor:pointer;font-size:12.5px;border-left:3px solid transparent}
+.lnb-item:hover{background:#f4f5f7}
+.lnb-item.active{background:#eef2f7;border-left-color:#1a3a5f;color:#1a3a5f;font-weight:700}
+.lnb-item.parent::before{content:"+ ";color:#999}
+.main{flex:1;padding:14px 18px;overflow:auto}
+.breadcrumb{font-size:11.5px;color:#777;margin-bottom:10px}
+.breadcrumb b{color:#1a3a5f}
+/* Top filter */
+.top-filter{background:#fff;border:1px solid #d9dde2;border-radius:4px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.top-filter label{font-weight:600;color:#333;font-size:12px;margin-right:2px}
+.top-filter select{height:28px;padding:0 8px;border:1px solid #c9ccd1;border-radius:3px;background:#fff;font-size:12px;color:#333;min-width:120px}
+.btn{height:28px;padding:0 14px;border:1px solid #1a3a5f;background:#1a3a5f;color:#fff;border-radius:3px;font-size:12px;cursor:pointer;font-weight:600}
+.btn.ghost{background:#fff;color:#1a3a5f}
+.btn.sm{height:24px;padding:0 10px;font-size:11.5px}
+/* Page tabs */
+.ptabs{display:flex;border-bottom:2px solid #1a3a5f;margin-bottom:12px;background:#fff;border-radius:4px 4px 0 0}
+.ptab{padding:10px 20px;cursor:pointer;font-size:13px;color:#666;font-weight:600;border:1px solid transparent;border-bottom:0}
+.ptab.active{background:#1a3a5f;color:#fff;border-radius:3px 3px 0 0}
+/* Card */
+.card{background:#fff;border:1px solid #d9dde2;border-radius:4px;margin-bottom:12px}
+.card-head{padding:10px 14px;border-bottom:1px solid #e5e8ec;display:flex;justify-content:space-between;align-items:center;background:#fafbfc}
+.card-head h3{font-size:13px;color:#1a3a5f;font-weight:700}
+.card-head .tools{display:flex;gap:6px;align-items:center}
+.card-head .tools select{height:26px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:12px;padding:0 6px;border-radius:3px}
+.card-body{padding:12px 14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+/* Inner tabs */
+.itabs{display:flex;border-bottom:1px solid #d9dde2;margin-bottom:10px}
+.itab{padding:7px 14px;cursor:pointer;font-size:12px;color:#666;border-bottom:2px solid transparent;font-weight:600}
+.itab.active{color:#1a3a5f;border-bottom-color:#1a3a5f}
+/* Table */
+table.data{width:100%;border-collapse:collapse;font-size:11.5px}
+table.data th{background:#eef2f7;color:#1a3a5f;font-weight:700;padding:7px 6px;border:1px solid #d9dde2;text-align:center}
+table.data td{padding:6px;border:1px solid #e5e8ec;text-align:right;color:#333}
+table.data td.c{text-align:center}
+table.data td.l{text-align:left}
+table.data tbody tr:hover{background:#fffbe6}
+table.data tr.hl{background:#fff3cd !important}
+table.data tfoot td{background:#f4f5f7;font-weight:700}
+.neg{color:#d32f2f;font-weight:700}
+.muted{color:#999}
+/* MyTask */
+.mtask{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mtask-item{border:1px solid #d9dde2;border-radius:3px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;background:#fff}
+.mtask-item:hover{background:#eef2f7;border-color:#1a3a5f}
+.mtask-item.disabled{cursor:default;color:#bbb;background:#fafbfc}
+.mtask-item.disabled:hover{background:#fafbfc;border-color:#d9dde2}
+.mtask-label{color:#555;font-size:12px}
+.mtask-val{font-size:14px;font-weight:700;color:#1a3a5f}
+.mtask-val.zero{color:#bbb}
+.mtask-val.danger{color:#d32f2f}
+.mtask-item.urgent{border-color:#d32f2f}
+/* HCSI score cells */
+.score-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.score-cell{border:1px solid #d9dde2;border-radius:3px;padding:10px;text-align:center;background:#fff}
+.score-cell .lbl{font-size:11px;color:#666;margin-bottom:5px;height:28px;display:flex;align-items:center;justify-content:center}
+.score-cell .val{font-size:20px;font-weight:700;color:#1a3a5f}
+.score-cell .val.warn{color:#e67e22}
+.score-cell .val.bad{color:#d32f2f}
+.score-cell.guarantee{background:#fffaf0;border-color:#e8d4a0}
+.score-cell.guarantee .val{color:#b8860b}
+/* HCSI summary cards (5) */
+.hcsi-sum{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.hcsi-sum-c{border:1px solid #d9dde2;border-radius:3px;padding:12px;text-align:center;background:#fff}
+.hcsi-sum-c .l{font-size:11.5px;color:#666;margin-bottom:6px}
+.hcsi-sum-c .v{font-size:22px;font-weight:700;color:#1a3a5f}
+.hcsi-sum-c.guar{background:#fffaf0;border-color:#e8d4a0}
+.hcsi-sum-c.guar .v{color:#b8860b}
+/* Donut */
+.donut-wrap{display:grid;grid-template-columns:240px 1fr;gap:14px;align-items:center}
+.donut{position:relative;width:220px;height:220px}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut .ctr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.donut .ctr .p{font-size:22px;font-weight:700;color:#1a3a5f}
+.donut .ctr .n{font-size:11px;color:#666;margin-top:2px}
+.donut path{cursor:pointer;transition:opacity .15s}
+.donut path:hover{opacity:0.7}
+/* Daily channel summary */
+.chan-sum{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#666;font-size:11.5px}
+/* Period filter inside section */
+.sec-filter{display:flex;gap:6px;align-items:center}
+.sec-filter label{font-size:11.5px;color:#555}
+.sec-filter select{height:26px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:11.5px;padding:0 6px;border-radius:3px}
+/* HCSI detail layout */
+.hcsi-section{background:#fff;border:1px solid #d9dde2;border-radius:4px;margin-bottom:14px}
+.hcsi-section-head{padding:10px 14px;border-bottom:1px solid #e5e8ec;background:#eef2f7;display:flex;justify-content:space-between;align-items:center}
+.hcsi-section-head h3{font-size:13px;color:#1a3a5f;font-weight:700}
+.hcsi-section-head .meta{font-size:11.5px;color:#666}
+.hcsi-section-head .meta b{color:#1a3a5f}
+.hcsi-section-body{padding:14px}
+.divider-label{font-weight:700;color:#1a3a5f;font-size:12px;margin:14px 0 6px;padding-left:6px;border-left:3px solid #1a3a5f}
+.divider-label:first-child{margin-top:0}
+/* Agency list */
+.ag-list-wrap{display:grid;grid-template-columns:340px 1fr;gap:14px}
+.ag-list{border:1px solid #d9dde2;border-radius:3px;max-height:480px;overflow-y:auto;background:#fff}
+.ag-search{padding:8px;border-bottom:1px solid #e5e8ec;display:flex;gap:4px}
+.ag-search input{flex:1;height:26px;border:1px solid #c9ccd1;padding:0 8px;font-size:11.5px;border-radius:3px}
+.ag-row{padding:8px 10px;border-bottom:1px solid #f0f1f3;cursor:pointer;display:flex;justify-content:space-between;font-size:11.5px}
+.ag-row:hover{background:#f4f5f7}
+.ag-row.active{background:#eef2f7;font-weight:700;color:#1a3a5f}
+.ag-row .sc{font-weight:700}
+.ag-row .sc.bad{color:#d32f2f}
+.ag-row .sc.warn{color:#e67e22}
+/* Modal */
+.modal-bg{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:4px;width:480px;padding:0;border:1px solid #ccc}
+.modal-head{padding:12px 16px;background:#1a3a5f;color:#fff;font-weight:700;border-radius:4px 4px 0 0;display:flex;justify-content:space-between}
+.modal-head .x{cursor:pointer}
+.modal-body{padding:16px}
+.modal-body .route{background:#f4f5f7;padding:8px;font-family:monospace;font-size:11px;margin:6px 0;border-radius:3px}
+/* AI review */
+.ai-review{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.ai-box{border:1px solid #d9dde2;border-radius:3px;padding:10px;font-size:11.5px;line-height:1.6}
+.ai-box.pos{border-left:4px solid #2e7d32}
+.ai-box.neg{border-left:4px solid #d32f2f}
+.ai-box .tag{display:inline-block;padding:2px 8px;border-radius:2px;font-weight:700;font-size:11px;margin-bottom:6px}
+.ai-box.pos .tag{background:#e8f5e9;color:#2e7d32}
+.ai-box.neg .tag{background:#fdecea;color:#d32f2f}
+/* Chart wrapper */
+.chart-wrap{position:relative;height:240px}
+.notice{padding:8px 12px;background:#fffbe6;border:1px solid #ffe58f;border-radius:3px;color:#8c6d1f;font-size:11.5px;margin-bottom:8px}
+.notice b{color:#5a4a0e}
+.hidden{display:none !important}
+
+    .row2col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .row2col > .card{margin-bottom:0}
+
+    table.data tfoot td{background:#f0f3f8;font-weight:600;color:#1a3a5f;border-top:2px solid #1a3a5f}
+</style>
+</head>
+<body>
+
+<div class="gnb">
+  <div class="logo">Hana<span>Hub</span></div>
+  <div class="gnb-menu">
+    <a>호텔</a><a>항공</a><a>패키지</a><a>통합정산</a><a>고객</a><a>업무공통</a><a>시스템</a>
+    <a class="active">영업지원관리</a><a>BI포탈</a>
+  </div>
+  <div class="gnb-right">강재희 <span>로그아웃</span></div>
+</div>
+<div class="subbar">
+  <a>● 최근방문</a><a>★ 즐겨찾기</a><a>≡ 전체메뉴</a><a>🔍 메뉴검색</a>
+</div>
+
+<div class="wrap">
+  <aside class="lnb">
+    <div class="lnb-title">영업지원관리</div>
+    <div class="lnb-item active">영업대시보드</div>
+    <div class="lnb-item parent">통합예약조회</div>
+    <div class="lnb-item parent">대리점관리</div>
+    <div class="lnb-item parent">VOC</div>
+    <div class="lnb-item parent">영업지원/공지</div>
+    <div class="lnb-item parent">커뮤니티 광장</div>
+    <div class="lnb-item parent">법인DB</div>
+    <div class="lnb-item parent">입찰/법인이력관리</div>
+    <div class="lnb-item parent">프로모션 및 물품신청</div>
+    <div class="lnb-item parent">판매메인 ADMIN</div>
+    <div class="lnb-item parent">하나톡ID 서비스관리</div>
+    <div class="lnb-item parent">SITECODE관리</div>
+    <div class="lnb-item parent">닷컴문의</div>
+    <div class="lnb-item parent">마이체크리스트</div>
+  </aside>
+
+  <main class="main">
+    <div class="breadcrumb">영업지원관리 &gt; <b>영업대시보드</b></div>
+
+    <!-- 공통 팀/담당자 필터 -->
+    <div class="top-filter">
+      <label>팀</label>
+      <select><option>영업1팀</option><option>영업2팀</option><option>영업3팀</option></select>
+      <label>담당자</label>
+      <select><option>전체</option><option>강영업</option><option>김영업</option><option>박담당</option></select>
+      <button class="btn">조회</button>
+    </div>
+
+    <!-- 페이지 탭 -->
+    <div class="ptabs">
+      <div class="ptab active" data-page="home">대시보드 홈</div>
+      <div class="ptab" data-page="channel">채널별 예약현황</div>
+      <div class="ptab" data-page="hcsi">HCSI 상세</div>
+    </div>
+
+    <!-- =================== 대시보드 홈 =================== -->
+    <section id="page-home">
+
+      <div class="row2col">
+      <!-- 영역 1: 나의 업무관리 -->
+      <div class="card">
+        <div class="card-head"><h3>나의 업무관리</h3></div>
+        <div class="card-body">
+          <div class="itabs">
+            <div class="itab active" data-mtab="pkg">패키지 예약관리</div>
+            <div class="itab" data-mtab="quote">온라인 견적서</div>
+          </div>
+          <div id="mtab-pkg" class="mtask">
+            <div class="mtask-item" onclick="openTaskModal('일일 신규 예약','GET /pkg/booking/new?date=today','12건 / 38명','패키지영업')">
+              <div class="mtask-label">일일 신규 예약</div><div class="mtask-val">12건 / 38명</div></div>
+            <div class="mtask-item" onclick="openTaskModal('대기인원 WT','GET /pkg/booking/waiting','5건','패키지영업')">
+              <div class="mtask-label">대기인원 WT</div><div class="mtask-val">5건</div></div>
+            <div class="mtask-item urgent" onclick="openTaskModal('APIS 미입력','GET /pkg/booking/apis?within=30','7건','패키지영업')">
+              <div class="mtask-label">APIS 미입력 <br>(출발 30일 이내)</div><div class="mtask-val danger">7건</div></div>
+            <div class="mtask-item urgent" onclick="openTaskModal('계약금 미입금','GET /pkg/booking/deposit?within=90','3건','패키지영업')">
+              <div class="mtask-label">계약금 미입금<br> (출발 90일 이내)</div><div class="mtask-val danger">3건</div></div>
+          </div>
+          <div id="mtab-quote" class="mtask hidden">
+            <div class="mtask-item" onclick="openTaskModal('일일 신규 문의','GET /quote/new','8건','온라인견적')">
+              <div class="mtask-label">일일 신규 문의</div><div class="mtask-val">8건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('진행 중','GET /quote/inprogress','14건','온라인견적')">
+              <div class="mtask-label">진행 중</div><div class="mtask-val">14건</div></div>
+            <div class="mtask-item urgent" onclick="openTaskModal('기한 내 미처리','GET /quote/overdue','2건','온라인견적')">
+              <div class="mtask-label">기한 내 미처리</div><div class="mtask-val danger">2건</div></div>
+            <div class="mtask-item disabled"><div class="mtask-label">처리 완료</div><div class="mtask-val zero">0건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('전달 완료','GET /quote/delivered','21건','온라인견적')">
+              <div class="mtask-label">전달 완료</div><div class="mtask-val">21건</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 영역 2: 예약 채널 현황 -->
+      <div class="card">
+        <div class="card-head">
+          <h3>예약 채널 현황 (최근 7일 요약)</h3>
+          <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
+        </div>
+        <div class="card-body">
+          <div class="chan-sum"><span>기준일: 2026-05-09 ~ 2026-05-15</span><span>합계: <b style="color:#1a3a5f">187건 / 612명</b></span></div>
+          <table class="data">
+            <thead><tr><th>채널</th><th>건수</th><th>인원</th><th>매출</th><th>비중</th></tr></thead>
+            <tbody>
+              <tr><td class="l">공식인증예약센터</td><td>62</td><td>198</td><td>198,400,000</td><td>33.2%</td></tr>
+              <tr><td class="l">브랜드몰</td><td>38</td><td>128</td><td>132,500,000</td><td>20.3%</td></tr>
+              <tr><td class="l">일반대리점</td><td>45</td><td>152</td><td>148,700,000</td><td>24.1%</td></tr>
+              <tr><td class="l">제휴사</td><td>18</td><td>62</td><td>58,200,000</td><td>9.6%</td></tr>
+              <tr><td class="l">자회사</td><td>14</td><td>48</td><td>44,800,000</td><td>7.5%</td></tr>
+              <tr><td class="l">직판</td><td>10</td><td>24</td><td>27,500,000</td><td>5.3%</td></tr>
+            </tbody>
+            <tfoot><tr><td class="c">합계</td><td>187</td><td>612</td><td>610,100,000</td><td>100%</td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      </div>
+      <!-- 영역 3: 출발월별 상품 예약현황 -->
+      <div class="card">
+        <div class="card-head">
+          <h3>출발월별 상품 예약현황</h3>
+          <div class="tools sec-filter">
+            <label>연도</label><select><option>2026년</option><option>2025년</option></select>
+            <label>월</label><select><option>05월</option><option>06월</option><option>07월</option></select>
+            <button class="btn sm">조회</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="itabs">
+            <div class="itab active" data-dtab="chan">채널별</div>
+            <div class="itab" data-dtab="attr">속성별</div>
+            <div class="itab" data-dtab="brand">브랜드별</div>
+          </div>
+
+          <!-- 채널별 -->
+          <div id="dtab-chan">
+            <div class="donut-wrap">
+              <div class="donut" id="donut-chan">
+                <svg viewBox="0 0 100 100" id="svg-chan"></svg>
+                <div class="ctr" id="ctr-chan"><div class="p">100%</div><div class="n">전체</div></div>
+              </div>
+              <table class="data" id="tbl-chan">
+                <thead><tr><th>채널</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+                <tbody></tbody>
+                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- 속성별 -->
+          <div id="dtab-attr" class="hidden">
+            <div class="donut-wrap">
+              <div class="donut" id="donut-attr">
+                <svg viewBox="0 0 100 100" id="svg-attr"></svg>
+                <div class="ctr" id="ctr-attr"><div class="p">100%</div><div class="n">전체</div></div>
+              </div>
+              <table class="data" id="tbl-attr">
+                <thead><tr><th>속성</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+                <tbody></tbody>
+                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+
+          <!-- 브랜드별 -->
+          <div id="dtab-brand" class="hidden">
+            <div class="donut-wrap">
+              <div class="donut" id="donut-brand">
+                <svg viewBox="0 0 100 100" id="svg-brand"></svg>
+                <div class="ctr" id="ctr-brand"><div class="p">100%</div><div class="n">전체</div></div>
+              </div>
+              <table class="data" id="tbl-brand">
+                <thead><tr><th>브랜드</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+                <tbody></tbody>
+                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 영역 4: 일자별 모객 추이 -->
+      <div class="card">
+        <div class="card-head">
+          <h3>일자별 모객 추이</h3>
+          <div class="tools sec-filter">
+            <label>항목</label><select><option>모객율</option><option>모객수</option><option>좌석수</option></select>
+            <label>기간</label><select><option>최근 10일</option><option>최근 30일</option><option>최근 90일</option></select>
+            <label><input type="checkbox" checked> 전년 동기 비교</label>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="chart-wrap"><canvas id="chart-trend"></canvas></div>
+        </div>
+      </div>
+	  
+      <!-- 영역 5: HCSI 요약 미리보기 -->
+      <div class="card">
+        <div class="card-head">
+          <h3>HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">개런티 프로그램 준수 현황 강조</span></h3>
+          <div class="tools"><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
+        </div>
+        <div class="card-body">
+          <div class="hcsi-sum">
+            <div class="hcsi-sum-c"><div class="l">종합만족</div><div class="v">86</div></div>
+            <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">88</div></div>
+            <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">84</div></div>
+            <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">82</div></div>
+            <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">2.4h</div></div>
+          </div>
+          <div class="divider-label">개런티 항목 주의</div>
+          <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
+            <div class="score-cell"><div class="lbl">일정</div><div class="val">95</div></div>
+            <div class="score-cell"><div class="lbl">항공</div><div class="val">91</div></div>
+            <div class="score-cell"><div class="lbl">호텔</div><div class="val">88</div></div>
+            <div class="score-cell"><div class="lbl">경비</div><div class="val">85</div></div>
+            <div class="score-cell"><div class="lbl">여행계약</div><div class="val">83</div></div>
+            <div class="score-cell"><div class="lbl">취소수수료</div><div class="val">79</div></div>
+            <div class="score-cell"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
+            <div class="score-cell"><div class="lbl">쇼핑</div><div class="val bad">46</div></div>
+          </div>
+          <div class="divider-label">하위 대리점 Top 5</div>
+          <table class="data">
+            <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th><th>담당자만족</th><th>응답수</th></tr></thead>
+            <tbody>
+              <tr><td class="l">강서투어</td><td class="neg">62</td><td class="neg">58</td><td>68</td><td>12</td></tr>
+              <tr><td class="l">분당하나여행</td><td class="neg">68</td><td>72</td><td>74</td><td>18</td></tr>
+              <tr><td class="l">수원월드투어</td><td class="neg">71</td><td>74</td><td>76</td><td>9</td></tr>
+              <tr><td class="l">동탄여행센터</td><td class="neg">74</td><td>76</td><td>78</td><td>15</td></tr>
+              <tr><td class="l">마포트래블</td><td class="neg">76</td><td>78</td><td>80</td><td>11</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
+    </section>
+
+    <!-- =================== 채널별 예약현황 =================== -->
+    <section id="page-channel" class="hidden">
+      <div class="card">
+        <div class="card-head"><h3>채널별 예약현황</h3></div>
+        <div class="card-body">
+          <div class="itabs">
+            <div class="itab active" data-ctab="daily">일자별 상세</div>
+            <div class="itab" data-ctab="agency">대리점별 상세</div>
+            <div class="itab" data-ctab="long">장기 추이</div>
+          </div>
+
+          <!-- 일자별 상세 -->
+          <div id="ctab-daily">
+            <div class="top-filter" style="margin-bottom:8px">
+              <label>조회기간</label>
+              <input type="date" value="2026-05-06" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <span>~</span>
+              <input type="date" value="2026-05-15" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <label>채널</label>
+              <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option><option>일반대리점</option><option>제휴사</option><option>자회사</option><option>직판</option></select>
+              <label>속성</label>
+              <select><option>전체</option><option>[P]패키지</option><option>[Q]인센티브</option><option>[W]허니문</option></select>
+              <button class="btn">조회</button>
+            </div>
+            <table class="data">
+              <thead>
+                <tr><th rowspan="2">채널</th><th colspan="10">일자별 예약건수</th><th rowspan="2">합계</th></tr>
+                <tr><th>05/06</th><th>05/07</th><th>05/08</th><th>05/09</th><th>05/10</th><th>05/11</th><th>05/12</th><th>05/13</th><th>05/14</th><th>05/15</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="l">공식인증예약센터</td><td>8</td><td>10</td><td>9</td><td>7</td><td>6</td><td>11</td><td>9</td><td>8</td><td>10</td><td>12</td><td><b>90</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td>5</td><td>4</td><td>6</td><td>7</td><td>4</td><td>5</td><td>6</td><td>4</td><td>5</td><td>6</td><td><b>52</b></td></tr>
+                <tr><td class="l">일반대리점</td><td>7</td><td>5</td><td>6</td><td>8</td><td>5</td><td>4</td><td>7</td><td>6</td><td>5</td><td>9</td><td><b>62</b></td></tr>
+                <tr><td class="l">제휴사</td><td>2</td><td>3</td><td>2</td><td>3</td><td>1</td><td>2</td><td>3</td><td>2</td><td>3</td><td>4</td><td><b>25</b></td></tr>
+                <tr><td class="l">자회사</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>19</b></td></tr>
+                <tr><td class="l">직판</td><td>1</td><td>1</td><td>2</td><td>1</td><td>0</td><td>2</td><td>1</td><td>1</td><td>2</td><td>2</td><td><b>13</b></td></tr>
+              </tbody>
+              <tfoot><tr><td class="c">합계</td><td>25</td><td>25</td><td>26</td><td>28</td><td>18</td><td>26</td><td>27</td><td>23</td><td>27</td><td>36</td><td>261</td></tr></tfoot>
+            </table>
+          </div>
+
+          <!-- 대리점별 상세 -->
+          <div id="ctab-agency" class="hidden">
+            <div class="top-filter" style="margin-bottom:8px">
+              <label>조회기간</label>
+              <input type="date" value="2026-05-06" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <span>~</span>
+              <input type="date" value="2026-05-15" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <label>채널</label>
+              <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option><option>일반대리점</option></select>
+              <label>대리점 검색</label>
+              <input type="text" placeholder="대리점명/코드" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px">
+              <button class="btn">조회</button>
+            </div>
+            <div class="notice"><b>[안내]</b> <br>조회기간 내 <b>예약발생 대리점만 노출됩니다.</b> (예약 0건 대리점은 자동 제외)</div>
+            <table class="data">
+              <thead>
+                <tr><th rowspan="2">채널</th><th rowspan="2">대리점</th><th colspan="10">일자별 예약건수</th><th rowspan="2">합계</th></tr>
+                <tr><th>05/06</th><th>05/07</th><th>05/08</th><th>05/09</th><th>05/10</th><th>05/11</th><th>05/12</th><th>05/13</th><th>05/14</th><th>05/15</th></tr>
+              </thead>
+              <tbody>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A4722 강남센터</td><td>3</td><td>4</td><td>3</td><td>2</td><td>2</td><td>4</td><td>3</td><td>3</td><td>4</td><td>5</td><td><b>33</b></td></tr>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A4815 명동센터</td><td>2</td><td>3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>3</td><td>3</td><td><b>24</b></td></tr>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A5021 분당센터</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td><b>33</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1102 강서투어</td><td>1</td><td>0</td><td>2</td><td>1</td><td>0</td><td>1</td><td>2</td><td>1</td><td>0</td><td>2</td><td><b>10</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1245 분당하나여행</td><td>2</td><td>2</td><td>1</td><td>3</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>3</td><td><b>20</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1388 수원월드투어</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td><b>13</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td class="l">M2201 프리미엄몰</td><td>3</td><td>2</td><td>3</td><td>4</td><td>2</td><td>3</td><td>3</td><td>2</td><td>3</td><td>3</td><td><b>28</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td class="l">M2305 스탠다드몰</td><td>2</td><td>2</td><td>3</td><td>3</td><td>2</td><td>2</td><td>3</td><td>2</td><td>2</td><td>3</td><td><b>24</b></td></tr>
+                <tr><td class="l">제휴사</td><td class="l">P3110 OO카드</td><td>1</td><td>2</td><td>1</td><td>2</td><td>0</td><td>1</td><td>2</td><td>1</td><td>2</td><td>2</td><td><b>14</b></td></tr>
+                <tr><td class="l">자회사</td><td class="l">S4001 하나여행</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>19</b></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 장기 추이 -->
+          <div id="ctab-long" class="hidden">
+            <div class="top-filter" style="margin-bottom:8px">
+              <label>조회기간</label>
+              <select><option>최근 6개월</option><option>최근 12개월</option></select>
+              <label>단위</label>
+              <select><option>월</option><option>주</option></select>
+              <label>채널</label>
+              <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option></select>
+              <button class="btn">조회</button>
+            </div>
+            <table class="data">
+              <thead><tr><th>채널</th><th>2025-12</th><th>2026-01</th><th>2026-02</th><th>2026-03</th><th>2026-04</th><th>2026-05</th><th>MoM</th></tr></thead>
+              <tbody>
+                <tr><td class="l">공식인증예약센터</td><td>240</td><td>252</td><td>238</td><td>261</td><td>278</td><td>290</td><td style="color:#2e7d32">+4.3%</td></tr>
+                <tr><td class="l">브랜드몰</td><td>148</td><td>156</td><td>142</td><td>161</td><td>168</td><td>172</td><td style="color:#2e7d32">+2.4%</td></tr>
+                <tr><td class="l">일반대리점</td><td>192</td><td>185</td><td>178</td><td>190</td><td>198</td><td>185</td><td class="neg">-6.6%</td></tr>
+                <tr><td class="l">제휴사</td><td>72</td><td>78</td><td>74</td><td>82</td><td>85</td><td>88</td><td style="color:#2e7d32">+3.5%</td></tr>
+                <tr><td class="l">자회사</td><td>58</td><td>62</td><td>60</td><td>65</td><td>67</td><td>70</td><td style="color:#2e7d32">+4.5%</td></tr>
+                <tr><td class="l">직판</td><td>38</td><td>42</td><td>40</td><td>44</td><td>46</td><td>48</td><td style="color:#2e7d32">+4.3%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================== HCSI 상세 =================== -->
+    <section id="page-hcsi" class="hidden">
+
+      <!-- 조회 필터 -->
+      <div class="top-filter">
+        <label>조회월</label>
+        <select><option>2026년</option></select>
+        <select><option>04월</option><option>03월</option><option>02월</option></select>
+        <label>정렬</label>
+        <select><option>종합만족 낮은순</option><option>종합만족 높은순</option><option>개런티 준수 낮은순</option><option>응답수 많은순</option></select>
+        <button class="btn">조회</button>
+      </div>
+
+      <!-- 상단: 전체 대리점 평균 -->
+      <div class="hcsi-section">
+        <div class="hcsi-section-head">
+          <h3>전체 대리점 평균</h3>
+          <div class="meta">응답수 <b>1,247건</b> / 대리점 <b>87개소</b> / 기준월 <b>2026.04</b></div>
+        </div>
+        <div class="hcsi-section-body">
+          <div class="hcsi-sum">
+            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div></div>
+            <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">88</div></div>
+            <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">84</div></div>
+            <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">82</div></div>
+            <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">2.4h</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 하단: 대리점 선택 (확실하게 구분) -->
+      <div class="hcsi-section">
+        <div class="hcsi-section-head" style="background:#fffaf0;border-bottom-color:#e8d4a0">
+          <h3 style="color:#b8860b">▼ 대리점별 상세 조회</h3>
+          <div class="meta">좌측에서 대리점 선택 시 상세 점수가 우측에 표시됩니다</div>
+        </div>
+        <div class="hcsi-section-body">
+          <div class="ag-list-wrap">
+            <!-- 좌측: 대리점 리스트 -->
+            <div class="ag-list">
+              <div class="ag-search"><input placeholder="대리점명/코드 검색"><button class="btn sm">검색</button></div>
+              <div id="ag-rows"></div>
+            </div>
+
+            <!-- 우측: 선택 대리점 상세 -->
+            <div>
+              <div style="padding:8px 12px;background:#1a3a5f;color:#fff;border-radius:3px 3px 0 0;font-weight:700;font-size:13px" id="ag-title">A4722 강남센터 (응답 23건)</div>
+              <div style="border:1px solid #d9dde2;border-top:0;padding:14px;border-radius:0 0 3px 3px">
+                <div class="hcsi-sum" id="ag-sum">
+                  <div class="hcsi-sum-c"><div class="l">종합만족</div><div class="v">88</div></div>
+                  <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">90</div></div>
+                  <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">85</div></div>
+                  <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">84</div></div>
+                  <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">2.1h</div></div>
+                </div>
+
+                <div class="divider-label">담당자 만족 세부</div>
+                <div class="score-grid">
+                  <div class="score-cell"><div class="lbl">담당자 연락원활</div><div class="val">91</div></div>
+                  <div class="score-cell"><div class="lbl">담당자 표현</div><div class="val">89</div></div>
+                  <div class="score-cell"><div class="lbl">담당자 전문성</div><div class="val">90</div></div>
+                  <div class="score-cell"><div class="lbl">담당자 재이용 의사</div><div class="val">92</div></div>
+                </div>
+
+                <div class="divider-label">개런티 프로그램 (8항목)</div>
+                <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
+                  <div class="score-cell guarantee"><div class="lbl">일정안내</div><div class="val">95</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">항공안내</div><div class="val">91</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">호텔안내</div><div class="val">88</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">쇼핑안내</div><div class="val bad">46</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">경비안내</div><div class="val">85</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">여행계약</div><div class="val">83</div></div>
+                  <div class="score-cell guarantee"><div class="lbl">취소수수료</div><div class="val">79</div></div>
+                </div>
+
+                <div class="divider-label">기타 안내</div>
+                <div class="score-grid">
+                  <div class="score-cell"><div class="lbl">브랜드 안내</div><div class="val">86</div></div>
+                  <div class="score-cell"><div class="lbl">마일리지 안내</div><div class="val">82</div></div>
+                  <div class="score-cell"><div class="lbl">전체 만족</div><div class="val">85</div></div>
+                  <div class="score-cell"><div class="lbl">담당자 만족</div><div class="val">90</div></div>
+                </div>
+
+                <div class="ai-review">
+                  <div class="ai-box pos">
+                    <span class="tag">긍정 리뷰 AI 요약</span>
+                    <div id="ai-pos">가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음. 담당자 응대가 빠르고 정확하다는 평이 많음.</div>
+                  </div>
+                  <div class="ai-box neg">
+                    <span class="tag">부정 리뷰 AI 요약</span>
+                    <div id="ai-neg">쇼핑 일정이 과도하게 길고 부담스럽다는 불만이 집중됨(쇼핑 46점). 선택관광 가격 안내가 사전 안내와 상이했다는 의견 있음. 일부 식사 메뉴에 대한 보완 필요.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <div class="modal-head"><span id="m-title">제목</span><span class="x" onclick="closeModal()">✕</span></div>
+    <div class="modal-body">
+      <div><b>라우트</b><div class="route" id="m-route">-</div></div>
+      <div style="margin-top:8px"><b>대상</b> <span id="m-target"></span></div>
+      <div style="margin-top:6px"><b>권한</b> <span id="m-perm"></span></div>
+      <div style="margin-top:12px;color:#666;font-size:11.5px">※ 넥사크로 마이그레이션 시 <code>nexacro.goNextScreen()</code> 으로 매핑됩니다.</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+// ============ Page nav ============
+function switchPage(p){
+  document.querySelectorAll('.ptab').forEach(t=>t.classList.toggle('active',t.dataset.page===p));
+  ['home','channel','hcsi'].forEach(id=>{
+    document.getElementById('page-'+id).classList.toggle('hidden',id!==p);
+  });
+  document.querySelector('.breadcrumb b').textContent =
+    p==='home'?'영업대시보드 > 대시보드 홈': p==='channel'?'영업대시보드 > 채널별 예약현황':'영업대시보드 > HCSI 상세';
+}
+document.querySelectorAll('.ptab').forEach(t=>t.addEventListener('click',()=>switchPage(t.dataset.page)));
+
+// MyTask tabs
+document.querySelectorAll('[data-mtab]').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('[data-mtab]').forEach(x=>x.classList.toggle('active',x===t));
+  document.getElementById('mtab-pkg').classList.toggle('hidden',t.dataset.mtab!=='pkg');
+  document.getElementById('mtab-quote').classList.toggle('hidden',t.dataset.mtab!=='quote');
+}));
+
+// Departure tabs
+document.querySelectorAll('[data-dtab]').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('[data-dtab]').forEach(x=>x.classList.toggle('active',x===t));
+  ['chan','attr','brand'].forEach(k=>{
+    document.getElementById('dtab-'+k).classList.toggle('hidden',k!==t.dataset.dtab);
+  });
+}));
+
+// Channel page tabs
+document.querySelectorAll('[data-ctab]').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('[data-ctab]').forEach(x=>x.classList.toggle('active',x===t));
+  ['daily','agency','long'].forEach(k=>{
+    document.getElementById('ctab-'+k).classList.toggle('hidden',k!==t.dataset.ctab);
+  });
+}));
+
+// ============ Modal ============
+function openTaskModal(title,route,target,perm){
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-route').textContent=route;
+  document.getElementById('m-target').textContent=target;
+  document.getElementById('m-perm').textContent=perm;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+
+// ============ Donut + Table ============
+function buildDonut(svgId, ctrId, tblId, data){
+  const svg=document.getElementById(svgId);
+  const ctr=document.getElementById(ctrId);
+  const tbody=document.querySelector('#'+tblId+' tbody');
+  const total=data.reduce((s,d)=>s+d.pax,0);
+  let cum=0;
+  svg.innerHTML='';
+  tbody.innerHTML='';
+  const colors=['#1a3a5f','#3498db','#16a085','#e67e22','#9b59b6','#34495e','#2ecc71','#f39c12','#c0392b','#7f8c8d','#27ae60','#2980b9','#8e44ad','#d35400','#bdc3c7'];
+  data.forEach((d,i)=>{
+    const pct=d.pax/total;
+    const a0=cum*2*Math.PI, a1=(cum+pct)*2*Math.PI;
+    cum+=pct;
+    const x0=50+40*Math.cos(a0), y0=50+40*Math.sin(a0);
+    const x1=50+40*Math.cos(a1), y1=50+40*Math.sin(a1);
+    const large=pct>0.5?1:0;
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',`M 50 50 L ${x0} ${y0} A 40 40 0 ${large} 1 ${x1} ${y1} Z`);
+    path.setAttribute('fill',colors[i%colors.length]);
+    path.setAttribute('stroke','#fff');
+    path.setAttribute('stroke-width','0.5');
+    path.addEventListener('mouseenter',()=>{
+      ctr.innerHTML=`<div class="p">${(pct*100).toFixed(1)}%</div><div class="n">${d.name}</div>`;
+      tbody.children[i].classList.add('hl');
+    });
+    path.addEventListener('mouseleave',()=>{
+      ctr.innerHTML=`<div class="p">100%</div><div class="n">전체</div>`;
+      tbody.children[i].classList.remove('hl');
+    });
+    svg.appendChild(path);
+    // inner donut hole
+    const tr=document.createElement('tr');
+    const margin=Math.round(d.sales*d.rate/100);
+    tr.innerHTML=`<td class="l"><span style="display:inline-block;width:8px;height:8px;background:${colors[i%colors.length]};margin-right:4px"></span>${d.name}</td><td>${d.pax.toLocaleString()}</td><td>${d.sales.toLocaleString()}</td><td>${margin.toLocaleString()}</td><td>${d.rate}%</td>`;
+    tr.addEventListener('mouseenter',()=>{
+      ctr.innerHTML=`<div class="p">${(pct*100).toFixed(1)}%</div><div class="n">${d.name}</div>`;
+      svg.children[i].style.opacity='0.7';
+    });
+    tr.addEventListener('mouseleave',()=>{
+      ctr.innerHTML=`<div class="p">100%</div><div class="n">전체</div>`;
+      svg.children[i].style.opacity='1';
+    });
+    tbody.appendChild(tr);
+  });
+  // hole
+  const hole=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  hole.setAttribute('cx','50');hole.setAttribute('cy','50');hole.setAttribute('r','22');hole.setAttribute('fill','#fff');
+  svg.appendChild(hole);
+  // totals
+  const tbl=document.getElementById(tblId);
+  const totPax=data.reduce((s,d)=>s+d.pax,0);
+  const totSales=data.reduce((s,d)=>s+d.sales,0);
+  const totMargin=data.reduce((s,d)=>s+Math.round(d.sales*d.rate/100),0);
+  const avgRate=totSales>0?(totMargin/totSales*100):0;
+  const tfoot=tbl.querySelector('tfoot');
+  if(tfoot){
+    tfoot.querySelector('.sum-pax').textContent=totPax.toLocaleString();
+    tfoot.querySelector('.sum-sales').textContent=totSales.toLocaleString();
+    tfoot.querySelector('.sum-margin').textContent=totMargin.toLocaleString();
+    tfoot.querySelector('.sum-rate').textContent=avgRate.toFixed(2)+'%';
+  }
+}
+
+const channelData=[
+  {name:'공식인증예약센터',pax:380,sales:520000000,rate:18.2},
+  {name:'브랜드몰',pax:215,sales:298000000,rate:17.4},
+  {name:'일반대리점',pax:248,sales:340000000,rate:16.1},
+  {name:'제휴사',pax:102,sales:138000000,rate:15.0},
+  {name:'자회사',pax:82,sales:112000000,rate:14.8},
+  {name:'직판',pax:100,sales:130468337,rate:15.2}
+];
+const attrData=[
+  {name:'[P]패키지',pax:680,sales:920000000,rate:17.5},
+  {name:'[Q]인센티브',pax:120,sales:198000000,rate:19.2},
+  {name:'[M]AD투어',pax:42,sales:62000000,rate:14.0},
+  {name:'[W]허니문',pax:88,sales:165000000,rate:18.8},
+  {name:'[G]골프',pax:48,sales:88000000,rate:16.5},
+  {name:'[C]크루즈',pax:35,sales:75000000,rate:21.0},
+  {name:'[Z]제우스',pax:62,sales:142000000,rate:22.5},
+  {name:'[X]현지투어플러스',pax:52,sales:78000000,rate:12.8}
+];
+const brandData=[
+  {name:'프리미엄',pax:142,sales:288000000,rate:21.5},
+  {name:'스탠다드',pax:480,sales:622000000,rate:17.2},
+  {name:'세이브',pax:218,sales:248000000,rate:14.0},
+  {name:'ZEUS',pax:62,sales:142000000,rate:22.5},
+  {name:'허니문',pax:78,sales:148000000,rate:18.5},
+  {name:'골프',pax:48,sales:88000000,rate:16.5},
+  {name:'크루즈',pax:35,sales:75000000,rate:21.0},
+  {name:'현지투어플러스',pax:64,sales:86000000,rate:13.0}
+];
+buildDonut('svg-chan','ctr-chan','tbl-chan',channelData);
+buildDonut('svg-attr','ctr-attr','tbl-attr',attrData);
+buildDonut('svg-brand','ctr-brand','tbl-brand',brandData);
+
+// ============ Chart trend ============
+const ctx=document.getElementById('chart-trend');
+const labels=[];
+for(let i=10;i>=0;i--){const d=new Date(2026,4,15-i);labels.push((d.getMonth()+1)+'/'+d.getDate());}
+const cur=labels.map(()=>60+Math.random()*30);
+const prev=labels.map(()=>55+Math.random()*28);
+new Chart(ctx,{type:'line',data:{labels,datasets:[
+  {label:'2026',data:cur,borderColor:'#1a3a5f',backgroundColor:'rgba(26,58,95,0.08)',fill:true,tension:0.3,pointRadius:2},
+  {label:'2025(전년)',data:prev,borderColor:'#999',borderDash:[4,4],fill:false,tension:0.3,pointRadius:2}
+]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top'}},scales:{y:{beginAtZero:false,suggestedMin:40,suggestedMax:100}}}});
+
+// ============ HCSI agency list ============
+const agencies=[
+  {code:'A4722',name:'강남센터',resp:23,gen:88,guar:84,mgr:90,full:85},
+  {code:'A4815',name:'명동센터',resp:18,gen:85,guar:82,mgr:88,full:83},
+  {code:'A5021',name:'분당센터',resp:21,gen:87,guar:85,mgr:89,full:84},
+  {code:'M2201',name:'프리미엄몰',resp:15,gen:90,guar:88,mgr:92,full:87},
+  {code:'M2305',name:'스탠다드몰',resp:12,gen:83,guar:80,mgr:86,full:82},
+  {code:'B1102',name:'강서투어',resp:12,gen:62,guar:58,mgr:68,full:60},
+  {code:'B1245',name:'분당하나여행',resp:18,gen:68,guar:72,mgr:74,full:66},
+  {code:'B1388',name:'수원월드투어',resp:9,gen:71,guar:74,mgr:76,full:70},
+  {code:'B1502',name:'동탄여행센터',resp:15,gen:74,guar:76,mgr:78,full:72},
+  {code:'B1611',name:'마포트래블',resp:11,gen:76,guar:78,mgr:80,full:74},
+  {code:'P3110',name:'OO카드 제휴',resp:8,gen:84,guar:81,mgr:87,full:82},
+  {code:'S4001',name:'하나여행',resp:14,gen:86,guar:83,mgr:89,full:84}
+];
+function renderAgList(){
+  const box=document.getElementById('ag-rows');
+  box.innerHTML='';
+  agencies.forEach((a,i)=>{
+    const cls=a.gen<70?'bad':a.gen<80?'warn':'';
+    const row=document.createElement('div');
+    row.className='ag-row'+(i===0?' active':'');
+    row.innerHTML=`<span>${a.code} ${a.name}<br><span style="color:#999;font-size:10.5px">응답 ${a.resp}건</span></span><span class="sc ${cls}">${a.gen}점</span>`;
+    row.addEventListener('click',()=>{
+      document.querySelectorAll('.ag-row').forEach(r=>r.classList.remove('active'));
+      row.classList.add('active');
+      document.getElementById('ag-title').textContent=`${a.code} ${a.name} (응답 ${a.resp}건)`;
+      const sum=document.getElementById('ag-sum');
+      sum.children[0].querySelector('.v').textContent=a.gen;
+      sum.children[1].querySelector('.v').textContent=a.mgr;
+      sum.children[2].querySelector('.v').textContent=a.full;
+      sum.children[3].querySelector('.v').textContent=a.guar;
+      if(a.gen<70){
+        document.getElementById('ai-pos').textContent='긍정 리뷰가 상대적으로 적습니다. 호텔 객실 위치 및 가이드 친절도에서 일부 긍정 평가가 확인되었습니다.';
+        document.getElementById('ai-neg').textContent='담당자 응답 지연, 쇼핑 일정 과다, 선택관광 가격 안내 미흡에 대한 불만이 다수 확인되었습니다. 개선 권고 대상 대리점입니다.';
+      } else {
+        document.getElementById('ai-pos').textContent='가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음.';
+        document.getElementById('ai-neg').textContent='쇼핑 일정이 과도하게 길다는 불만이 일부 확인됨. 선택관광 가격 안내 보완 필요.';
+      }
+    });
+    box.appendChild(row);
+  });
+}
+renderAgList();
+</script>
+</body>
+</html>
