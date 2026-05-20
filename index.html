@@ -185,6 +185,11 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 .modal-head .x{cursor:pointer}
 .modal-body{padding:16px}
 .modal-body .route{background:#f4f5f7;padding:8px;font-family:monospace;font-size:11px;margin:6px 0;border-radius:3px}
+.modal-body .ml-sec{font-size:12.5px;color:#1a3a5f;font-weight:700;margin:10px 0 4px 0;padding-bottom:3px;border-bottom:1px solid #e5e8ec}
+.modal-body .ml-sec:first-child{margin-top:0}
+.modal-body .ml-ul{margin:0;padding-left:18px;font-size:12px;line-height:1.7;color:#333}
+.modal-body .ml-ul li{margin-bottom:2px}
+.modal-body .ml-ul code{background:#f4f5f7;padding:1px 5px;border-radius:3px;font-family:monospace;font-size:11px;color:#5a4fcf}
 /* AI review */
 .ai-review{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 .ai-box{border:1px solid #d9dde2;border-radius:3px;padding:10px;font-size:11.5px;line-height:1.6}
@@ -254,6 +259,8 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 
 /* === Fixed Description Side Panel (v4) === */
 .wrap{padding-right:470px}
+.notice-box{background:#fff8e1;border:1px solid #f0c36d;border-left:4px solid #e67e22;padding:9px 12px;border-radius:4px;font-size:12px;line-height:1.7;color:#5a3a00;margin-bottom:10px}
+.notice-box b{color:#b54300}
 .desc-side{
   position:fixed;top:70px;right:14px;width:450px;
   max-height:calc(100vh - 90px);
@@ -354,9 +361,75 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 .trend-close{cursor:pointer;background:transparent;border:none;color:#fff;font-size:16px;line-height:1}
 .trend-modal-body{padding:14px 16px;overflow-y:auto;background:#fff}
 
+
+/* ============ [추가] 상단 안내 배지 ============ */
+.top-filter .top-notice{
+  margin-left:auto;
+  background:#fff8e1;border:1px solid #f0c36d;border-left:3px solid #e67e22;
+  color:#5a3a00;font-size:11.5px;line-height:1.5;
+  padding:5px 10px;border-radius:3px;
+  white-space:nowrap;
+}
+.top-filter .top-notice b{color:#b54300;font-weight:700}
+
+/* ============ [추가] 디스크립션 패널 접기 ============ */
+.desc-side-header{position:relative}
+.desc-toggle{
+  width:22px;height:22px;border:1px solid #c9ccd1;background:#fff;border-radius:3px;
+  cursor:pointer;color:#1a3a5f;font-size:13px;font-weight:700;line-height:1;padding:0;margin-right:6px;
+}
+.desc-toggle:hover{background:#eef2f7}
+.desc-side-collapsed-label{display:none}
+
+.desc-side.collapsed{width:34px;max-height:calc(100vh - 90px);}
+.desc-side.collapsed .desc-side-header{
+  flex-direction:column;border-bottom:none;padding:8px 4px;background:#fff;height:100%;
+}
+.desc-side.collapsed .desc-side-header .t,
+.desc-side.collapsed .desc-side-header .btn-main,
+.desc-side.collapsed .desc-side-body{display:none}
+.desc-side.collapsed .desc-toggle{margin-right:0}
+.desc-side.collapsed .desc-side-collapsed-label{
+  display:block;writing-mode:vertical-rl;transform:rotate(180deg);
+  margin-top:10px;font-size:12px;font-weight:700;color:#1a3a5f;letter-spacing:2px;
+}
+body.desc-collapsed .wrap{padding-right:54px}
+
+/* ============ [추가] 조회 전 안내 메시지 ============ */
+.pre-query-msg{
+  display:none;
+  flex-direction:column;align-items:center;justify-content:center;
+  padding:48px 16px;gap:8px;min-height:180px;
+}
+.pre-query-msg .pq-icon{
+  width:30px;height:30px;border-radius:50%;background:#e5e7eb;color:#6b7280;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Times New Roman',serif;font-style:italic;font-weight:700;font-size:14px;
+}
+.pre-query-msg .pq-title{font-size:13px;font-weight:700;color:#374151}
+.pre-query-msg .pq-desc{font-size:12px;color:#6b7280;text-align:center;line-height:1.7}
+
+/* pre-query 상태: 4개 카드 본문 컨텐츠 숨기고 안내만 표시 */
+body.pre-query #card-monthly .card-body > *:not(.pre-query-msg),
+body.pre-query #card-dailychannel .card-body > *:not(.pre-query-msg),
+body.pre-query #card-dailytrend .card-body > *:not(.pre-query-msg),
+body.pre-query #card-hcsi .card-body > *:not(.pre-query-msg){display:none !important}
+
+body.pre-query .pre-query-msg{display:flex}
+
+/* 나의 업무관리: 라벨/탭은 유지, 값만 "-" 로 표시 */
+body.pre-query #card-mytask .mtask-val,
+body.pre-query #card-mytask .qval{
+  font-size:0;position:relative;color:transparent;
+}
+body.pre-query #card-mytask .mtask-val::after,
+body.pre-query #card-mytask .qval::after{
+  content:'-';font-size:13px;color:#9ca3af;font-weight:500;
+}
+body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
 </style>
 </head>
-<body>
+<body class="pre-query">
 
 <div class="gnb">
   <div class="logo">Hana<span>Hub</span></div>
@@ -398,14 +471,16 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
       <select id="f-team"><option>영업1팀</option><option>영업2팀</option><option>영업3팀</option></select>
       <label>담당자</label>
       <select id="f-user"><option>전체</option><option>강영업</option><option>김영업</option><option>박담당</option></select>
-      <label>구분 <span class="info-tip" tabindex="0" aria-label="구분 도움말">i<span class="info-tip-bubble"><b>구분 안내</b><br><b>하나담당자</b> : 하나담당자A 기준 예약 조회<br><b>하나담당자-인센티브</b> : 하나담당자A로 예약 조회하나 속성 중 Q 제외<br><b>인센티브</b> : 인센티브 담당 기준 예약 조회</span></span></label>
+      <label>구분 <span class="info-tip" tabindex="0" aria-label="구분 도움말">i<span class="info-tip-bubble"><b>구분 안내</b><br><b>하나담당자</b> : 하나담당자A 기준 예약 조회<br><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)<br><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</span></span></label>
       <select id="f-attr">
-        <option value="all">하나담당자</option>
-        <option value="P">하나담당자-인센티브</option>
-        <option value="Q">인센티브</option>
+        <option value="" selected>선택</option>
+        <option value="hana">하나담당자</option>
+        <option value="pkg">패키지담당자</option>
+        <option value="incentive">인센티브담당자</option>
       </select>
       <button class="btn" onclick="saveFilter()">조회</button>
       <span id="f-saved" style="color:#16a085;font-size:11px;margin-left:6px;opacity:0;transition:opacity .3s">✓ 선택값 저장됨</span>
+      <span class="top-notice"><b>※ 안내</b> 영업대시보드 예약조회는 <b>패키지 상품</b>에 한해 조회 가능 · <b>호텔 / 항공 상품 미포함</b></span>
     </div>
 
     <!-- 페이지 탭 -->
@@ -420,22 +495,20 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 
       <div class="row2col">
       <!-- 영역 1: 나의 업무관리 -->
-      <div class="card">
+      <div class="card" id="card-mytask">
         <div class="card-head"><h3 class="desc-trigger" data-desc="mytask" onclick="openDescPanel('mytask')">나의 업무관리 <span class="desc-ico">ⓘ</span></h3></div>
         <div class="card-body">
           <div class="itabs">
-            <div class="itab active" data-mtab="pkg">패키지 예약관리</div>
+            <div class="itab active" data-mtab="pkg">예약관리</div>
             <div class="itab" data-mtab="quote">온라인 견적서</div>
           </div>
           <div id="mtab-pkg" class="mtask">
-            <div class="mtask-item" onclick="openTaskModal('일일 신규 예약','GET /pkg/booking/new?date=today','12건 / 38명','패키지영업')">
-              <div class="mtask-label">일일 신규 예약</div><div class="mtask-val">12건 / 38명</div></div>
-            <div class="mtask-item" onclick="openTaskModal('대기인원 WT','GET /pkg/booking/waiting','5건','패키지영업')">
-              <div class="mtask-label">대기인원 WT</div><div class="mtask-val">5건</div></div>
-            <div class="mtask-item urgent" onclick="openTaskModal('APIS 미입력','GET /pkg/booking/apis?within=30','7건','패키지영업')">
-              <div class="mtask-label">APIS 미입력 <br>(출발 30일 이내)</div><div class="mtask-val danger">7건</div></div>
-            <div class="mtask-item urgent" onclick="openTaskModal('계약금 미입금','GET /pkg/booking/deposit?within=90','3건','패키지영업')">
-              <div class="mtask-label">계약금 미입금<br> (출발 90일 이내)</div><div class="mtask-val danger">3건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('daily-new')">
+              <div class="mtask-label">일일 신규 예약<br>(전일자 기준)</div><div class="mtask-val">12건 / 38명</div></div>
+            <div class="mtask-item" onclick="openTaskModal('waiting-wt')">
+              <div class="mtask-label">대기인원 WT<br>(전일자 기준)</div><div class="mtask-val">5건</div></div>
+            <div class="mtask-item urgent" onclick="openTaskModal('deposit-unpaid')">
+              <div class="mtask-label">계약금 미입금<br>(출발 90일 이내)</div><div class="mtask-val danger">3건</div></div>
           </div>
                     <div id="mtab-quote" class="mtask quote-task hidden">
             <div class="qsec-title">처리상태</div>
@@ -448,19 +521,19 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
                     <span class="qlbl">미처리</span><span class="qval">0건</span></td>
                 </tr>
                 <tr>
-                  <td class="qcell disabled">
+                  <td class="qcell" onclick="openTaskModal('보류','GET /quote/status?st=hold','0건','온라인견적')">
                     <span class="qlbl">보류</span><span class="qval">0건</span></td>
                   <td class="qcell" onclick="openTaskModal('비딩중','GET /quote/status?st=bidding','0건','온라인견적')">
                     <span class="qlbl">비딩중</span><span class="qval">0건</span></td>
                 </tr>
                 <tr>
-                  <td class="qcell disabled">
+                  <td class="qcell" onclick="openTaskModal('처리중','GET /quote/status?st=ongoing','0건','온라인견적')">
                     <span class="qlbl">처리중</span><span class="qval">0건</span></td>
                   <td class="qcell" onclick="openTaskModal('처리완료','GET /quote/status?st=done','0건','온라인견적')">
                     <span class="qlbl">처리완료</span><span class="qval">0건</span></td>
                 </tr>
                 <tr>
-                  <td class="qcell disabled">
+                  <td class="qcell" onclick="openTaskModal('전달완료','GET /quote/status?st=delivered','0건','온라인견적')">
                     <span class="qlbl">전달완료</span><span class="qval">0건</span></td>
                   <td class="qcell" onclick="openTaskModal('견적확인','GET /quote/status?st=checked','0건','온라인견적')">
                     <span class="qlbl">견적확인</span><span class="qval">0건</span></td>
@@ -490,7 +563,7 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
       </div>
 
       <!-- 영역 3 (이동): 출발월별 상품 예약현황 -->
-      <div class="card">
+      <div class="card" id="card-monthly">
         <div class="card-head">
           <h3 class="desc-trigger" data-desc="monthly" onclick="openDescPanel('monthly')">출발월별 상품 예약현황 <span class="desc-ico">ⓘ</span></h3>
           <div class="tools sec-filter">
@@ -500,6 +573,11 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
           </div>
         </div>
         <div class="card-body">
+          <div class="pre-query-msg">
+            <div class="pq-icon">i</div>
+            <div class="pq-title">조회 전 상태입니다</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 / 속성별 / 브랜드별 예약 현황이 표시됩니다.</div>
+          </div>
           <div class="itabs">
             <div class="itab active" data-dtab="chan">채널별</div>
             <div class="itab" data-dtab="attr">속성별</div>
@@ -556,12 +634,17 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
             </div>
 
       <!-- 영역 2 (신규): 일자별 예약 채널 현황 -->
-      <div class="card">
+      <div class="card" id="card-dailychannel">
         <div class="card-head">
           <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">최근 7일 (고정)</span> <span class="desc-ico">ⓘ</span></h3>
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
         </div>
         <div class="card-body">
+          <div class="pre-query-msg">
+            <div class="pq-icon">i</div>
+            <div class="pq-title">조회 전 상태입니다</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>최근 7일 일자별 예약 채널 현황이 표시됩니다.</div>
+          </div>
           <div class="top-filter" style="margin-bottom:8px">
             <label>조회기간</label>
             <input type="date" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
@@ -588,14 +671,19 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
       </div>
 
       <!-- 영역 4 (신규): 일자별 모객 현황 추이 -->
-      <div class="card">
+      <div class="card" id="card-dailytrend">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="dailytrend" onclick="openDescPanel('dailytrend')">일자별 모객 현황 추이 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">총예약 / 총취소 / 순예약 + 전년도 순예약 YoY</span> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="dailytrend" onclick="openDescPanel('dailytrend')">일자별 예약 현황  <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">총예약 / 총취소 / 순예약 + 전년도 순예약 YoY</span> <span class="desc-ico">ⓘ</span></h3>
           <div class="tools">
             <button class="btn ghost sm" onclick="openTrendPopup()">최근 3개월 추이 보기</button>
           </div>
         </div>
         <div class="card-body">
+          <div class="pre-query-msg">
+            <div class="pq-icon">i</div>
+            <div class="pq-title">조회 전 상태입니다</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>총예약·총취소·순예약 및 전년 YoY 추이가 표시됩니다.</div>
+          </div>
           <div class="top-filter" style="margin-bottom:8px">
             <label>조회기간</label>
             <input type="date" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
@@ -642,12 +730,17 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
       </div>
 
       <!-- 영역 5: HCSI 요약 미리보기 -->
-      <div class="card">
+      <div class="card" id="card-hcsi">
         <div class="card-head">
           <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">전월 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
         </div>
         <div class="card-body">
+          <div class="pre-query-msg">
+            <div class="pq-icon">i</div>
+            <div class="pq-title">조회 전 상태입니다</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>HCSI 요약 지표 및 개런티 항목이 표시됩니다.</div>
+          </div>
           <div class="hcsi-sum">
             <div class="hcsi-sum-c"><div class="l">종합만족</div><div class="v">86</div></div>
             <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">88</div></div>
@@ -950,9 +1043,11 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 <!-- === Fixed Description Side Panel === -->
 <aside class="desc-side" id="descSide">
   <div class="desc-side-header">
+    <button type="button" class="desc-toggle" id="descToggleBtn" onclick="toggleDescSide()" title="접기/펼치기" aria-label="안내 패널 접기/펼치기">‹</button>
     <span class="t" id="descSideTitle">영업대시보드 안내</span>
     <button type="button" class="btn-main" onclick="loadMainDesc()">↺ 메인 안내</button>
   </div>
+  <div class="desc-side-collapsed-label" aria-hidden="true">안내</div>
   <div class="desc-side-body" id="descSideBody">
     <!-- 동적 주입 -->
   </div>
@@ -960,6 +1055,11 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 
 <!-- === Main Description Template === -->
 <<template id="desc-tpl-main">
+  <div class="notice-box">
+    <b>※ 안내</b><br>
+    - 영업대시보드 예약 가능 상품 안내는 화면 상단 고정 영역을 참고<br>
+    - 각 영역은 데이터 <b>조회 전 화면 UI(레이아웃·카드 프레임)가 먼저 구성</b>되고, <b>조회 버튼 클릭 후</b> 데이터가 노출됨
+  </div>
   <h4>화면 개요</h4>
   <p>- 영업사원 통합 대시보드. 담당자별 업무 현황, 예약 채널, 출발월별 추이, 매출 실적, HCSI를 한 화면에서 확인.</p>
   <p>- 각 카드 우측 ⓘ 클릭 시 상세 설명 표시됨.</p>
@@ -969,7 +1069,8 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
     <li><b>나의 업무관리</b> — 대기 업무 및 알림</li>
     <li><b>예약 채널 현황</b> — 채널별 건수·증감률</li>
     <li><b>출발월별 예약</b> — 월별 추이·비교</li>
-    <li><b>실적 / HCSI</b> — 매출 및 고객만족도</li>
+	<li><b>일자별 예약현황</b>— 7일간 예약 현황</li>
+    <li><b>HCSI</b> —고객만족도</li>
   </ul>
 
   <h4>공통 필터 (권한별)</h4>
@@ -995,9 +1096,10 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
     <tr>
       <th>구분 옵션</th>
       <td>
-        · <code>하나담당자</code> : 하나담당자A 기준 <b>(기본값)</b><br>
-        · <code>하나담당자–인센티브</code> : 하나담당자A 기준, 속성 Q 제외<br>
-        · <code>인센티브</code> : 인센티브 담당자 기준
+        · <code>하나담당자</code> : 하나담당자A 기준 예약 조회<br>
+        · <code>패키지담당자</code> : 하나담당자A 기준 예약 조회 (Q 속성 제외)<br>
+        · <code>인센티브담당자</code> : 인센티브 담당 기준 예약 조회<br>
+        · <b>기본값 없음</b> · 미선택 후 조회 시 알림 노출됨
       </td>
     </tr>
     <tr>
@@ -1020,11 +1122,8 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 <div class="modal-bg" id="modal">
   <div class="modal">
     <div class="modal-head"><span id="m-title">제목</span><span class="x" onclick="closeModal()">✕</span></div>
-    <div class="modal-body">
-      <div><b>라우트</b><div class="route" id="m-route">-</div></div>
-      <div style="margin-top:8px"><b>대상</b> <span id="m-target"></span></div>
-      <div style="margin-top:6px"><b>권한</b> <span id="m-perm"></span></div>
-      <div style="margin-top:12px;color:#666;font-size:11.5px">※ 넥사크로 마이그레이션 시 <code>nexacro.goNextScreen()</code> 으로 매핑됩니다.</div>
+    <div class="modal-body" id="m-body">
+      <!-- 동적 주입 -->
     </div>
   </div>
 </div>
@@ -1066,11 +1165,79 @@ document.querySelectorAll('[data-ctab]').forEach(t=>t.addEventListener('click',(
 }));
 
 // ============ Modal ============
-function openTaskModal(title,route,target,perm){
-  document.getElementById('m-title').textContent=title;
-  document.getElementById('m-route').textContent=route;
-  document.getElementById('m-target').textContent=target;
-  document.getElementById('m-perm').textContent=perm;
+// ============ 업무관리 카드 클릭 시 노출되는 안내 모달 정의 ============
+var TASK_MODAL_DEFS = {
+  'daily-new': {
+    title: '일일 신규 예약',
+    body:
+      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<ul class="ml-ul">'+
+        '<li><b>전일자</b> 접수된 신규 예약 건수 / 인원 카운팅</li>'+
+        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<ul class="ml-ul">'+
+        '<li>이동 경로: <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code></li>'+
+        '<li>전일자 기준 + 상단 <b>구분</b> 값으로 검색된 데이터가 노출됨</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">구분별 랜딩 로직</h5>'+
+      '<ul class="ml-ul">'+
+        '<li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색</li>'+
+        '<li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b> 조건으로 검색</li>'+
+        '<li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색</li>'+
+      '</ul>'
+  },
+  'waiting-wt': {
+    title: '대기인원 WT',
+    body:
+      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<ul class="ml-ul">'+
+        '<li><b>전일자</b> 기준 대기(WT) 예약 건수 카운팅</li>'+
+        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<ul class="ml-ul">'+
+        '<li>이동 경로: <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code></li>'+
+        '<li>전일자 기준 + 상단 <b>구분</b> 값으로 검색 후 <b>WT 예약건만 솔팅</b>되어 노출</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">구분별 랜딩 로직</h5>'+
+      '<ul class="ml-ul">'+
+        '<li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색 (WT 솔팅)</li>'+
+        '<li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b> (WT 솔팅)</li>'+
+        '<li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색 (WT 솔팅)</li>'+
+      '</ul>'
+  },
+  'deposit-unpaid': {
+    title: '계약금 미입금',
+    body:
+      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<ul class="ml-ul">'+
+        '<li><b>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</b> 데이터 카운팅</li>'+
+        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
+        '<li>상세 계산식: 영업지원팀 전달 예정</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<ul class="ml-ul">'+
+        '<li>이동 경로: <code>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</code></li>'+
+        '<li>상단 <b>구분</b> 값 기준으로 필터링된 미수1 데이터 노출</li>'+
+      '</ul>'
+  }
+};
+
+function openTaskModal(keyOrTitle, route, target, perm){
+  var def = TASK_MODAL_DEFS[keyOrTitle];
+  if(def){
+    document.getElementById('m-title').textContent = def.title;
+    document.getElementById('m-body').innerHTML = def.body;
+  } else {
+    // 레거시 호출 (온라인 견적서 탭 등): 기존 라우트/대상/권한 형태 유지
+    document.getElementById('m-title').textContent = keyOrTitle;
+    document.getElementById('m-body').innerHTML =
+      '<div><b>라우트</b><div class="route">'+(route||'-')+'</div></div>'+
+      '<div style="margin-top:8px"><b>대상</b> <span>'+(target||'')+'</span></div>'+
+      '<div style="margin-top:6px"><b>권한</b> <span>'+(perm||'')+'</span></div>'+
+      '<div style="margin-top:12px;color:#666;font-size:11.5px">※ 넥사크로 마이그레이션 시 <code>nexacro.goNextScreen()</code> 으로 매핑됩니다.</div>';
+  }
   document.getElementById('modal').classList.add('show');
 }
 function closeModal(){document.getElementById('modal').classList.remove('show')}
@@ -1317,8 +1484,25 @@ function saveFilter(){
   var team=document.getElementById('f-team').value;
   var user=document.getElementById('f-user').value;
   var attr=document.getElementById('f-attr').value;
+  if(!attr){
+    alert('구분을 선택해 주세요.');
+    document.getElementById('f-attr').focus();
+    return;
+  }
   localStorage.setItem('salesDashFilter', JSON.stringify({team:team,user:user,attr:attr}));
   var s=document.getElementById('f-saved'); if(s){ s.style.opacity='1'; setTimeout(()=>s.style.opacity='0',1600); }
+  // [추가] 조회 완료 → pre-query 상태 해제하여 데이터 노출
+  document.body.classList.remove('pre-query');
+}
+
+// [추가] 디스크립션 사이드 패널 접기/펼치기
+function toggleDescSide(){
+  var side=document.getElementById('descSide');
+  var btn=document.getElementById('descToggleBtn');
+  if(!side) return;
+  var collapsed=side.classList.toggle('collapsed');
+  document.body.classList.toggle('desc-collapsed', collapsed);
+  if(btn) btn.textContent = collapsed ? '›' : '‹';
 }
 
 // ============ HCSI 월별 데이터 (일배치 적재 시뮬레이션) ============
@@ -1459,17 +1643,30 @@ selectHcsiMonth('2026-04');
 <div class="desc-templates">
 
   <template id="desc-tpl-mytask" data-title="나의 업무관리">
+    <div class="notice-box">
+      - 영업대시보드 예약조회는 <b>패키지 상품에 한함</b> (호텔 / 항공 제외)<br>
+      - 데이터 조회 전 <b>화면 UI 구성 후</b> 데이터가 로드됨
+    </div>
     <h5>영역 개요</h5>
-    <p>- 본인 담당 일일 업무 현황 확인 영역<br>- 대상: 패키지 예약 / 온라인 견적</p>
-    <h5>주요 항목</h5>
+    <p>- 본인 담당 일일 업무 현황 확인 영역<br>- 대상 탭: <b>예약관리</b> / <b>온라인 견적서</b></p>
+    <h5>예약관리 항목</h5>
     <ul>
-      <li><b>일일 신규 예약</b> – 금일 접수 신규 예약 건수·인원</li>
-      <li><b>입금 확인 대기</b> – 입금 확인 필요 건</li>
-      <li><b>출발 임박</b> – D-3 이내 출발 예정 건</li>
-      <li><b>미처리 견적</b> – 회신 대기 견적서</li>
+      <li><b>일일 신규 예약</b> – 전일자 기준 신규 예약 건수 / 인원</li>
+      <li><b>대기인원 WT</b> – 전일자 기준 대기(WT) 예약 건수</li>
+      <li><b>계약금 미입금</b> – 미수1관리 기준 미입금 건수 (출발 90일 이내)</li>
     </ul>
-    <h5>활용 Tip</h5>
-    <p>- 카드 클릭 시 해당 조건 필터링 상세 목록 페이지로 이동</p>
+    <h5>클릭 시 동작</h5>
+    <ul>
+      <li><b>일일 신규 예약 / 대기인원 WT</b> → <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code>로 랜딩</li>
+      <li><b>계약금 미입금</b> → <code>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</code>로 랜딩</li>
+      <li>각 항목 클릭 시 상단 <b>구분</b> 값에 따라 검색 조건이 자동 적용됨</li>
+    </ul>
+    <h5>구분별 랜딩 로직 (예약관리 항목)</h5>
+    <ul>
+      <li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색</li>
+      <li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b></li>
+      <li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색</li>
+    </ul>
   </template>
 
   <template id="desc-tpl-channel7" data-title="예약 채널 현황 (최근 7일 요약)">
@@ -1527,7 +1724,7 @@ selectHcsiMonth('2026-04');
     <p>- 상단 <code>상세보기</code> 클릭 시 채널별 예약현황 페이지 이동</p>
   </template>
 
-  <template id="desc-tpl-dailytrend" data-title="일자별 모객 현황 추이">
+  <template id="desc-tpl-dailytrend" data-title="일자별 예약 현황 ">
     <h5>기준</h5>
     <ul>
       <li>1) 7일 단위 조회 (고정)</li>
@@ -1557,8 +1754,7 @@ selectHcsiMonth('2026-04');
     <p>- <b>전월 평균 HCSI</b>(Hana Customer Satisfaction Index) 점수 미리보기 제공</p>
     <h5>지표 설명</h5>
     <ul>
-      <li><b>전체 평균</b> – 전체 대리점 평균 만족도 점수</li>
-      <li><b>등급 분포</b> – S/A/B/C 등급별 대리점 비율</li>
+      <li><b>평균</b> – 담당 대리점 평균 만족도 점수</li>
     </ul>
     <h5>활용 Tip</h5>
     <p>- 상세 페이지에서 대리점별 월간 추이·비교 분석 가능</p>
