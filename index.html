@@ -71,7 +71,7 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 .neg{color:#d32f2f;font-weight:700}
 .muted{color:#999}
 /* MyTask */
-.mtask{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mtask{display:grid;grid-template-columns:1fr;gap:8px}
 .mtask-item{border:1px solid #d9dde2;border-radius:3px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;background:#fff}
 .mtask-item:hover{background:#eef2f7;border-color:#1a3a5f}
 .mtask-item.disabled{cursor:default;color:#bbb;background:#fafbfc}
@@ -91,7 +91,19 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 .score-cell.guarantee{background:#fffaf0;border-color:#e8d4a0}
 .score-cell.guarantee .val{color:#b8860b}
 /* HCSI summary cards (5) */
-.hcsi-sum{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px}
+.hcsi-sum{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}
+/* [수정] 1900px 기준 좁은 카드 영역에서 8컬럼 글자 잘림 방지 → 4컬럼 두 줄 */
+.row2col .hcsi-sum,
+.hcsi-compare-card .hcsi-sum,
+#ag-sum{grid-template-columns:repeat(4,1fr)}
+/* [수정] 홈 HCSI 미리보기: 개런티준수율 클릭 시 펼침 영역 */
+#hcsi-guar-detail{display:none;margin-top:8px}
+#hcsi-guar-detail.open{display:block}
+.hcsi-sum-c.guar.clickable{cursor:pointer;position:relative}
+.hcsi-sum-c.guar.clickable:hover{background:#fff3d6}
+.hcsi-sum-c.guar.clickable .toggle-ico{position:absolute;top:4px;right:6px;font-size:10px;color:#b8860b;transition:transform .15s}
+.hcsi-sum-c.guar.clickable.active .toggle-ico{transform:rotate(180deg)}
+    .hcsi-sum-c .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hcsi-sum-c{border:1px solid #d9dde2;border-radius:3px;padding:12px;text-align:center;background:#fff}
 .hcsi-sum-c .l{font-size:11.5px;color:#666;margin-bottom:6px}
 .hcsi-sum-c .v{font-size:22px;font-weight:700;color:#1a3a5f}
@@ -423,6 +435,16 @@ body.pre-query #card-monthly .card-body > *:not(.pre-query-msg),
 body.pre-query #card-dailychannel .card-body > *:not(.pre-query-msg),
 body.pre-query #card-dailytrend .card-body > *:not(.pre-query-msg),
 body.pre-query #card-hcsi .card-body > *:not(.pre-query-msg){display:none !important}
+    /* HCSI 영역: 구분=하나담당자일 때만 정상 노출 */
+    .hcsi-non-hana-msg{display:none;padding:28px 16px;text-align:center;background:#fffaf0;border:1px dashed #e8d4a0;border-radius:4px;color:#8a6a1b}
+    .hcsi-non-hana-msg .ico{font-size:18px;color:#b8860b;margin-bottom:6px;font-weight:700}
+    .hcsi-non-hana-msg .ttl{font-size:13px;font-weight:700;color:#8a6a1b;margin-bottom:4px}
+    .hcsi-non-hana-msg .dsc{font-size:11.5px;color:#8a6a1b;line-height:1.5}
+    body.non-hana #card-hcsi .card-body > *:not(.hcsi-non-hana-msg){display:none !important}
+    body.non-hana #card-hcsi .hcsi-non-hana-msg{display:block}
+    body.non-hana #page-hcsi .hcsi-section,
+    body.non-hana #page-hcsi > div:not(.hcsi-non-hana-msg):not(.filter-bar):not(.ptabs):not(.hcsi-page-head){display:none !important}
+    body.non-hana #page-hcsi .hcsi-non-hana-msg{display:block;margin-top:14px}
 
 body.pre-query .pre-query-msg{display:flex}
 
@@ -513,11 +535,13 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
           </div>
           <div id="mtab-pkg" class="mtask">
             <div class="mtask-item" onclick="openTaskModal('daily-new')">
-              <div class="mtask-label">일일 신규 예약<br>(전일자 기준)</div><div class="mtask-val">12건 / 38명</div></div>
-            <div class="mtask-item" onclick="openTaskModal('waiting-wt')">
-              <div class="mtask-label">대기인원 WT<br>(전일자 기준)</div><div class="mtask-val">5건</div></div>
-            <div class="mtask-item urgent" onclick="openTaskModal('deposit-unpaid')">
-              <div class="mtask-label">계약금 미입금<br>(출발 90일 이내)</div><div class="mtask-val danger">3건</div></div>
+              <div class="mtask-label">일일 신규 예약</div><div class="mtask-val">0건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('departure-7')">
+              <div class="mtask-label">출발 예약 (조회일 ~ +7일)</div><div class="mtask-val">0건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('waiting-15')">
+              <div class="mtask-label">대기 예약 (조회일 ~ +15)</div><div class="mtask-val">0건</div></div>
+            <div class="mtask-item" onclick="openTaskModal('unpaid-15')">
+              <div class="mtask-label">미수 예약 (조회일 ~ +15일)</div><div class="mtask-val">0건</div></div>
           </div>
                     <div id="mtab-quote" class="mtask quote-task hidden">
             <div class="qsec-title">처리상태</div>
@@ -759,13 +783,22 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
             <div class="pq-title">조회 전 상태입니다</div>
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>HCSI 요약 지표 및 개런티 항목이 표시됩니다.</div>
           </div>
-          <div class="hcsi-sum">
-            <div class="hcsi-sum-c"><div class="l">종합만족</div><div class="v">86</div></div>
-            <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">88</div></div>
-            <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">84</div></div>
-            <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">82</div></div>
-            <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">2.4h</div></div>
+          <div class="hcsi-non-hana-msg">
+            <div class="ico">ⓘ</div>
+            <div class="ttl">HCSI는 구분 “하나담당자” 조회 시에만 노출됩니다.</div>
+            <div class="dsc">상단 구분을 <b>하나담당자</b>로 선택 후 조회해 주세요.</div>
           </div>
+          <div class="hcsi-sum">
+            <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">1,247</div></div>
+            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div></div>
+            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">84</div></div>
+            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">88</div></div>
+            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">87</div></div>
+            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div></div>
+            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.4h</div></div>
+            <div class="hcsi-sum-c guar clickable" onclick="toggleHcsiGuarDetail(this)"><div class="l">개런티준수율 <span class="toggle-ico">▼</span></div><div class="v">82%</div></div>
+          </div>
+          <div id="hcsi-guar-detail">
           <div class="divider-label">개런티 항목 주의</div>
           <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
             <div class="score-cell"><div class="lbl">일정</div><div class="val">95</div></div>
@@ -777,6 +810,7 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
             <div class="score-cell"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
             <div class="score-cell"><div class="lbl">쇼핑</div><div class="val bad">46</div></div>
           </div>
+          </div><!-- /#hcsi-guar-detail -->
           <div class="divider-label">하위 대리점 Top 5</div>
           <table class="data">
             <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th><th>담당자만족</th><th>응답수</th></tr></thead>
@@ -894,6 +928,13 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
         <span style="color:#7b4dff;font-size:11px;margin-left:8px"> ※ 상품 출발일 기준</span>
       </div>
 
+      <!-- 구분이 하나담당자가 아닐 때 안내 -->
+      <div class="hcsi-non-hana-msg">
+        <div class="ico">ⓘ</div>
+        <div class="ttl">HCSI는 구분 “하나담당자” 조회 시에만 노출됩니다.</div>
+        <div class="dsc">상단 구분을 <b>하나담당자</b>로 선택 후 조회해 주세요.</div>
+      </div>
+
       <!-- 상단: 전체 대리점 평균 (선택 월) -->
       <div class="hcsi-section">
         <div class="hcsi-section-head">
@@ -902,11 +943,14 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
         </div>
         <div class="hcsi-section-body">
           <div class="hcsi-sum" id="hcsi-avg-sum">
+            <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">1,247</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div></div>
             <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 1 (전월대비)</div></div>
-            <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">88</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 2</div></div>
-            <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">84</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0</div></div>
-            <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">82</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 1</div></div>
-            <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">2.4h</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▼ 0.2h</div></div>
+            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">84</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0</div></div>
+            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">88</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 2</div></div>
+            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">87</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 1</div></div>
+            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0</div></div>
+            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.4h</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▼ 0.2h</div></div>
+            <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">82%</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 1</div></div>
           </div>
         </div>
       </div>
@@ -951,20 +995,40 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
                 <span id="ag-title-month" style="font-size:11.5px;font-weight:500;color:#bfd0e3">기준월 2026.04 </span>
               </div>
               <div style="border:1px solid #d9dde2;border-top:0;padding:14px;border-radius:0 0 3px 3px">
+                <div id="ag-no-data" class="hidden" style="padding:48px 20px;text-align:center;color:#666;font-size:13px;background:#fafbfc;border:1px dashed #c9ccd1;border-radius:3px">
+                  <div style="font-size:24px;color:#1a3a5f;margin-bottom:8px">ⓘ</div>
+                  <b style="color:#1a3a5f;font-size:14px">응답 수가 부족하여 결과가 제공되지 않습니다.</b>
+                </div>
+                <div id="ag-content-full">
                 <div class="hcsi-compare-summary">
                   <div class="hcsi-compare-card">
                     <div class="ttl">선택 대리점 평균</div>
-                    <div class="hcsi-sum" id="ag-sum" style="grid-template-columns:repeat(5,1fr);margin-bottom:0">
-                      <div class="hcsi-sum-c"><div class="l">종합만족</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">담당자만족</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">전체만족</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c guar"><div class="l">개런티 준수</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">평균 첫안내</div><div class="v">-</div></div>
+                    <div class="hcsi-sum" id="ag-sum" style="margin-bottom:0">
+                      <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">-</div></div>
+                      <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">-</div></div>
                     </div>
                   </div>
                   <div class="hcsi-compare-card">
                     <div class="ttl">전체 대리점 평균 대비 편차</div>
                     <div class="dev-bars" id="ag-dev-bars"></div>
+                  </div>
+                </div>
+				
+
+                <div class="ai-review">
+                  <div class="ai-box pos">
+                    <span class="tag">긍정 리뷰 AI 요약</span>
+                    <div id="ai-pos">가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음. 담당자 응대가 빠르고 정확하다는 평이 많음.</div>
+                  </div>
+                  <div class="ai-box neg">
+                    <span class="tag">부정 리뷰 AI 요약</span>
+                    <div id="ai-neg">쇼핑 일정이 과도하게 길고 부담스럽다는 불만이 집중됨(쇼핑 46점). 선택관광 가격 안내가 사전 안내와 상이했다는 의견 있음. 일부 식사 메뉴에 대한 보완 필요.</div>
                   </div>
                 </div>
 
@@ -996,7 +1060,7 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
                   <div class="score-cell"><div class="lbl">담당자 만족</div><div class="val">90</div></div>
                 </div>
 
-                <div class="divider-label">월별 추이 <span style="font-weight:400;color:#7b4dff;font-size:11px">월배치 기반</span></div>
+                <div class="divider-label">월별 추이 <span style="font-weight:400;color:#7b4dff;font-size:11px">종합만족도</span></div>
                 <div class="ag-compare-box" style="margin-bottom:10px">
                   <div class="ag-compare-head">
                     <span>월별 추이 <span style="color:#666;font-weight:500">(<b id="ag-trend-name">강남센터</b> vs 전체평균)</span></span>
@@ -1005,16 +1069,6 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
                   <div style="height:240px"><canvas id="ag-trend"></canvas></div>
                   <div class="ag-month-summary" id="ag-month-summary"></div>
                 </div>
-
-                <div class="ai-review">
-                  <div class="ai-box pos">
-                    <span class="tag">긍정 리뷰 AI 요약</span>
-                    <div id="ai-pos">가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음. 담당자 응대가 빠르고 정확하다는 평이 많음.</div>
-                  </div>
-                  <div class="ai-box neg">
-                    <span class="tag">부정 리뷰 AI 요약</span>
-                    <div id="ai-neg">쇼핑 일정이 과도하게 길고 부담스럽다는 불만이 집중됨(쇼핑 46점). 선택관광 가격 안내가 사전 안내와 상이했다는 의견 있음. 일부 식사 메뉴에 대한 보완 필요.</div>
-                  </div>
                 </div>
               </div>
               </div>
@@ -1157,57 +1211,63 @@ var TASK_MODAL_DEFS = {
   'daily-new': {
     title: '일일 신규 예약',
     body:
-      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<h5 class="ml-sec">메뉴 이동</h5>'+
       '<ul class="ml-ul">'+
-        '<li><b>전일자</b> 접수된 신규 예약 건수 / 인원 카운팅</li>'+
-        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
+        '<li>이동 경로: <code>예약조회</code> 메뉴로 이동</li>'+
       '</ul>'+
-      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<h5 class="ml-sec">조회 조건</h5>'+
       '<ul class="ml-ul">'+
-        '<li>이동 경로: <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code></li>'+
-        '<li>전일자 기준 + 상단 <b>구분</b> 값으로 검색된 데이터가 노출됨</li>'+
+        '<li>조회기간 : <b>최초예약일</b>, 조회일 <b>-1일</b></li>'+
+        '<li>예약자보기 <b>취소자 제외</b></li>'+
+        '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분별 랜딩 로직</h5>'+
-      '<ul class="ml-ul">'+
-        '<li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색</li>'+
-        '<li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b> 조건으로 검색</li>'+
-        '<li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색</li>'+
-      '</ul>'
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
   },
-  'waiting-wt': {
-    title: '대기인원 WT',
+  'departure-7': {
+    title: '출발 예약 (조회일 ~ +7일)',
     body:
-      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<h5 class="ml-sec">메뉴 이동</h5>'+
       '<ul class="ml-ul">'+
-        '<li><b>전일자</b> 기준 대기(WT) 예약 건수 카운팅</li>'+
-        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
+        '<li>이동 경로: <code>예약조회</code> 메뉴로 이동</li>'+
       '</ul>'+
-      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<h5 class="ml-sec">조회 조건</h5>'+
       '<ul class="ml-ul">'+
-        '<li>이동 경로: <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code></li>'+
-        '<li>전일자 기준 + 상단 <b>구분</b> 값으로 검색 후 <b>WT 예약건만 솔팅</b>되어 노출</li>'+
+        '<li>조회기간 : <b>출발일</b>, 조회일 <b>~ +15일</b></li>'+
+        '<li>예약자보기 <b>취소자 제외</b></li>'+
+        '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분별 랜딩 로직</h5>'+
-      '<ul class="ml-ul">'+
-        '<li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색 (WT 솔팅)</li>'+
-        '<li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b> (WT 솔팅)</li>'+
-        '<li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색 (WT 솔팅)</li>'+
-      '</ul>'
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
   },
-  'deposit-unpaid': {
-    title: '계약금 미입금',
+  'waiting-15': {
+    title: '대기 예약 (조회일 ~ +15)',
     body:
-      '<h5 class="ml-sec">집계 기준</h5>'+
+      '<h5 class="ml-sec">메뉴 이동</h5>'+
       '<ul class="ml-ul">'+
-        '<li><b>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</b> 데이터 카운팅</li>'+
-        '<li>대상 상품: <b>패키지 상품</b>에 한함 (호텔 / 항공 제외)</li>'+
-        '<li>상세 계산식: 영업지원팀 전달 예정</li>'+
+        '<li>이동 경로: <code>예약조회</code> 메뉴로 이동</li>'+
       '</ul>'+
-      '<h5 class="ml-sec">클릭 랜딩</h5>'+
+      '<h5 class="ml-sec">조회 조건</h5>'+
       '<ul class="ml-ul">'+
-        '<li>이동 경로: <code>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</code></li>'+
-        '<li>상단 <b>구분</b> 값 기준으로 필터링된 미수1 데이터 노출</li>'+
-      '</ul>'
+        '<li>조회기간 : <b>출발일</b>, 조회일 <b>~ +15일</b></li>'+
+        '<li>예약자보기 <b>취소자 제외</b></li>'+
+        '<li>OK / WT : <b>WT</b></li>'+
+        '<li>담당자 : <b>조회자</b></li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
+  },
+  'unpaid-15': {
+    title: '미수 예약 (조회일 ~ +15일)',
+    body:
+      '<h5 class="ml-sec">메뉴 이동</h5>'+
+      '<ul class="ml-ul">'+
+        '<li>이동 경로: <code>미수1</code> 메뉴로 이동</li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">조회 조건</h5>'+
+      '<ul class="ml-ul">'+
+        '<li>조회기간 : 조회일 <b>~ +15일</b></li>'+
+        '<li>미과수구분 : <b>미수</b></li>'+
+        '<li>담당자 : <b>조회자</b></li>'+
+      '</ul>'+
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
   },
   '주간 신규 문의': {
     title: '주간 신규 문의',
@@ -1621,18 +1681,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeTrendPopup();})
 
 // ============ HCSI agency list ============
 const agencies=[
-  {code:'A4722',name:'강남센터',resp:23,gen:88,guar:84,mgr:90,full:85},
-  {code:'A4815',name:'명동센터',resp:18,gen:85,guar:82,mgr:88,full:83},
-  {code:'A5021',name:'분당센터',resp:21,gen:87,guar:85,mgr:89,full:84},
-  {code:'M2201',name:'프리미엄몰',resp:15,gen:90,guar:88,mgr:92,full:87},
-  {code:'M2305',name:'스탠다드몰',resp:12,gen:83,guar:80,mgr:86,full:82},
-  {code:'B1102',name:'강서투어',resp:12,gen:62,guar:58,mgr:68,full:60},
-  {code:'B1245',name:'분당하나여행',resp:18,gen:68,guar:72,mgr:74,full:66},
-  {code:'B1388',name:'수원월드투어',resp:9,gen:71,guar:74,mgr:76,full:70},
-  {code:'B1502',name:'동탄여행센터',resp:15,gen:74,guar:76,mgr:78,full:72},
-  {code:'B1611',name:'마포트래블',resp:11,gen:76,guar:78,mgr:80,full:74},
-  {code:'P3110',name:'OO카드 제휴',resp:8,gen:84,guar:81,mgr:87,full:82},
-  {code:'S4001',name:'하나여행',resp:14,gen:86,guar:83,mgr:89,full:84}
+  {code:'A4722',name:'강남센터',resp:23,gen:88,guar:84,mgr:90,full:85,smooth:90,prof:89,expr:87,firstH:2.0},
+  {code:'A4815',name:'명동센터',resp:18,gen:85,guar:82,mgr:88,full:83,smooth:88,prof:86,expr:84,firstH:2.3},
+  {code:'A5021',name:'분당센터',resp:21,gen:87,guar:85,mgr:89,full:84,smooth:89,prof:87,expr:85,firstH:2.1},
+  {code:'M2201',name:'프리미엄몰',resp:15,gen:90,guar:88,mgr:92,full:87,smooth:92,prof:90,expr:88,firstH:1.8},
+  {code:'M2305',name:'스탠다드몰',resp:12,gen:83,guar:80,mgr:86,full:82,smooth:86,prof:84,expr:82,firstH:2.5},
+  {code:'B1102',name:'강서투어',resp:12,gen:62,guar:58,mgr:68,full:60,smooth:68,prof:64,expr:62,firstH:3.6},
+  {code:'B1245',name:'분당하나여행',resp:18,gen:68,guar:72,mgr:74,full:66,smooth:74,prof:70,expr:68,firstH:3.2},
+  {code:'B1388',name:'수원월드투어',resp:9,gen:71,guar:74,mgr:76,full:70,smooth:76,prof:73,expr:71,firstH:3.0},
+  {code:'B1502',name:'동탄여행센터',resp:15,gen:74,guar:76,mgr:78,full:72,smooth:78,prof:75,expr:73,firstH:2.8},
+  {code:'B1611',name:'마포트래블',resp:11,gen:76,guar:78,mgr:80,full:74,smooth:80,prof:77,expr:75,firstH:2.7},
+  {code:'P3110',name:'OO카드 제휴',resp:8,gen:84,guar:81,mgr:87,full:82,smooth:87,prof:85,expr:83,firstH:2.4},
+  {code:'S4001',name:'하나여행',resp:1,gen:86,guar:83,mgr:89,full:84,smooth:89,prof:87,expr:85,firstH:2.2}
 ];
 function getSortedAgencies(){
   const sortEl=document.getElementById('ag-sort');
@@ -1642,7 +1702,15 @@ function getSortedAgencies(){
   else if(mode==='gen_desc')arr.sort((a,b)=>b.gen-a.gen);
   else if(mode==='guar_asc')arr.sort((a,b)=>a.guar-b.guar);
   else if(mode==='resp_desc')arr.sort((a,b)=>b.resp-a.resp);
+  // S4001 하나여행은 항상 최하단에 위치
+  arr.sort((a,b)=>(a.code==='S4001'?1:0)-(b.code==='S4001'?1:0));
   return arr;
+}
+function toggleHcsiGuarDetail(el){
+  const box=document.getElementById('hcsi-guar-detail');
+  if(!box) return;
+  const open=box.classList.toggle('open');
+  if(el) el.classList.toggle('active', open);
 }
 let selectedAgency=null;
 function renderDevBars(a){
@@ -1660,7 +1728,7 @@ function renderDevBars(a){
     const w=Math.min(Math.abs(d)*8,50);
     const sign=d>0?'+':'';
     return `<div class="dev-row"><div class="dlbl">${label}</div><div class="dev-track"><span class="dev-fill ${cls}" style="width:${w}%"></span></div><div class="dval ${cls}">${sign}${d}${suffix}</div></div>`;
-  }).join('') + `<div class="ag-rank-box"><span>채널 내 순위 <b>2</b> / 12</span><span>상위 17%</span></div>`;
+  }).join('');
 }
 function selectAgency(a,row){
   selectedAgency=a;
@@ -1669,12 +1737,26 @@ function selectAgency(a,row){
   document.querySelectorAll('.ag-row').forEach(r=>r.classList.remove('active'));
   if(row) row.classList.add('active');
   document.getElementById('ag-title').textContent=`${a.code} ${a.name} (응답 ${a.resp}건)`;
+  // 표본수가 1건 이하인 경우: 점수 및 AI리뷰를 노출하지 않고 안내 메시지 표시
+  const _noData=document.getElementById('ag-no-data');
+  const _full=document.getElementById('ag-content-full');
+  if(a.resp<=1){
+    if(_noData) _noData.classList.remove('hidden');
+    if(_full) _full.classList.add('hidden');
+    return;
+  } else {
+    if(_noData) _noData.classList.add('hidden');
+    if(_full) _full.classList.remove('hidden');
+  }
   const sum=document.getElementById('ag-sum');
-  sum.children[0].querySelector('.v').textContent=a.gen;
-  sum.children[1].querySelector('.v').textContent=a.mgr;
+  sum.children[0].querySelector('.v').textContent=a.resp;
+  sum.children[1].querySelector('.v').textContent=a.gen;
   sum.children[2].querySelector('.v').textContent=a.full;
-  sum.children[3].querySelector('.v').textContent=a.guar;
-  sum.children[4].querySelector('.v').textContent=(a.firstH||2.1)+'h';
+  sum.children[3].querySelector('.v').textContent=a.smooth;
+  sum.children[4].querySelector('.v').textContent=a.prof;
+  sum.children[5].querySelector('.v').textContent=a.expr;
+  sum.children[6].querySelector('.v').textContent=(a.firstH||2.1)+'h';
+  sum.children[7].querySelector('.v').textContent=a.guar+'%';
   renderDevBars(a);
   if(a.gen<70){
     document.getElementById('ai-pos').textContent='긍정 리뷰가 상대적으로 적습니다. 호텔 객실 위치 및 가이드 친절도에서 일부 긍정 평가가 확인되었습니다.';
@@ -1690,10 +1772,12 @@ function renderAgList(){
   box.innerHTML='';
   const list = getSortedAgencies();
   list.forEach((a)=>{
-    const cls=a.gen<70?'bad':a.gen<80?'warn':'';
+    const isHide = a.code==='S4001';
+    const cls = isHide ? '' : (a.gen<70?'bad':a.gen<80?'warn':'');
+    const scoreTxt = isHide ? '-' : (a.gen+'점');
     const row=document.createElement('div');
     row.className='ag-row'+(selectedAgency&&selectedAgency.code===a.code?' active':'');
-    row.innerHTML=`<span>${a.code} ${a.name}<br><span style="color:#999;font-size:10.5px">응답 ${a.resp}건</span></span><span class="sc ${cls}">${a.gen}점</span>`;
+    row.innerHTML=`<span>${a.code} ${a.name}<br><span style="color:#999;font-size:10.5px">응답 ${a.resp}건</span></span><span class="sc ${cls}">${scoreTxt}</span>`;
     row.addEventListener('click',()=>selectAgency(a,row));
     box.appendChild(row);
   });
@@ -1717,6 +1801,8 @@ renderAgList();
     if(saved.team){ var t=document.getElementById('f-team'); if(t&&[...t.options].some(o=>o.value===saved.team||o.text===saved.team)) t.value=saved.team; }
     if(saved.user){ var u=document.getElementById('f-user'); if(u) u.value=saved.user; }
     if(saved.attr){ var a=document.getElementById('f-attr'); if(a) a.value=saved.attr; }
+    // [추가] 저장된 구분이 '하나담당자'가 아니면 non-hana 클래스 적용
+    if(saved.attr && saved.attr!=='hana'){ document.body.classList.add('non-hana'); }
   }catch(e){}
 })();
 function saveFilter(){
@@ -1732,6 +1818,8 @@ function saveFilter(){
   var s=document.getElementById('f-saved'); if(s){ s.style.opacity='1'; setTimeout(()=>s.style.opacity='0',1600); }
   // [추가] 조회 완료 → pre-query 상태 해제하여 데이터 노출
   document.body.classList.remove('pre-query');
+  // [추가] HCSI 영역 노출 제어: 구분이 '하나담당자'(hana)일 때만 노출
+  document.body.classList.toggle('non-hana', attr !== 'hana');
 }
 
 // [추가] 디스크립션 사이드 패널 접기/펼치기
@@ -1747,14 +1835,14 @@ function toggleDescSide(){
 // ============ HCSI 월별 데이터 (일배치 적재 시뮬레이션) ============
 // 상품 출발일 기준 · 전월 데이터는 월초 적재됨
 const hcsiMonthly = [
-  // [key, label, status('done'|'ongoing'), resp, store, gen, mgr, full, guar, firstH]
-  {key:'2025-11', label:'2025.11', status:'done',    resp:1180, store:84, gen:84, mgr:86, full:82, guar:80, firstH:2.7},
-  {key:'2025-12', label:'2025.12', status:'done',    resp:1320, store:86, gen:85, mgr:87, full:83, guar:81, firstH:2.6},
-  {key:'2026-01', label:'2026.01', status:'done',    resp:1095, store:85, gen:83, mgr:85, full:81, guar:79, firstH:2.8},
-  {key:'2026-02', label:'2026.02', status:'done',    resp:1210, store:86, gen:84, mgr:86, full:83, guar:80, firstH:2.6},
-  {key:'2026-03', label:'2026.03', status:'done',    resp:1305, store:87, gen:85, mgr:86, full:84, guar:83, firstH:2.5},
-  {key:'2026-04', label:'2026.04', status:'done',    resp:1247, store:87, gen:86, mgr:88, full:84, guar:82, firstH:2.4},
-  {key:'2026-05', label:'2026.05', status:'ongoing', resp:486,  store:62, gen:85, mgr:87, full:83, guar:81, firstH:2.5}
+  // [key, label, status, resp, store, gen, mgr, full, guar, firstH, smooth(원활성), prof(전문성), expr(표현성)]
+  {key:'2025-11', label:'2025.11', status:'done',    resp:1180, store:84, gen:84, mgr:86, full:82, guar:80, firstH:2.7, smooth:86, prof:85, expr:83},
+  {key:'2025-12', label:'2025.12', status:'done',    resp:1320, store:86, gen:85, mgr:87, full:83, guar:81, firstH:2.6, smooth:87, prof:86, expr:84},
+  {key:'2026-01', label:'2026.01', status:'done',    resp:1095, store:85, gen:83, mgr:85, full:81, guar:79, firstH:2.8, smooth:85, prof:84, expr:82},
+  {key:'2026-02', label:'2026.02', status:'done',    resp:1210, store:86, gen:84, mgr:86, full:83, guar:80, firstH:2.6, smooth:86, prof:85, expr:83},
+  {key:'2026-03', label:'2026.03', status:'done',    resp:1305, store:87, gen:85, mgr:86, full:84, guar:83, firstH:2.5, smooth:87, prof:86, expr:84},
+  {key:'2026-04', label:'2026.04', status:'done',    resp:1247, store:87, gen:86, mgr:88, full:84, guar:82, firstH:2.4, smooth:88, prof:87, expr:85},
+  {key:'2026-05', label:'2026.05', status:'ongoing', resp:486,  store:62, gen:85, mgr:87, full:83, guar:81, firstH:2.5, smooth:87, prof:86, expr:84}
 ];
 
 function selectHcsiMonth(key){
@@ -1778,11 +1866,14 @@ function selectHcsiMonth(key){
     if(d<0) return `<div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ ${Math.abs(d)}${suffix||''}</div>`;
     return `<div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0${suffix||''}</div>`;
   }
-  sum.children[0].innerHTML = `<div class="l">종합만족도</div><div class="v">${m.gen}</div>`+dHtml(m.gen,prev&&prev.gen);
-  sum.children[1].innerHTML = `<div class="l">담당자만족</div><div class="v">${m.mgr}</div>`+dHtml(m.mgr,prev&&prev.mgr);
-  sum.children[2].innerHTML = `<div class="l">전체만족</div><div class="v">${m.full}</div>`+dHtml(m.full,prev&&prev.full);
-  sum.children[3].innerHTML = `<div class="l">개런티 준수</div><div class="v">${m.guar}</div>`+dHtml(m.guar,prev&&prev.guar);
-  sum.children[4].innerHTML = `<div class="l">평균 첫안내</div><div class="v">${m.firstH}h</div>`+dHtml(m.firstH,prev&&prev.firstH,'h');
+  sum.children[0].innerHTML = `<div class="l">표본수</div><div class="v">${m.resp.toLocaleString()}</div>`+(prev?`<div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div>`:`<div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div>`);
+  sum.children[1].innerHTML = `<div class="l">종합만족도</div><div class="v">${m.gen}</div>`+dHtml(m.gen,prev&&prev.gen);
+  sum.children[2].innerHTML = `<div class="l">전반적만족도</div><div class="v">${m.full}</div>`+dHtml(m.full,prev&&prev.full);
+  sum.children[3].innerHTML = `<div class="l">원활성</div><div class="v">${m.smooth}</div>`+dHtml(m.smooth,prev&&prev.smooth);
+  sum.children[4].innerHTML = `<div class="l">전문성</div><div class="v">${m.prof}</div>`+dHtml(m.prof,prev&&prev.prof);
+  sum.children[5].innerHTML = `<div class="l">표현성</div><div class="v">${m.expr}</div>`+dHtml(m.expr,prev&&prev.expr);
+  sum.children[6].innerHTML = `<div class="l">첫안내소요시간</div><div class="v">${m.firstH}h</div>`+dHtml(m.firstH,prev&&prev.firstH,'h');
+  sum.children[7].innerHTML = `<div class="l">개런티준수율</div><div class="v">${m.guar}%</div>`+dHtml(m.guar,prev&&prev.guar);
   // 대리점 상세 영역의 기준월 표기 갱신
   const at=document.getElementById('ag-title-month');
   if(at) at.textContent='기준월 '+m.label+(m.status==='ongoing'?' (진행중)':' (확정)');
@@ -1888,23 +1979,34 @@ selectHcsiMonth('2026-04');
     </div>
     <h5>영역 개요</h5>
     <p>- 본인 담당 일일 업무 현황 확인 영역<br>- 대상 탭: <b>예약관리</b> / <b>온라인 견적서</b></p>
-    <h5>예약관리 항목</h5>
+    <h5>구분 개인화 (3개 조건 필요)</h5>
     <ul>
-      <li><b>일일 신규 예약</b> – 전일자 기준 신규 예약 건수 / 인원</li>
-      <li><b>대기인원 WT</b> – 전일자 기준 대기(WT) 예약 건수</li>
-      <li><b>계약금 미입금</b> – 미수1관리 기준 미입금 건수 (출발 90일 이내)</li>
+      <li><b>하나담당자A</b> : 담당자가 해당 직원</li>
+      <li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>
+      <li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>
     </ul>
-    <h5>클릭 시 동작</h5>
+    <h5>예약관리 항목 (클릭 시 동작)</h5>
     <ul>
-      <li><b>일일 신규 예약 / 대기인원 WT</b> → <code>패키지 &gt; 판매예약 &gt; 예약관리 &gt; 예약조회</code>로 랜딩</li>
-      <li><b>계약금 미입금</b> → <code>통합정산 &gt; 미수 &gt; 미수1관리 &gt; 미수1</code>로 랜딩</li>
-      <li>각 항목 클릭 시 상단 <b>구분</b> 값에 따라 검색 조건이 자동 적용됨</li>
-    </ul>
-    <h5>구분별 랜딩 로직 (예약관리 항목)</h5>
-    <ul>
-      <li><b>하나담당자</b> : 담당자 &gt; 하나담당자로 검색</li>
-      <li><b>패키지담당자</b> : 담당자 &gt; 하나담당자 + 상품속성 <b>Q 제외</b></li>
-      <li><b>인센티브담당자</b> : 담당자 &gt; 인센티브담당자로 검색</li>
+      <li><b>1. 일일 신규 예약</b><br>
+        - <code>예약조회</code> 메뉴로 이동<br>
+        - 조회기간 : 최초예약일, 조회일 -1일 / 예약자보기 취소자 제외<br>
+        - 담당자 : 조회자
+      </li>
+      <li><b>2. 출발 예약 (조회일 ~ +7일)</b><br>
+        - <code>예약조회</code> 메뉴로 이동<br>
+        - 조회기간 : 출발일, 조회일 ~ +15일 / 예약자보기 취소자 제외<br>
+        - 담당자 : 조회자
+      </li>
+      <li><b>3. 대기 예약 (조회일 ~ +15)</b><br>
+        - <code>예약조회</code> 메뉴로 이동<br>
+        - 조회기간 : 출발일, 조회일 ~ +15일 / 예약자보기 취소자 제외 / OK·WT 중 <b>WT</b><br>
+        - 담당자 : 조회자
+      </li>
+      <li><b>4. 미수 예약 (조회일 ~ +15일)</b><br>
+        - <code>미수1</code> 메뉴로 이동<br>
+        - 조회기간 : 조회일 ~ +15일 / 미과수구분 미수<br>
+        - 담당자 : 조회자
+      </li>
     </ul>
   </template>
 
