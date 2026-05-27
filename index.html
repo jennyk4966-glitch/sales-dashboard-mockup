@@ -20,12 +20,31 @@ body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color
 .subbar a{color:#fff;text-decoration:none;opacity:0.9}
 /* Layout */
 .wrap{display:flex;min-height:calc(100vh - 90px)}
-.lnb{width:200px;background:#fff;border-right:1px solid #d9dde2;padding:14px 0}
-.lnb-title{padding:8px 16px;font-weight:700;color:#1a3a5f;font-size:13px;border-bottom:1px solid #e5e8ec;margin-bottom:6px}
-.lnb-item{padding:9px 16px;color:#444;cursor:pointer;font-size:12.5px;border-left:3px solid transparent}
-.lnb-item:hover{background:#f4f5f7}
-.lnb-item.active{background:#eef2f7;border-left-color:#1a3a5f;color:#1a3a5f;font-weight:700}
-.lnb-item.parent::before{content:"+ ";color:#999}
+.lnb{width:220px;background:#3d3a4f;border-right:1px solid #2a2838;padding:0;display:flex;flex-direction:column;transition:width .18s ease;position:relative}
+.lnb-tabs{display:flex;align-items:stretch;background:#2f2d3e;border-bottom:1px solid #534d68}
+.lnb-tab{flex:1;background:transparent;border:none;color:#c9c5d4;font-size:11.5px;padding:7px 2px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;border-right:1px solid #423f54;font-family:inherit;line-height:1.2}
+.lnb-tab:last-of-type{border-right:1px solid #423f54}
+.lnb-tab .ic{font-size:13px;line-height:1}
+.lnb-tab.active{background:#4a4660;color:#fff;font-weight:700;box-shadow:inset 0 -2px 0 #fff}
+.lnb-tab:hover:not(.active){background:#3a3850;color:#fff}
+.lnb-toggle{width:26px;background:#2f2d3e;border:none;color:#c9c5d4;cursor:pointer;font-size:14px;font-weight:700;border-left:1px solid #534d68;line-height:1}
+.lnb-toggle:hover{background:#3a3850;color:#fff}
+.lnb-section-head{display:flex;align-items:center;gap:8px;padding:11px 14px;background:#5a536f;color:#fff;font-weight:700;font-size:13px;border-bottom:1px solid #2a2838}
+.lnb-sec-ic{color:#7ea8ff;font-size:13px;line-height:1}
+.lnb-list{padding:4px 0;flex:1;overflow-y:auto}
+.lnb-item{padding:9px 16px 9px 18px;color:#d6d3df;cursor:pointer;font-size:12.5px;border-left:3px solid transparent}
+.lnb-item:hover{background:#4a4660;color:#fff}
+.lnb-item.active{background:#4a4660;border-left-color:#7ea8ff;color:#fff;font-weight:700}
+.lnb-item.parent::before{content:"+ ";color:#9892ab;margin-right:2px}
+/* collapsed state */
+.lnb.collapsed{width:34px}
+.lnb.collapsed .lnb-tab,
+.lnb.collapsed .lnb-section-head,
+.lnb.collapsed .lnb-list{display:none}
+.lnb.collapsed .lnb-tabs{flex-direction:column;border-bottom:none;background:transparent}
+.lnb.collapsed .lnb-toggle{width:100%;height:34px;border-left:none;border-bottom:1px solid #534d68;background:#2f2d3e}
+.lnb-collapsed-label{display:none}
+.lnb.collapsed .lnb-collapsed-label{display:block;writing-mode:vertical-rl;text-orientation:mixed;color:#c9c5d4;font-size:12px;font-weight:700;padding:14px 0;text-align:center;letter-spacing:2px}
 .main{flex:1;padding:14px 18px;overflow:auto}
 .breadcrumb{font-size:11.5px;color:#777;margin-bottom:10px}
 .breadcrumb b{color:#1a3a5f}
@@ -470,27 +489,35 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
   </div>
   <div class="gnb-right">강재희 <span>로그아웃</span></div>
 </div>
-<div class="subbar">
-  <a>● 최근방문</a><a>★ 즐겨찾기</a><a>≡ 전체메뉴</a><a>🔍 메뉴검색</a>
-</div>
-
 <div class="wrap">
-  <aside class="lnb">
-    <div class="lnb-title">영업지원관리</div>
-    <div class="lnb-item active">영업대시보드</div>
-    <div class="lnb-item parent">통합예약조회</div>
-    <div class="lnb-item parent">대리점관리</div>
-    <div class="lnb-item parent">VOC</div>
-    <div class="lnb-item parent">영업지원/공지</div>
-    <div class="lnb-item parent">커뮤니티 광장</div>
-    <div class="lnb-item parent">법인DB</div>
-    <div class="lnb-item parent">입찰/법인이력관리</div>
-    <div class="lnb-item parent">프로모션 및 물품신청</div>
-    <div class="lnb-item parent">판매메인 ADMIN</div>
-    <div class="lnb-item parent">하나톡ID 서비스관리</div>
-    <div class="lnb-item parent">SITECODE관리</div>
-    <div class="lnb-item parent">닷컴문의</div>
-    <div class="lnb-item parent">마이체크리스트</div>
+  <aside class="lnb" id="lnb">
+    <div class="lnb-tabs">
+      <button type="button" class="lnb-tab" title="최근방문"><span class="ic">◐</span>최근방문</button>
+      <button type="button" class="lnb-tab" title="즐겨찾기"><span class="ic">★</span>즐겨찾기</button>
+      <button type="button" class="lnb-tab active" title="전체메뉴"><span class="ic">≡</span>전체메뉴</button>
+      <button type="button" class="lnb-tab" title="메뉴검색"><span class="ic">⌕</span>메뉴검색</button>
+      <button type="button" class="lnb-toggle" id="lnbToggleBtn" onclick="toggleLnb()" title="접기/펼치기" aria-label="좌측 메뉴 접기/펼치기">‹</button>
+    </div>
+    <div class="lnb-collapsed-label" aria-hidden="true">전체메뉴</div>
+    <div class="lnb-section-head">
+      <span class="lnb-sec-ic">◉</span><span class="lnb-sec-title">영업지원관리</span>
+    </div>
+    <div class="lnb-list">
+      <div class="lnb-item active">영업대시보드</div>
+      <div class="lnb-item parent">통합예약조회</div>
+      <div class="lnb-item parent">대리점관리</div>
+      <div class="lnb-item parent">VOC</div>
+      <div class="lnb-item parent">영업지원/공지</div>
+      <div class="lnb-item parent">커뮤니티 광장</div>
+      <div class="lnb-item parent">법인DB</div>
+      <div class="lnb-item parent">입찰/법인이력관리</div>
+      <div class="lnb-item parent">프로모션 및 물품신청</div>
+      <div class="lnb-item parent">판매메인 ADMIN</div>
+      <div class="lnb-item parent">하나톡ID 서비스관리</div>
+      <div class="lnb-item parent">SITECODE관리</div>
+      <div class="lnb-item parent">닷컴문의</div>
+      <div class="lnb-item parent">마이체크리스트</div>
+    </div>
   </aside>
 
   <main class="main">
@@ -1221,7 +1248,7 @@ var TASK_MODAL_DEFS = {
         '<li>예약자보기 <b>취소자 제외</b></li>'+
         '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자</b> : 하나담당자A 기준 예약 조회</li>'+'<li><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)</li>'+'<li><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</li>'+'</ul>'+''
   },
   'departure-7': {
     title: '출발 예약 (조회일 ~ +7일)',
@@ -1236,7 +1263,7 @@ var TASK_MODAL_DEFS = {
         '<li>예약자보기 <b>취소자 제외</b></li>'+
         '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자</b> : 하나담당자A 기준 예약 조회</li>'+'<li><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)</li>'+'<li><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</li>'+'</ul>'+''
   },
   'waiting-15': {
     title: '대기 예약 (조회일 ~ +15)',
@@ -1252,7 +1279,7 @@ var TASK_MODAL_DEFS = {
         '<li>OK / WT : <b>WT</b></li>'+
         '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자</b> : 하나담당자A 기준 예약 조회</li>'+'<li><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)</li>'+'<li><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</li>'+'</ul>'+''
   },
   'unpaid-15': {
     title: '미수 예약 (조회일 ~ +15일)',
@@ -1267,7 +1294,7 @@ var TASK_MODAL_DEFS = {
         '<li>미과수구분 : <b>미수</b></li>'+
         '<li>담당자 : <b>조회자</b></li>'+
       '</ul>'+
-      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자A</b> : 담당자가 해당 직원</li>'+'<li><b>인센티브영업담당자(정)</b> : 인센티브 OP가 해당 직원</li>'+'<li><b>하나담당자A 중 인센제외</b> : 담당자가 해당 직원</li>'+'</ul>'+''
+      '<h5 class="ml-sec">구분 개인화 (3개 조건)</h5>'+'<ul class="ml-ul">'+'<li><b>하나담당자</b> : 하나담당자A 기준 예약 조회</li>'+'<li><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)</li>'+'<li><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</li>'+'</ul>'+''
   },
   '주간 신규 문의': {
     title: '주간 신규 문의',
@@ -1829,6 +1856,16 @@ function toggleDescSide(){
   if(!side) return;
   var collapsed=side.classList.toggle('collapsed');
   document.body.classList.toggle('desc-collapsed', collapsed);
+  if(btn) btn.textContent = collapsed ? '›' : '‹';
+}
+
+// [추가] 좌측 메뉴(LNB) 접기/펼치기
+function toggleLnb(){
+  var side=document.getElementById('lnb');
+  var btn=document.getElementById('lnbToggleBtn');
+  if(!side) return;
+  var collapsed=side.classList.toggle('collapsed');
+  document.body.classList.toggle('lnb-collapsed', collapsed);
   if(btn) btn.textContent = collapsed ? '›' : '‹';
 }
 
