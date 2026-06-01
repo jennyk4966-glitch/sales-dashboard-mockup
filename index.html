@@ -62,6 +62,7 @@ body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color
 .info-tip-bubble b{color:#ffd866;font-weight:600}
 .info-tip:hover .info-tip-bubble,.info-tip:focus .info-tip-bubble{display:block}
 .top-filter select{height:28px;padding:0 8px;border:1px solid #c9ccd1;border-radius:3px;background:#fff;font-size:12px;color:#333;min-width:120px}
+.top-filter select:disabled{background:#eef0f2;color:#9aa0a6;border-color:#dde0e4;cursor:not-allowed;opacity:1}
 .btn{height:28px;padding:0 14px;border:1px solid #1a3a5f;background:#1a3a5f;color:#fff;border-radius:3px;font-size:12px;cursor:pointer;font-weight:600}
 .btn.ghost{background:#fff;color:#1a3a5f}
 .btn.sm{height:24px;padding:0 10px;font-size:11.5px}
@@ -577,8 +578,8 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
         <option value="sales">영업본부</option>
         <option value="local">지방사업본부</option>
       </select>
-      <label class="admin-only-label">부서</label>
-      <select id="f-dept" class="admin-only" onchange="onDeptChange()">
+      <label>부서</label>
+      <select id="f-dept" onchange="onDeptChange()">
         <option value="sales1">영업1부</option>
         <option value="sales2">영업2부</option>
         <option value="sales3">영업3부</option>
