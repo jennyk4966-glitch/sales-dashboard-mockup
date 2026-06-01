@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0527</title>
+<title>영업사원 대시보드_0601</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -48,8 +48,12 @@ body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color
 .main{flex:1;padding:14px 18px;overflow:auto}
 .breadcrumb{font-size:11.5px;color:#777;margin-bottom:10px}
 .breadcrumb b{color:#1a3a5f}
+/* [추가] breadcrumb 와 권한 토글 한 줄 배치 (권한 영역 추후 삭제 시 .breadcrumb-row 래퍼도 함께 정리) */
+.breadcrumb-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.breadcrumb-row .breadcrumb{margin-bottom:10px}
+.breadcrumb-row .role-switch-row{margin-bottom:10px}
 /* Top filter */
-.top-filter{background:#fff;border:1px solid #d9dde2;border-radius:4px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.top-filter{background:#fff;border:1px solid #d9dde2;border-radius:4px;padding:10px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
 .top-filter label{font-weight:600;color:#333;font-size:12px;margin-right:2px}
 .info-tip{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:50%;background:#1a3a5f;color:#fff;font-size:10px;font-weight:700;font-style:italic;font-family:'Times New Roman',serif;cursor:help;position:relative;margin-left:2px;vertical-align:middle;line-height:1}
 .info-tip:hover,.info-tip:focus{background:#2c5a8a;outline:none}
@@ -405,12 +409,16 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 /* ============ [추가] 상단 안내 배지 ============ */
 .top-filter .top-notice{
   margin-left:auto;
-  background:#fff8e1;border:1px solid #f0c36d;border-left:3px solid #e67e22;
-  color:#5a3a00;font-size:11.5px;line-height:1.5;
-  padding:5px 10px;border-radius:3px;
-  white-space:nowrap;
+  background:transparent;border:none;
+  color:#888;font-size:11.5px;line-height:1.5;
+  padding:5px 0;
+  white-space:normal;
 }
-.top-filter .top-notice b{color:#b54300;font-weight:700}
+/* 한 줄에 다 못 들어가면 안내 문구가 통째로 다음 줄로 내려가 필터가 깨지지 않도록 */
+@media (max-width:1200px){
+  .top-filter .top-notice{ margin-left:0; flex-basis:100%; }
+}
+.top-filter .top-notice b{color:#888;font-weight:400}
 
 /* ============ [추가] 디스크립션 패널 접기 ============ */
 .desc-side-header{position:relative}
@@ -466,6 +474,20 @@ body.pre-query #card-hcsi .card-body > *:not(.pre-query-msg){display:none !impor
     body.non-hana #page-hcsi .hcsi-non-hana-msg{display:block;margin-top:14px}
 
 body.pre-query .pre-query-msg{display:flex}
+/* [추가] 데이터 없음(no-data) 상태: 차트/테이블 영역은 빈 상태 메시지로 대체. KPI 타일(0건)은 그대로 노출 */
+.no-data-msg{display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px 16px;background:#fafbfc;border:1px dashed #d9dde2;border-radius:4px;color:#6b7280;text-align:center;line-height:1.6;min-height:180px}
+.no-data-msg .nd-icon{width:34px;height:34px;border-radius:50%;background:#e5e7eb;color:#6b7280;font-weight:700;font-style:italic;font-family:'Times New Roman',serif;display:flex;align-items:center;justify-content:center;margin-bottom:10px;font-size:16px}
+.no-data-msg .nd-title{font-size:13px;font-weight:700;color:#374151;margin-bottom:4px}
+.no-data-msg .nd-desc{font-size:11.5px;color:#6b7280}
+body.no-data #card-monthly .card-body > *:not(.no-data-msg),
+body.no-data #card-dailychannel .card-body > *:not(.no-data-msg),
+body.no-data #card-dailytrend .card-body > *:not(.no-data-msg),
+body.no-data #card-hcsi .card-body > *:not(.no-data-msg){display:none !important}
+body.no-data #card-monthly .no-data-msg,
+body.no-data #card-dailychannel .no-data-msg,
+body.no-data #card-dailytrend .no-data-msg,
+body.no-data #card-hcsi .no-data-msg{display:flex}
+
 
 /* 나의 업무관리: 라벨/탭은 유지, 값만 "-" 로 표시 */
 body.pre-query #card-mytask .mtask-val,
@@ -477,9 +499,23 @@ body.pre-query #card-mytask .qval::after{
   content:'-';font-size:13px;color:#9ca3af;font-weight:500;
 }
 body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
+
+/* ============ [추가] 권한 토글 ============ */
+.role-switch-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:6px}
+.role-switch-row .role-label{font-size:11.5px;color:#666;font-weight:600}
+.role-switch{display:inline-flex;border:1px solid #c9ccd1;border-radius:3px;overflow:hidden;background:#fff}
+.role-switch label{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;font-size:12px;color:#555;cursor:pointer;font-weight:600;border-right:1px solid #e5e8ec}
+.role-switch label:last-child{border-right:none}
+.role-switch input{margin:0;cursor:pointer}
+.role-switch label.on{background:#1a3a5f;color:#fff}
+/* 관리권한 전용 필드: 기본 숨김, 관리권한일 때만 노출 */
+.top-filter .admin-only{display:none}
+body.role-admin .top-filter .admin-only{display:inline-flex;align-items:center;gap:6px}
+body.role-admin .top-filter .admin-only-label{display:inline-block}
+.top-filter .admin-only-label{display:none}
 </style>
 </head>
-<body class="pre-query">
+<body class="pre-query lnb-collapsed desc-collapsed">
 
 <div class="gnb">
   <div class="logo">Hana<span>Hub</span></div>
@@ -490,13 +526,13 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
   <div class="gnb-right">강재희 <span>로그아웃</span></div>
 </div>
 <div class="wrap">
-  <aside class="lnb" id="lnb">
+  <aside class="lnb collapsed" id="lnb">
     <div class="lnb-tabs">
       <button type="button" class="lnb-tab" title="최근방문"><span class="ic">◐</span>최근방문</button>
       <button type="button" class="lnb-tab" title="즐겨찾기"><span class="ic">★</span>즐겨찾기</button>
       <button type="button" class="lnb-tab active" title="전체메뉴"><span class="ic">≡</span>전체메뉴</button>
       <button type="button" class="lnb-tab" title="메뉴검색"><span class="ic">⌕</span>메뉴검색</button>
-      <button type="button" class="lnb-toggle" id="lnbToggleBtn" onclick="toggleLnb()" title="접기/펼치기" aria-label="좌측 메뉴 접기/펼치기">‹</button>
+      <button type="button" class="lnb-toggle" id="lnbToggleBtn" onclick="toggleLnb()" title="접기/펼치기" aria-label="좌측 메뉴 접기/펼치기">›</button>
     </div>
     <div class="lnb-collapsed-label" aria-hidden="true">전체메뉴</div>
     <div class="lnb-section-head">
@@ -521,14 +557,36 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
   </aside>
 
   <main class="main">
-    <div class="breadcrumb">영업지원관리 &gt; <b>영업대시보드</b></div>
+    <!-- [수정] breadcrumb 와 권한 토글을 한 줄에 배치 (권한 영역은 UI 검토용, 추후 삭제 예정) -->
+    <div class="breadcrumb-row">
+      <div class="breadcrumb">영업지원관리 &gt; <b>영업대시보드</b></div>
 
-    <!-- 공통 팀/담당자 필터 -->
+      <!-- 공통 팀/담당자 필터 -->
+      <!-- [추가] 권한 선택 (목업: 조회권한/관리권한 전환) -->
+      <div class="role-switch-row">
+        <span class="role-label">권한</span>
+        <div class="role-switch" id="roleSwitch">
+          <label class="on"><input type="radio" name="role" value="view" checked onchange="switchRole('view')">조회권한</label>
+          <label><input type="radio" name="role" value="admin" onchange="switchRole('admin')">관리권한</label>
+        </div>
+      </div>
+    </div>
     <div class="top-filter">
+      <label class="admin-only-label">본부</label>
+      <select id="f-hq" class="admin-only" onchange="onHqChange()">
+        <option value="sales">영업본부</option>
+        <option value="local">지방사업본부</option>
+      </select>
+      <label class="admin-only-label">부서</label>
+      <select id="f-dept" class="admin-only" onchange="onDeptChange()">
+        <option value="sales1">영업1부</option>
+        <option value="sales2">영업2부</option>
+        <option value="sales3">영업3부</option>
+      </select>
       <label>팀</label>
-      <select id="f-team"><option>영업1팀</option><option>영업2팀</option><option>영업3팀</option></select>
+      <select id="f-team" onchange="onTeamChange()"><option>영업1팀</option><option>영업2팀</option><option>영업3팀</option></select>
       <label>담당자</label>
-      <select id="f-user"><option>전체</option><option>강영업</option><option>김영업</option><option>박담당</option></select>
+      <select id="f-user"><option>강영업</option><option>김영업</option><option>박담당</option></select>
       <label>구분 <span class="info-tip" tabindex="0" aria-label="구분 도움말">i<span class="info-tip-bubble"><b>구분 안내</b><br><b>하나담당자</b> : 하나담당자A 기준 예약 조회<br><b>패키지담당자</b> : 하나담당자A 기준 예약 조회 (Q 속성 제외)<br><b>인센티브담당자</b> : 인센티브 담당 기준 예약 조회</span></span></label>
       <select id="f-attr">
         <option value="" selected>선택</option>
@@ -538,7 +596,7 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
       </select>
       <button class="btn" onclick="saveFilter()">조회</button>
       <span id="f-saved" style="color:#16a085;font-size:11px;margin-left:6px;opacity:0;transition:opacity .3s">✓ 선택값 저장됨</span>
-      <span class="top-notice"><b>※ 안내</b> 영업대시보드 예약조회는 <b>패키지 상품</b>에 한해 조회 가능 · <b>호텔 / 항공 상품 미포함</b></span>
+      <span class="top-notice">※ 영업대시보드 예약조회는 패키지 상품에 한해 조회 가능 (호텔 / 항공 상품 미포함)</span>
     </div>
 
     <!-- 페이지 탭 -->
@@ -633,7 +691,12 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
           </div>
         </div>
         <div class="card-body">
-          <div class="pre-query-msg">
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
+          </div>
+                    <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 / 속성별 / 브랜드별 예약 현황이 표시됩니다.</div>
@@ -700,7 +763,12 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
         </div>
         <div class="card-body">
-          <div class="pre-query-msg">
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
+          </div>
+                    <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>최근 7일 일자별 예약 채널 현황이 표시됩니다.</div>
@@ -739,7 +807,12 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
           </div>
         </div>
         <div class="card-body">
-          <div class="pre-query-msg">
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
+          </div>
+                    <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>총예약·총취소·순예약 및 전년 YoY 추이가 표시됩니다.</div>
@@ -805,7 +878,12 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
         </div>
         <div class="card-body">
-          <div class="pre-query-msg">
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
+          </div>
+                    <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>HCSI 요약 지표 및 개런티 항목이 표시됩니다.</div>
@@ -1109,9 +1187,9 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
 </div>
 
 <!-- === Fixed Description Side Panel === -->
-<aside class="desc-side" id="descSide">
+<aside class="desc-side collapsed" id="descSide">
   <div class="desc-side-header">
-    <button type="button" class="desc-toggle" id="descToggleBtn" onclick="toggleDescSide()" title="접기/펼치기" aria-label="안내 패널 접기/펼치기">‹</button>
+    <button type="button" class="desc-toggle" id="descToggleBtn" onclick="toggleDescSide()" title="접기/펼치기" aria-label="안내 패널 접기/펼치기">›</button>
     <span class="t" id="descSideTitle">영업대시보드 안내</span>
     <button type="button" class="btn-main" onclick="loadMainDesc()">↺ 메인 안내</button>
   </div>
@@ -1847,7 +1925,119 @@ function saveFilter(){
   document.body.classList.remove('pre-query');
   // [추가] HCSI 영역 노출 제어: 구분이 '하나담당자'(hana)일 때만 노출
   document.body.classList.toggle('non-hana', attr !== 'hana');
+  // [추가] 데이터 없음(no-data) 상태: 담당자=김영업 + 구분=하나담당자 조회 시 빈 상태 노출
+  // (신입사원/팀장 등 본인이 담당자로 등록된 예약이 없는 케이스 시연)
+  var isNoData = (user === '김영업' && attr === 'hana');
+  document.body.classList.toggle('no-data', isNoData);
 }
+
+// ============ [추가] 권한(조회/관리) 토글 & 조직 캐스케이드 ============
+// 조직 구조 (목업)
+var ORG = {
+  sales: {
+    name: '영업본부',
+    depts: {
+      sales1: { name: '영업1부', teams: {
+        '영업1팀': ['강영업','김영업','박담당'],
+        '영업2팀': [],
+        '영업3팀': []
+      }},
+      sales2: { name: '영업2부', teams: {
+        '영업1팀': [], '영업2팀': [], '영업3팀': []
+      }},
+      sales3: { name: '영업3부', teams: {
+        '영업1팀': [], '영업2팀': [], '영업3팀': []
+      }}
+    }
+  },
+  local: {
+    name: '지방사업본부',
+    depts: {
+      local1: { name: '지방영업1부', teams: { '지방1팀': [], '지방2팀': [] }},
+      local2: { name: '지방영업2부', teams: { '지방1팀': [], '지방2팀': [] }}
+    }
+  }
+};
+
+function fillSelect(sel, items, asObj){
+  sel.innerHTML = '';
+  items.forEach(function(it){
+    var o = document.createElement('option');
+    if(asObj){ o.value = it.value; o.textContent = it.label; }
+    else { o.value = it; o.textContent = it; }
+    sel.appendChild(o);
+  });
+}
+
+function onHqChange(){
+  var hq = document.getElementById('f-hq').value;
+  var deptSel = document.getElementById('f-dept');
+  var depts = ORG[hq] ? ORG[hq].depts : {};
+  var items = Object.keys(depts).map(function(k){ return {value:k, label: depts[k].name }; });
+  fillSelect(deptSel, items, true);
+  onDeptChange();
+}
+function onDeptChange(){
+  var hq = document.getElementById('f-hq').value;
+  var dept = document.getElementById('f-dept').value;
+  var teamSel = document.getElementById('f-team');
+  var teams = (ORG[hq] && ORG[hq].depts[dept]) ? ORG[hq].depts[dept].teams : {};
+  fillSelect(teamSel, Object.keys(teams), false);
+  onTeamChange();
+}
+function onTeamChange(){
+  // 관리권한 모드에서만 담당자 동적 변경
+  if(!document.body.classList.contains('role-admin')) return;
+  var hq = document.getElementById('f-hq').value;
+  var dept = document.getElementById('f-dept').value;
+  var team = document.getElementById('f-team').value;
+  var users = (ORG[hq] && ORG[hq].depts[dept] && ORG[hq].depts[dept].teams[team]) ? ORG[hq].depts[dept].teams[team] : [];
+  var userSel = document.getElementById('f-user');
+  if(users.length === 0){
+    userSel.innerHTML = '<option value="">담당자 없음</option>';
+  } else {
+    fillSelect(userSel, users, false);
+  }
+}
+
+function switchRole(role){
+  var labels = document.querySelectorAll('#roleSwitch label');
+  labels.forEach(function(l){
+    var input = l.querySelector('input');
+    l.classList.toggle('on', input && input.value === role);
+  });
+  var isAdmin = (role === 'admin');
+  document.body.classList.toggle('role-admin', isAdmin);
+
+  var hq = document.getElementById('f-hq');
+  var dept = document.getElementById('f-dept');
+  var team = document.getElementById('f-team');
+  var user = document.getElementById('f-user');
+
+  if(isAdmin){
+    // 관리권한: 모두 활성, 본부=영업본부/부서=영업1부/팀=영업1팀 기본
+    hq.disabled = false; dept.disabled = false; team.disabled = false; user.disabled = false;
+    hq.value = 'sales';
+    onHqChange(); // 부서/팀/담당자 재구성
+  } else {
+    // 조회권한: 로그인 사용자(=강영업) 고정, 부/팀/담당자 disabled
+    // 영업본부 > 영업1부 > 영업1팀 > 강영업 으로 고정
+    hq.value = 'sales';
+    onHqChange();
+    // onHqChange 가 user 를 재구성하므로 강영업으로 고정
+    dept.value = 'sales1';
+    onDeptChange();
+    team.value = '영업1팀';
+    // 담당자: 강영업 고정
+    user.innerHTML = '<option value="강영업" selected>강영업</option>';
+    hq.disabled = true; dept.disabled = true; team.disabled = true; user.disabled = true;
+  }
+}
+
+// 초기화: 기본 조회권한
+document.addEventListener('DOMContentLoaded', function(){
+  switchRole('view');
+});
 
 // [추가] 디스크립션 사이드 패널 접기/펼치기
 function toggleDescSide(){
