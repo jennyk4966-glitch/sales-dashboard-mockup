@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0601</title>
+<title>영업사원 대시보드_0604</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -142,6 +142,34 @@ table.data tfoot td{background:#f4f5f7;font-weight:700}
 .donut .ctr .n{font-size:11px;color:#666;margin-top:2px}
 .donut path{cursor:pointer;transition:opacity .15s}
 .donut path:hover{opacity:0.7}
+/* === [추가] 출발월별 예약현황 - 다항목 고정영역 UI === */
+.dtbl-col{min-width:0;align-self:start}
+.dtbl-cap{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:#666;margin-bottom:5px}
+.dtbl-cap b{color:#1a3a5f}
+.dtbl-cap .cap-hint{color:#9aa0a8}
+.dtbl-scroll{border:1px solid #e5e8ec;border-radius:4px;overflow-y:auto;scrollbar-gutter:stable}
+.dtbl-scroll.etc-open{max-height:178px}
+.dtbl-scroll table.data{border-collapse:separate;border-spacing:0}
+.dtbl-scroll table.data th,.dtbl-scroll table.data td{border-right:1px solid #e5e8ec;border-bottom:1px solid #e5e8ec}
+.dtbl-scroll table.data th:first-child,.dtbl-scroll table.data td:first-child{border-left:none}
+.dtbl-scroll table.data th:last-child,.dtbl-scroll table.data td:last-child{border-right:none}
+.dtbl-scroll thead th{position:sticky;top:0;z-index:3}
+.dtbl-scroll tfoot td{position:sticky;bottom:0;z-index:3}
+.leg{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.leg-sp{display:inline-block;width:8px;margin-right:5px}
+table.data tr.etc-head{cursor:pointer;background:#f7f9fc}
+table.data tr.etc-head:hover{background:#eef3fa}
+table.data tr.etc-head td{font-weight:700;color:#1a3a5f}
+table.data tr.etc-head .etc-tg{display:inline-block;width:13px;color:#7b8190;font-size:10px}
+table.data tr.etc-sub td{background:#fcfdfe;color:#666}
+table.data tr.etc-sub td.sub{padding-left:18px}
+table.data tr.etc-sub td.sub .leg-sp{width:6px}
+/* 전체 탭 단위 강조 */
+#tbl-chan td{padding:13px 6px}
+#tbl-chan td .ev-num{font-size:15px;font-weight:700;color:#1a3a5f}
+#tbl-chan td .ev-rate{font-size:15px;font-weight:700;color:#1f8a4c}
+#tbl-chan td .ev-u{font-size:11px;color:#8a909a;margin-left:2px}
+
 /* Daily channel summary */
 .chan-sum{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;color:#666;font-size:11.5px}
 /* Period filter inside section */
@@ -700,24 +728,19 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 / 속성별 / 브랜드별 예약 현황이 표시됩니다.</div>
           </div>
           <div class="itabs">
-            <div class="itab active" data-dtab="chan">채널별</div>
+            <div class="itab active" data-dtab="chan">전체</div>
             <div class="itab" data-dtab="attr">속성별</div>
             <div class="itab" data-dtab="brand">브랜드별</div>
           </div>
 
-          <!-- 채널별 -->
+          <!-- 전체 -->
           <div id="dtab-chan">
-            <div class="donut-wrap">
-              <div class="donut" id="donut-chan">
-                <svg viewBox="0 0 100 100" id="svg-chan"></svg>
-                <div class="ctr" id="ctr-chan"><div class="p">100%</div><div class="n">전체</div></div>
-              </div>
-              <table class="data" id="tbl-chan">
-                <thead><tr><th>채널</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
-                <tbody></tbody>
-                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
-              </table>
-            </div>
+            <table class="data" id="tbl-chan">
+              <thead><tr><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+              <tbody>
+                <tr><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr>
+              </tbody>
+            </table>
           </div>
 
           <!-- 속성별 -->
@@ -727,11 +750,16 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
                 <svg viewBox="0 0 100 100" id="svg-attr"></svg>
                 <div class="ctr" id="ctr-attr"><div class="p">100%</div><div class="n">전체</div></div>
               </div>
-              <table class="data" id="tbl-attr">
-                <thead><tr><th>속성</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
-                <tbody></tbody>
-                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
-              </table>
+              <div class="dtbl-col">
+                <div class="dtbl-cap" id="cap-attr"></div>
+                <div class="dtbl-scroll">
+                <table class="data" id="tbl-attr">
+                  <thead><tr><th>속성</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+                  <tbody></tbody>
+                  <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
+                </table>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -742,11 +770,16 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
                 <svg viewBox="0 0 100 100" id="svg-brand"></svg>
                 <div class="ctr" id="ctr-brand"><div class="p">100%</div><div class="n">전체</div></div>
               </div>
-              <table class="data" id="tbl-brand">
-                <thead><tr><th>브랜드</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
-                <tbody></tbody>
-                <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
-              </table>
+              <div class="dtbl-col">
+                <div class="dtbl-cap" id="cap-brand"></div>
+                <div class="dtbl-scroll">
+                <table class="data" id="tbl-brand">
+                  <thead><tr><th>브랜드</th><th>인원</th><th>매출</th><th>수익</th><th>수익률</th></tr></thead>
+                  <tbody></tbody>
+                  <tfoot><tr><td class="c">합계</td><td class="sum-pax"></td><td class="sum-sales"></td><td class="sum-margin"></td><td class="sum-rate"></td></tr></tfoot>
+                </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1562,67 +1595,118 @@ function closeModal(){document.getElementById('modal').classList.remove('show')}
 document.getElementById('modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
 
 // ============ Donut + Table ============
-function buildDonut(svgId, ctrId, tblId, data){
+function buildDonut(svgId, ctrId, tblId, data, mainCount){
   const svg=document.getElementById(svgId);
   const ctr=document.getElementById(ctrId);
-  const tbody=document.querySelector('#'+tblId+' tbody');
-  const total=data.reduce((s,d)=>s+d.pax,0);
+  const table=document.getElementById(tblId);
+  const tbody=table.querySelector('tbody');
+  const colors=['#1a3a5f','#3498db','#16a085','#e67e22','#9b59b6','#2ecc71','#f39c12','#c0392b','#2980b9','#8e44ad','#27ae60','#d35400'];
+  const ETC='#b0b7c3';
+  svg.innerHTML=''; tbody.innerHTML='';
+  const sorted=data.slice().sort((a,b)=>b.sales-a.sales);
+  const total=sorted.reduce((s,d)=>s+d.pax,0);
+  let mains,others;
+  if(typeof mainCount==='number'){ mains=sorted.slice(0,mainCount); others=sorted.slice(mainCount); }
+  else { mains=sorted.filter(d=>d.main); others=sorted.filter(d=>!d.main); }
+  // ----- 도넛 그룹: 주요 항목 + 기타(합산) -----
+  const groups=mains.map((d,i)=>({name:d.name,pax:d.pax,color:colors[i%colors.length],etc:false}));
+  let etcGroup=null;
+  if(others.length){
+    const epax=others.reduce((s,d)=>s+d.pax,0);
+    etcGroup={name:'기타 '+others.length+'개',pax:epax,color:ETC,etc:true};
+    groups.push(etcGroup);
+  }
+  const etcIdx=groups.length-1;
   let cum=0;
-  svg.innerHTML='';
-  tbody.innerHTML='';
-  const colors=['#1a3a5f','#3498db','#16a085','#e67e22','#9b59b6','#34495e','#2ecc71','#f39c12','#c0392b','#7f8c8d','#27ae60','#2980b9','#8e44ad','#d35400','#bdc3c7'];
-  data.forEach((d,i)=>{
-    const pct=d.pax/total;
-    const a0=cum*2*Math.PI, a1=(cum+pct)*2*Math.PI;
-    cum+=pct;
+  groups.forEach((g,gi)=>{
+    const pct=total>0?g.pax/total:0;
+    const a0=cum*2*Math.PI, a1=(cum+pct)*2*Math.PI; cum+=pct;
     const x0=50+40*Math.cos(a0), y0=50+40*Math.sin(a0);
     const x1=50+40*Math.cos(a1), y1=50+40*Math.sin(a1);
     const large=pct>0.5?1:0;
     const path=document.createElementNS('http://www.w3.org/2000/svg','path');
     path.setAttribute('d',`M 50 50 L ${x0} ${y0} A 40 40 0 ${large} 1 ${x1} ${y1} Z`);
-    path.setAttribute('fill',colors[i%colors.length]);
-    path.setAttribute('stroke','#fff');
-    path.setAttribute('stroke-width','0.5');
+    path.setAttribute('fill',g.color);
+    path.setAttribute('stroke','#fff'); path.setAttribute('stroke-width','0.5');
     path.addEventListener('mouseenter',()=>{
-      ctr.innerHTML=`<div class="p">${(pct*100).toFixed(1)}%</div><div class="n">${d.name}</div>`;
-      tbody.children[i].classList.add('hl');
+      ctr.innerHTML=`<div class="p">${(pct*100).toFixed(1)}%</div><div class="n">${g.name}</div>`;
+      tbody.querySelectorAll('tr[data-g="'+gi+'"]').forEach(r=>r.classList.add('hl'));
     });
     path.addEventListener('mouseleave',()=>{
       ctr.innerHTML=`<div class="p">100%</div><div class="n">전체</div>`;
-      tbody.children[i].classList.remove('hl');
+      tbody.querySelectorAll('tr.hl').forEach(r=>r.classList.remove('hl'));
     });
     svg.appendChild(path);
-    // inner donut hole
-    const tr=document.createElement('tr');
-    const margin=Math.round(d.sales*d.rate/100);
-    tr.innerHTML=`<td class="l"><span style="display:inline-block;width:8px;height:8px;background:${colors[i%colors.length]};margin-right:4px"></span>${d.name}</td><td>${d.pax.toLocaleString()}</td><td>${d.sales.toLocaleString()}</td><td>${margin.toLocaleString()}</td><td>${d.rate}%</td>`;
-    tr.addEventListener('mouseenter',()=>{
-      ctr.innerHTML=`<div class="p">${(pct*100).toFixed(1)}%</div><div class="n">${d.name}</div>`;
-      svg.children[i].style.opacity='0.7';
-    });
-    tr.addEventListener('mouseleave',()=>{
-      ctr.innerHTML=`<div class="p">100%</div><div class="n">전체</div>`;
-      svg.children[i].style.opacity='1';
-    });
-    tbody.appendChild(tr);
   });
-  // hole
   const hole=document.createElementNS('http://www.w3.org/2000/svg','circle');
   hole.setAttribute('cx','50');hole.setAttribute('cy','50');hole.setAttribute('r','22');hole.setAttribute('fill','#fff');
   svg.appendChild(hole);
-  // totals
-  const tbl=document.getElementById(tblId);
-  const totPax=data.reduce((s,d)=>s+d.pax,0);
+  // ----- 행 생성 helper -----
+  function rowHtml(d,dotColor,extra){
+    const margin=Math.round(d.sales*d.rate/100);
+    return `<td class="l ${extra||''}">`+(dotColor?`<span class="leg" style="background:${dotColor}"></span>`:'<span class="leg-sp"></span>')+
+      `${d.name}</td><td>${d.pax.toLocaleString()}</td><td>${d.sales.toLocaleString()}</td><td>${margin.toLocaleString()}</td><td>${d.rate}%</td>`;
+  }
+  function hoverBind(tr,gi){
+    tr.addEventListener('mouseenter',()=>{
+      const sl=svg.children[gi]; if(sl&&sl.tagName==='path') sl.style.opacity='0.7';
+      const g=groups[gi]; if(g) ctr.innerHTML=`<div class="p">${(total>0?g.pax/total*100:0).toFixed(1)}%</div><div class="n">${g.name}</div>`;
+    });
+    tr.addEventListener('mouseleave',()=>{
+      const sl=svg.children[gi]; if(sl&&sl.tagName==='path') sl.style.opacity='1';
+      ctr.innerHTML=`<div class="p">100%</div><div class="n">전체</div>`;
+    });
+  }
+  // 주요 항목 행
+  mains.forEach((d,i)=>{
+    const tr=document.createElement('tr');
+    tr.setAttribute('data-g',i);
+    tr.innerHTML=rowHtml(d,colors[i%colors.length]);
+    hoverBind(tr,i);
+    tbody.appendChild(tr);
+  });
+  // 기타 그룹: 접기/펼치기
+  if(others.length){
+    const esales=others.reduce((s,d)=>s+d.sales,0);
+    const emargin=others.reduce((s,d)=>s+Math.round(d.sales*d.rate/100),0);
+    const erate=esales?(emargin/esales*100):0;
+    const head=document.createElement('tr');
+    head.className='etc-head'; head.setAttribute('data-g',etcIdx);
+    head.innerHTML=`<td class="l"><span class="leg" style="background:${ETC}"></span><span class="etc-tg">▸</span>기타 <b>${others.length}</b>개</td>`+
+      `<td>${etcGroup.pax.toLocaleString()}</td><td>${esales.toLocaleString()}</td><td>${emargin.toLocaleString()}</td><td>${erate.toFixed(1)}%</td>`;
+    hoverBind(head,etcIdx);
+    const subRows=others.map(d=>{
+      const tr=document.createElement('tr');
+      tr.className='etc-sub'; tr.setAttribute('data-g',etcIdx); tr.style.display='none';
+      tr.innerHTML=rowHtml(d,null,'sub');
+      hoverBind(tr,etcIdx);
+      return tr;
+    });
+    let open=false;
+    head.addEventListener('click',()=>{
+      open=!open;
+      head.querySelector('.etc-tg').textContent=open?'▾':'▸';
+      subRows.forEach(r=>r.style.display=open?'':'none');
+      const sc=table.closest('.dtbl-scroll');
+      if(sc) sc.classList.toggle('etc-open',open);
+    });
+    tbody.appendChild(head);
+    subRows.forEach(r=>tbody.appendChild(r));
+  }
+  // 합계
   const totSales=data.reduce((s,d)=>s+d.sales,0);
   const totMargin=data.reduce((s,d)=>s+Math.round(d.sales*d.rate/100),0);
   const avgRate=totSales>0?(totMargin/totSales*100):0;
-  const tfoot=tbl.querySelector('tfoot');
+  const tfoot=table.querySelector('tfoot');
   if(tfoot){
-    tfoot.querySelector('.sum-pax').textContent=totPax.toLocaleString();
+    tfoot.querySelector('.sum-pax').textContent=total.toLocaleString();
     tfoot.querySelector('.sum-sales').textContent=totSales.toLocaleString();
     tfoot.querySelector('.sum-margin').textContent=totMargin.toLocaleString();
     tfoot.querySelector('.sum-rate').textContent=avgRate.toFixed(2)+'%';
   }
+  // 캡션
+  const cap=document.getElementById('cap-'+tblId.split('-')[1]);
+  if(cap){ cap.innerHTML=`<span>주요 <b>${mains.length}</b>개 · 전체 <b>${data.length}</b>개</span><span class="cap-hint">기타 행 클릭 시 펼침</span>`; }
 }
 
 const channelData=[
@@ -1637,24 +1721,50 @@ const attrData=[
   {name:'[P]패키지',pax:680,sales:920000000,rate:17.5},
   {name:'[Q]인센티브',pax:120,sales:198000000,rate:19.2},
   {name:'[M]AD투어',pax:42,sales:62000000,rate:14.0},
-  {name:'[W]허니문',pax:88,sales:165000000,rate:18.8},
+  {name:'[F]패스/입장권',pax:30,sales:45000000,rate:12.5},
+  {name:'[B]결합상품',pax:26,sales:40000000,rate:13.0},
+  {name:'[E]박람회/전시회',pax:18,sales:30000000,rate:11.8},
   {name:'[G]골프',pax:48,sales:88000000,rate:16.5},
-  {name:'[C]크루즈',pax:35,sales:75000000,rate:21.0},
+  {name:'[J]종교',pax:14,sales:22000000,rate:13.5},
+  {name:'[K]액티비티',pax:22,sales:34000000,rate:14.5},
+  {name:'[U]우리끼리',pax:35,sales:52000000,rate:15.0},
+  {name:'[X]현지투어플러스',pax:52,sales:78000000,rate:12.8},
+  {name:'[W]허니문',pax:88,sales:165000000,rate:18.8},
   {name:'[Z]제우스',pax:62,sales:142000000,rate:22.5},
-  {name:'[X]현지투어플러스',pax:52,sales:78000000,rate:12.8}
+  {name:'[C]크루즈',pax:35,sales:75000000,rate:21.0}
 ];
 const brandData=[
-  {name:'프리미엄',pax:142,sales:288000000,rate:21.5},
-  {name:'스탠다드',pax:480,sales:622000000,rate:17.2},
-  {name:'세이브',pax:218,sales:248000000,rate:14.0},
-  {name:'ZEUS',pax:62,sales:142000000,rate:22.5},
-  {name:'허니문',pax:78,sales:148000000,rate:18.5},
+  {name:'프리미엄',pax:142,sales:288000000,rate:21.5,main:true},
+  {name:'스탠다드',pax:480,sales:622000000,rate:17.2,main:true},
+  {name:'세이브',pax:218,sales:248000000,rate:14.0,main:true},
+  {name:'우리끼리',pax:64,sales:92000000,rate:15.0},
+  {name:'ZEUS',pax:62,sales:142000000,rate:22.5,main:true},
+  {name:'허니문',pax:78,sales:148000000,rate:18.5,main:true},
   {name:'골프',pax:48,sales:88000000,rate:16.5},
   {name:'크루즈',pax:35,sales:75000000,rate:21.0},
-  {name:'현지투어플러스',pax:64,sales:86000000,rate:13.0}
+  {name:'내나라여행',pax:40,sales:58000000,rate:13.5},
+  {name:'브랜드미적용',pax:20,sales:28000000,rate:10.0},
+  {name:'트레킹',pax:18,sales:24000000,rate:14.0},
+  {name:'레포츠',pax:16,sales:22000000,rate:13.0},
+  {name:'현지투어',pax:30,sales:42000000,rate:12.5},
+  {name:'현지투어플러스',pax:64,sales:86000000,rate:13.0},
+  {name:'제우스 프라이빗',pax:24,sales:68000000,rate:23.5},
+  {name:'제우스 시그니처',pax:20,sales:55000000,rate:22.8},
+  {name:'제우스 셀렉트',pax:16,sales:40000000,rate:21.5}
 ];
-buildDonut('svg-chan','ctr-chan','tbl-chan',channelData);
-buildDonut('svg-attr','ctr-attr','tbl-attr',attrData);
+(function(){
+  const d=channelData;
+  const totPax=d.reduce((s,x)=>s+x.pax,0);
+  const totSales=d.reduce((s,x)=>s+x.sales,0);
+  const totMargin=d.reduce((s,x)=>s+Math.round(x.sales*x.rate/100),0);
+  const avgRate=totSales?totMargin/totSales*100:0;
+  const tr=document.querySelector('#tbl-chan tbody tr');
+  tr.querySelector('.sum-pax').innerHTML='<span class="ev-num">'+totPax.toLocaleString()+'</span><span class="ev-u">명</span>';
+  tr.querySelector('.sum-sales').innerHTML='<span class="ev-num">'+totSales.toLocaleString()+'</span><span class="ev-u">원</span>';
+  tr.querySelector('.sum-margin').innerHTML='<span class="ev-num">'+totMargin.toLocaleString()+'</span><span class="ev-u">원</span>';
+  tr.querySelector('.sum-rate').innerHTML='<span class="ev-rate">'+avgRate.toFixed(2)+'</span><span class="ev-u">%</span>';
+})();
+buildDonut('svg-attr','ctr-attr','tbl-attr',attrData,6);
 buildDonut('svg-brand','ctr-brand','tbl-brand',brandData);
 
 // ============ Chart 일자별 모객 추이 (총예약/총취소/순예약, 최근 7일 고정) ============
