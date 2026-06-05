@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0604</title>
+<title>영업사원 대시보드_0605</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -422,6 +422,35 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .dt-chart-scroll{width:100%;overflow-x:hidden;margin-top:10px}
 .dt-chart-scroll.scroll-x{overflow-x:auto}
 .dt-chart-scroll.scroll-x #dt-chart-inner{min-width:1400px}
+/* 일자별 예약 채널 현황: 기간 가로 스크롤 + 채널 컬럼 고정 */
+.ch-scroll-wrap{width:100%;overflow-x:hidden}
+.ch-scroll-wrap.scroll-x{overflow-x:auto}
+.ch-scroll-wrap.scroll-x table.data{min-width:1400px}
+.ch-scroll-wrap table.data thead tr:first-child th:first-child,
+.ch-scroll-wrap table.data tbody td:first-child,
+.ch-scroll-wrap table.data tfoot td:first-child{position:sticky;left:0;z-index:2}
+.ch-scroll-wrap table.data thead tr:first-child th:first-child{z-index:3;background:#eef2f7}
+.ch-scroll-wrap table.data tbody td:first-child{background:#f4f5f7}
+.ch-scroll-wrap table.data tbody tr:hover td:first-child{background:#fffbe6}
+.ch-scroll-wrap table.data tfoot td:first-child{background:#f4f5f7}
+.ch-scroll-wrap.scroll-x table.data thead tr:first-child th:first-child,
+.ch-scroll-wrap.scroll-x table.data tbody td:first-child,
+.ch-scroll-wrap.scroll-x table.data tfoot td:first-child{box-shadow:1px 0 0 #d9dde2}
+
+/* ===== 합계(마지막) 컬럼 우측 고정 ===== */
+.ch-scroll-wrap table.data thead tr:first-child th:last-child,
+.ch-scroll-wrap table.data tbody td:last-child,
+.ch-scroll-wrap table.data tfoot td:last-child{position:sticky;right:0;z-index:2}
+.ch-scroll-wrap table.data thead tr:first-child th:last-child{z-index:3;background:#eef2f7}
+.ch-scroll-wrap table.data tbody td:last-child{background:#f4f5f7}
+.ch-scroll-wrap table.data tbody tr:hover td:last-child{background:#fffbe6}
+.ch-scroll-wrap table.data tfoot td:last-child{background:#f4f5f7}
+.ch-scroll-wrap.scroll-x table.data thead tr:first-child th:last-child,
+.ch-scroll-wrap.scroll-x table.data tbody td:last-child,
+.ch-scroll-wrap.scroll-x table.data tfoot td:last-child{box-shadow:-1px 0 0 #d9dde2}
+.ch-scroll-wrap table.data thead tr:first-child th:first-child,
+.ch-scroll-wrap table.data tbody td:first-child,
+.ch-scroll-wrap table.data tfoot td:first-child{white-space:nowrap;min-width:120px}
 .trend-tbl tr.net td.neg{background:#fdecea;color:#c0392b;font-weight:700;position:relative}
 .trend-tbl tr.net td.neg::after{content:'▼';font-size:9px;margin-left:3px;color:#c0392b}
 
@@ -487,13 +516,13 @@ body.desc-collapsed .wrap{padding-right:54px}
 body.pre-query #card-monthly .card-body > *:not(.pre-query-msg),
 body.pre-query #card-dailychannel .card-body > *:not(.pre-query-msg),
 body.pre-query #card-dailytrend .card-body > *:not(.pre-query-msg),
-body.pre-query #card-hcsi .card-body > *:not(.pre-query-msg){display:none !important}
+body.pre-query #card-hcsi .card-body > *:not(.pre-query-msg){visibility:hidden !important}
     /* HCSI 영역: 구분=하나담당자일 때만 정상 노출 */
     .hcsi-non-hana-msg{display:none;padding:28px 16px;text-align:center;background:#fffaf0;border:1px dashed #e8d4a0;border-radius:4px;color:#8a6a1b}
     .hcsi-non-hana-msg .ico{font-size:18px;color:#b8860b;margin-bottom:6px;font-weight:700}
     .hcsi-non-hana-msg .ttl{font-size:13px;font-weight:700;color:#8a6a1b;margin-bottom:4px}
     .hcsi-non-hana-msg .dsc{font-size:11.5px;color:#8a6a1b;line-height:1.5}
-    body.non-hana #card-hcsi .card-body > *:not(.hcsi-non-hana-msg){display:none !important}
+    body.non-hana #card-hcsi .card-body > *:not(.hcsi-non-hana-msg){visibility:hidden !important}
     body.non-hana #card-hcsi .hcsi-non-hana-msg{display:block}
     body.non-hana #page-hcsi .hcsi-section,
     body.non-hana #page-hcsi > div:not(.hcsi-non-hana-msg):not(.filter-bar):not(.ptabs):not(.hcsi-page-head){display:none !important}
@@ -508,7 +537,7 @@ body.pre-query .pre-query-msg{display:flex}
 body.no-data #card-monthly .card-body > *:not(.no-data-msg),
 body.no-data #card-dailychannel .card-body > *:not(.no-data-msg),
 body.no-data #card-dailytrend .card-body > *:not(.no-data-msg),
-body.no-data #card-hcsi .card-body > *:not(.no-data-msg){display:none !important}
+body.no-data #card-hcsi .card-body > *:not(.no-data-msg){visibility:hidden !important}
 body.no-data #card-monthly .no-data-msg,
 body.no-data #card-dailychannel .no-data-msg,
 body.no-data #card-dailytrend .no-data-msg,
@@ -529,6 +558,12 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
 /* ============ [추가] 권한 토글 ============ */
 .role-switch-row{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-bottom:6px}
 .role-switch-row .role-label{font-size:11.5px;color:#666;font-weight:600}
+.role-info{position:relative;display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;line-height:1;border-radius:50%;color:#8a9099;font-size:13px;font-style:normal;cursor:help;margin-left:-4px}
+.role-info:hover{color:#1a3a5f}
+.role-info .role-tip{display:none;position:absolute;top:150%;right:0;width:280px;background:#1a3a5f;color:#fff;font-size:11px;line-height:1.6;font-weight:400;padding:10px 12px;border-radius:5px;box-shadow:0 4px 14px rgba(0,0,0,.22);z-index:9999;text-align:left;white-space:normal}
+.role-info .role-tip b{color:#ffd24d;font-weight:700}
+.role-info:hover .role-tip,.role-info:focus .role-tip{display:block}
+.role-info .role-tip::after{content:"";position:absolute;bottom:100%;right:7px;border:6px solid transparent;border-bottom-color:#1a3a5f}
 .role-switch{display:inline-flex;border:1px solid #c9ccd1;border-radius:3px;overflow:hidden;background:#fff}
 .role-switch label{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;font-size:12px;color:#555;cursor:pointer;font-weight:600;border-right:1px solid #e5e8ec}
 .role-switch label:last-child{border-right:none}
@@ -539,6 +574,37 @@ body.pre-query #card-mytask .mtask-val.danger::after{color:#9ca3af}
 body.role-admin .top-filter .admin-only{display:inline-flex;align-items:center;gap:6px}
 body.role-admin .top-filter .admin-only-label{display:inline-block}
 .top-filter .admin-only-label{display:none}
+
+/* ===== [재적용] 카드 높이/가로폭 고정 (요청 수정) ===== */
+/* (A) 가로폭 1280px 고정: 이하로 좁아지면 가로 스크롤 */
+.main > .breadcrumb-row,
+.main > .top-filter,
+.main > .top-notice,
+.main > .ptabs,
+.main > section{min-width:1280px}
+
+/* (B) 조회 전/후 데이터 카드 높이 고정: 안내메시지를 오버레이로 처리 */
+#card-monthly .card-body,
+#card-dailychannel .card-body,
+#card-dailytrend .card-body,
+#card-hcsi .card-body{position:relative;min-height:200px}
+#card-monthly .card-body > .no-data-msg,
+#card-monthly .card-body > .pre-query-msg,
+#card-dailychannel .card-body > .no-data-msg,
+#card-dailychannel .card-body > .pre-query-msg,
+#card-dailytrend .card-body > .no-data-msg,
+#card-dailytrend .card-body > .pre-query-msg,
+#card-hcsi .card-body > .no-data-msg,
+#card-hcsi .card-body > .pre-query-msg,
+#card-hcsi .card-body > .hcsi-non-hana-msg{
+  position:absolute;left:14px;right:14px;top:12px;bottom:12px;margin:0;z-index:5;background:#fff;
+}
+
+/* (C) 출발월별 탭(전체/속성별/브랜드별) 전환 높이 고정 */
+#card-monthly #dtab-chan,
+#card-monthly #dtab-attr,
+#card-monthly #dtab-brand{min-height:220px}
+#card-monthly .dtbl-scroll:not(.etc-open){max-height:198px;overflow:auto}
 </style>
 </head>
 <body class="pre-query lnb-collapsed desc-collapsed">
@@ -590,7 +656,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 공통 팀/담당자 필터 -->
       <!-- [추가] 권한 선택 (목업: 조회권한/관리권한 전환) -->
       <div class="role-switch-row">
-        <span class="role-label">권한</span>
+        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
         <div class="role-switch" id="roleSwitch">
           <label class="on"><input type="radio" name="role" value="view" checked onchange="switchRole('view')">조회권한</label>
           <label><input type="radio" name="role" value="admin" onchange="switchRole('admin')">관리권한</label>
@@ -720,12 +786,12 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           <div class="no-data-msg" aria-hidden="true">
             <div class="nd-icon">i</div>
             <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
+            <div class="nd-desc">해당 기간에 예약 내역이 없습니다 <br> 연도/월 또는 담당자 조건을 변경해 다시 조회해 주세요.</div>
           </div>
                     <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
-            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 / 속성별 / 브랜드별 예약 현황이 표시됩니다.</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>전체 / 속성별 / 브랜드별 예약 현황이 표시됩니다.</div>
           </div>
           <div class="itabs">
             <div class="itab active" data-dtab="chan">전체</div>
@@ -790,7 +856,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 2 (신규): 채널별 예약 현 -->
       <div class="card" id="card-dailychannel">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">채널별 예약 현황 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">최근 7일</span> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span class="desc-ico">ⓘ</span></h3>
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
         </div>
         <div class="card-body">
@@ -806,26 +872,32 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           </div>
           <div class="top-filter" style="margin-bottom:8px">
             <label>조회기간</label>
-            <input type="date" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            <select id="ch-range" onchange="changeChannelRange(this.value)" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <option value="7" selected>7일</option>
+              <option value="10">10일</option>
+              <option value="30">30일</option>
+            </select>
+            <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
             <span>~</span>
-            <input type="date" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-            <span style="color:#888;font-size:11.5px;margin-left:4px">※ 1주일 고정</span>
+            <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
           </div>
-          <table class="data">
-            <thead>
-              <tr><th rowspan="2">채널</th><th colspan="7">일자별 예약건수</th><th rowspan="2">합계</th></tr>
-              <tr><th>05/09(토)</th><th>05/10(일)</th><th>05/11(월)</th><th>05/12(화)</th><th>05/13(수)</th><th>05/14(목)</th><th>05/15(금)</th></tr>
-            </thead>
-            <tbody>
-              <tr><td class="l">공식인증예약센터</td><td>7</td><td>6</td><td>11</td><td>9</td><td>8</td><td>10</td><td>12</td><td><b>63</b></td></tr>
-              <tr><td class="l">브랜드몰</td><td>7</td><td>4</td><td>5</td><td>6</td><td>4</td><td>5</td><td>6</td><td><b>37</b></td></tr>
-              <tr><td class="l">일반대리점</td><td>8</td><td>5</td><td>4</td><td>7</td><td>6</td><td>5</td><td>9</td><td><b>44</b></td></tr>
-              <tr><td class="l">제휴사</td><td>3</td><td>1</td><td>2</td><td>3</td><td>2</td><td>3</td><td>4</td><td><b>18</b></td></tr>
-              <tr><td class="l">자회사</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>14</b></td></tr>
-              <tr><td class="l">직판</td><td>1</td><td>0</td><td>2</td><td>1</td><td>1</td><td>2</td><td>2</td><td><b>9</b></td></tr>
-            </tbody>
-            <tfoot><tr><td class="c">합계</td><td>28</td><td>18</td><td>26</td><td>27</td><td>23</td><td>27</td><td>36</td><td>185</td></tr></tfoot>
-          </table>
+          <div id="ch-scroll-wrap" class="ch-scroll-wrap">
+            <table class="data">
+              <thead id="ch-thead">
+                <tr><th rowspan="2">채널</th><th colspan="7">일자별 예약건수</th><th rowspan="2">합계</th></tr>
+                <tr><th>05/09(토)</th><th>05/10(일)</th><th>05/11(월)</th><th>05/12(화)</th><th>05/13(수)</th><th>05/14(목)</th><th>05/15(금)</th></tr>
+              </thead>
+              <tbody id="ch-tbody">
+                <tr><td class="l">공식인증예약센터</td><td>7</td><td>6</td><td>11</td><td>9</td><td>8</td><td>10</td><td>12</td><td><b>63</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td>7</td><td>4</td><td>5</td><td>6</td><td>4</td><td>5</td><td>6</td><td><b>37</b></td></tr>
+                <tr><td class="l">일반대리점</td><td>8</td><td>5</td><td>4</td><td>7</td><td>6</td><td>5</td><td>9</td><td><b>44</b></td></tr>
+                <tr><td class="l">제휴사</td><td>3</td><td>1</td><td>2</td><td>3</td><td>2</td><td>3</td><td>4</td><td><b>18</b></td></tr>
+                <tr><td class="l">자회사</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>14</b></td></tr>
+                <tr><td class="l">직판</td><td>1</td><td>0</td><td>2</td><td>1</td><td>1</td><td>2</td><td>2</td><td><b>9</b></td></tr>
+              </tbody>
+              <tfoot id="ch-tfoot"><tr><td class="c">합계</td><td>28</td><td>18</td><td>26</td><td>27</td><td>23</td><td>27</td><td>36</td><td>185</td></tr></tfoot>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -978,22 +1050,23 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           <div id="ctab-agency">
             <div class="top-filter" style="margin-bottom:8px">
               <label>조회기간</label>
+              <select id="agc-range" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333"><option value="7">7일</option><option value="10" selected>10일</option><option value="30">30일</option></select>
               <input type="date" value="2026-05-06" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
               <span>~</span>
               <input type="date" value="2026-05-15" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
               <label>채널</label>
-              <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option><option>일반대리점</option></select>
+              <select id="agc-channel"><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option><option>일반대리점</option></select>
               <label>대리점 검색</label>
               <input type="text" placeholder="대리점명/코드" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px">
-              <button class="btn">조회</button>
+              <button class="btn" onclick="searchAgency()">조회</button>
             </div>
             <div class="notice"><b>[안내]</b> <br>조회기간 내 <b>예약발생 대리점만 노출됩니다.</b> (예약 0건 대리점은 자동 제외)</div>
             <table class="data">
-              <thead>
+              <thead id="agc-thead">
                 <tr><th rowspan="2">채널</th><th rowspan="2">대리점코드</th><th rowspan="2">대리점</th><th colspan="10">일자별 예약건수</th><th rowspan="2">합계</th></tr>
                 <tr><th>05/06</th><th>05/07</th><th>05/08</th><th>05/09</th><th>05/10</th><th>05/11</th><th>05/12</th><th>05/13</th><th>05/14</th><th>05/15</th></tr>
               </thead>
-              <tbody>
+              <tbody id="agc-tbody">
                 <tr><td class="l">공식인증예약센터</td><td class="l">A4722</td><td class="l">강남센터</td><td>3</td><td>4</td><td>3</td><td>2</td><td>2</td><td>4</td><td>3</td><td>3</td><td>4</td><td>5</td><td><b>33</b></td></tr>
                 <tr><td class="l">공식인증예약센터</td><td class="l">A4815</td><td class="l">명동센터</td><td>2</td><td>3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>3</td><td>3</td><td><b>24</b></td></tr>
                 <tr><td class="l">공식인증예약센터</td><td class="l">A5021</td><td class="l">분당센터</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td><b>33</b></td></tr>
@@ -1013,8 +1086,6 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <div class="top-filter" style="margin-bottom:8px">
               <label>조회기간</label>
               <select><option>최근 6개월</option><option>최근 12개월</option></select>
-              <label>단위</label>
-              <select><option>월</option><option>주</option></select>
               <label>채널</label>
               <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option></select>
               <button class="btn">조회</button>
@@ -1861,6 +1932,167 @@ function changeDailyRange(range){
   else { wrap.classList.remove('scroll-x'); cwrap.classList.remove('scroll-x'); }
   // 차트 갱신
   buildDailyChart(d);
+}
+
+// ============ 채널별(일자별 예약 채널) 7/10/30일 데이터 & 렌더 ============
+const CH_CHANNELS = ['공식인증예약센터','브랜드몰','일반대리점','제휴사','자회사','직판'];
+const CH_DATA = {
+  '7': {
+    labels:['05/09(토)','05/10(일)','05/11(월)','05/12(화)','05/13(수)','05/14(목)','05/15(금)'],
+    rows:[
+      [7,6,11,9,8,10,12],
+      [7,4,5,6,4,5,6],
+      [8,5,4,7,6,5,9],
+      [3,1,2,3,2,3,4],
+      [2,2,2,1,2,2,3],
+      [1,0,2,1,1,2,2]
+    ]
+  },
+  '10': {
+    labels:['05/06(수)','05/07(목)','05/08(금)','05/09(토)','05/10(일)','05/11(월)','05/12(화)','05/13(수)','05/14(목)','05/15(금)'],
+    rows:[
+      [9,10,8,7,6,11,9,8,10,12],
+      [5,6,4,7,4,5,6,4,5,6],
+      [6,7,8,8,5,4,7,6,5,9],
+      [2,3,2,3,1,2,3,2,3,4],
+      [2,3,1,2,2,2,1,2,2,3],
+      [1,2,1,1,0,2,1,1,2,2]
+    ]
+  },
+  '30': (function(){
+    const lb=[];
+    const start=new Date(2026,3,16); // 4/16
+    const dn=['일','월','화','수','목','금','토'];
+    for(let i=0;i<30;i++){
+      const d=new Date(start); d.setDate(d.getDate()+i);
+      lb.push(String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0')+'('+dn[d.getDay()]+')');
+    }
+    const base=[10,5,6,3,2,1];
+    const rows=base.map(function(b){
+      const arr=[];
+      for(let i=0;i<30;i++){ arr.push(Math.max(0, Math.round(b + (Math.random()*b - b/2)))); }
+      return arr;
+    });
+    return {labels:lb, rows:rows};
+  })()
+};
+function changeChannelRange(range){
+  const d = CH_DATA[range];
+  if(!d) return;
+  const n = d.labels.length;
+  // 헤더
+  var thead = document.getElementById('ch-thead');
+  thead.innerHTML =
+    '<tr><th rowspan="2">채널</th><th colspan="'+n+'">일자별 예약건수</th><th rowspan="2">합계</th></tr>' +
+    '<tr>'+d.labels.map(function(l){return '<th>'+l+'</th>';}).join('')+'</tr>';
+  // 본문 + 열 합계
+  var colSum = new Array(n).fill(0);
+  var grand = 0;
+  var tbodyHtml = '';
+  d.rows.forEach(function(arr, ri){
+    var rowSum = 0;
+    var tds = arr.map(function(v,ci){ rowSum+=v; colSum[ci]+=v; return '<td>'+v+'</td>'; }).join('');
+    grand += rowSum;
+    tbodyHtml += '<tr><td class="l">'+CH_CHANNELS[ri]+'</td>'+tds+'<td><b>'+rowSum+'</b></td></tr>';
+  });
+  document.getElementById('ch-tbody').innerHTML = tbodyHtml;
+  // 합계 행
+  document.getElementById('ch-tfoot').innerHTML =
+    '<tr><td class="c">합계</td>'+colSum.map(function(v){return '<td>'+v+'</td>';}).join('')+'<td>'+grand+'</td></tr>';
+  // 기간 표시
+  var s = document.getElementById('ch-start');
+  var e = document.getElementById('ch-end');
+  if(s && e){
+    var endD = new Date(2026,4,15);
+    var startD = new Date(endD); startD.setDate(endD.getDate()-(parseInt(range)-1));
+    function fmt(dt){ return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+    s.value = fmt(startD); e.value = fmt(endD);
+  }
+  // 부제
+  var sub = document.getElementById('ch-subtitle');
+  if(sub){ sub.textContent = '최근 '+range+'일'; }
+  // 데이터 많은 경우(30일) 채널 컬럼 고정 + 기간 가로 스크롤
+  var wrap = document.getElementById('ch-scroll-wrap');
+  if(range==='30'){ wrap.classList.add('scroll-x'); }
+  else { wrap.classList.remove('scroll-x'); }
+}
+
+// ============ [추가] 예약현황(상세) 대리점별 상세 조회 (7/10/30일 + 채널) ============
+// 기준 10일(05/06~05/15) 데이터. 7일=뒤 7개, 30일=04/16~05/15 합성.
+const AGC_BASE = [
+  {ch:'공식인증예약센터', code:'A4722', name:'강남센터',     d:[3,4,3,2,2,4,3,3,4,5]},
+  {ch:'공식인증예약센터', code:'A4815', name:'명동센터',     d:[2,3,3,2,1,3,2,2,3,3]},
+  {ch:'공식인증예약센터', code:'A5021', name:'분당센터',     d:[3,3,3,3,3,4,4,3,3,4]},
+  {ch:'일반대리점',       code:'B1102', name:'강서투어',     d:[1,0,2,1,0,1,2,1,0,2]},
+  {ch:'일반대리점',       code:'B1245', name:'분당하나여행', d:[2,2,1,3,2,1,2,2,2,3]},
+  {ch:'일반대리점',       code:'B1388', name:'수원월드투어', d:[2,1,1,2,1,1,1,1,1,2]},
+  {ch:'브랜드몰',         code:'M2201', name:'프리미엄몰',   d:[3,2,3,4,2,3,3,2,3,3]},
+  {ch:'브랜드몰',         code:'M2305', name:'스탠다드몰',   d:[2,2,3,3,2,2,3,2,2,3]},
+  {ch:'제휴사',           code:'P3110', name:'OO카드',       d:[1,2,1,2,0,1,2,1,2,2]},
+  {ch:'자회사',           code:'S4001', name:'하나여행',     d:[2,2,1,2,2,2,1,2,2,3]}
+];
+// 30일 합성 데이터 캐시 (재조회 시 동일하게 유지)
+let AGC_30_CACHE = null;
+function agcGen30(){
+  if(AGC_30_CACHE) return AGC_30_CACHE;
+  AGC_30_CACHE = AGC_BASE.map(function(r){
+    var avg = r.d.reduce(function(a,b){return a+b;},0)/r.d.length;
+    var arr = [];
+    for(var i=0;i<20;i++){ arr.push(Math.max(0, Math.round(avg + (Math.random()*avg - avg/2)))); }
+    return arr.concat(r.d); // 앞 20일(04/16~05/05) + 기준 10일(05/06~05/15)
+  });
+  return AGC_30_CACHE;
+}
+function agcLabels(range){
+  // 종료일 2026-05-15 기준, range일치 라벨 (MM/DD)
+  var end = new Date(2026,4,15);
+  var n = parseInt(range,10);
+  var out = [];
+  for(var i=n-1;i>=0;i--){
+    var d = new Date(end); d.setDate(end.getDate()-i);
+    out.push(String(d.getMonth()+1).padStart(2,'0')+'/'+String(d.getDate()).padStart(2,'0'));
+  }
+  return out;
+}
+function searchAgency(){
+  var range = (document.getElementById('agc-range')||{}).value || '10';
+  var channel = (document.getElementById('agc-channel')||{}).value || '전체';
+  var n = parseInt(range,10);
+  // 행별 일자 배열 구성
+  var rows = AGC_BASE.map(function(r, idx){
+    var arr;
+    if(range==='30'){ arr = agcGen30()[idx]; }
+    else if(range==='7'){ arr = r.d.slice(3); }   // 뒤 7개 (05/09~05/15)
+    else { arr = r.d.slice(); }                    // 10일 전체
+    return {ch:r.ch, code:r.code, name:r.name, arr:arr};
+  });
+  // 채널 필터
+  if(channel!=='전체'){ rows = rows.filter(function(r){ return r.ch===channel; }); }
+  // 예약발생 대리점만 노출 (합계 0 제외)
+  rows = rows.filter(function(r){ return r.arr.reduce(function(a,b){return a+b;},0) > 0; });
+  // 라벨
+  var labels = agcLabels(range);
+  // 헤더
+  var thead = document.getElementById('agc-thead');
+  if(thead){
+    thead.innerHTML =
+      '<tr><th rowspan="2">채널</th><th rowspan="2">대리점코드</th><th rowspan="2">대리점</th>'+
+      '<th colspan="'+n+'">일자별 예약건수</th><th rowspan="2">합계</th></tr>'+
+      '<tr>'+labels.map(function(l){return '<th>'+l+'</th>';}).join('')+'</tr>';
+  }
+  // 본문
+  var tbody = document.getElementById('agc-tbody');
+  if(tbody){
+    if(rows.length===0){
+      tbody.innerHTML = '<tr><td class="c" colspan="'+(n+4)+'" style="padding:18px;color:#888">조회된 대리점이 없습니다. 채널 또는 조회기간 조건을 변경해 주세요.</td></tr>';
+    } else {
+      tbody.innerHTML = rows.map(function(r){
+        var sum = r.arr.reduce(function(a,b){return a+b;},0);
+        var tds = r.arr.map(function(v){return '<td>'+v+'</td>';}).join('');
+        return '<tr><td class="l">'+r.ch+'</td><td class="l">'+r.code+'</td><td class="l">'+r.name+'</td>'+tds+'<td><b>'+sum+'</b></td></tr>';
+      }).join('');
+    }
+  }
 }
 
 // ============ Popup: 최근 3개월 추이 보기 ============
