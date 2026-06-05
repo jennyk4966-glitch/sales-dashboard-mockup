@@ -92,6 +92,12 @@ table.data td.l{text-align:left}
 table.data tbody tr:hover{background:#fffbe6}
 table.data tr.hl{background:#fff3cd !important}
 table.data tfoot td{background:#f4f5f7;font-weight:700}
+/* [요청] 합계/비율 강조 */
+table.data th.sumc,table.data td.sumc{background:#fff5d6;color:#8a6300;font-weight:700}
+table.data th.ratec,table.data td.ratec{background:#e7f0fb;color:#1a3a5f;font-weight:700}
+table.data tr.totrow td,table.data tr.totrow th{background:#eef2f7;color:#1a3a5f;font-weight:700;border-top:2px solid #1a3a5f}
+table.data tr.totrow td.sumc{background:#ffe9a8;color:#7a5800}
+table.data tr.totrow td.ratec{background:#d6e6fa;color:#103a66}
 .neg{color:#d32f2f;font-weight:700}
 .muted{color:#999}
 /* MyTask */
@@ -1063,21 +1069,22 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <div class="notice"><b>[안내]</b> <br>조회기간 내 <b>예약발생 대리점만 노출됩니다.</b> (예약 0건 대리점은 자동 제외)</div>
             <table class="data">
               <thead id="agc-thead">
-                <tr><th rowspan="2">채널</th><th rowspan="2">대리점코드</th><th rowspan="2">대리점</th><th colspan="10">일자별 예약건수</th><th rowspan="2">합계</th></tr>
+                <tr><th rowspan="2">채널</th><th rowspan="2">대리점코드</th><th rowspan="2">대리점</th><th colspan="10">일자별 예약건수</th><th rowspan="2" class="sumc">합계</th></tr>
                 <tr><th>05/06</th><th>05/07</th><th>05/08</th><th>05/09</th><th>05/10</th><th>05/11</th><th>05/12</th><th>05/13</th><th>05/14</th><th>05/15</th></tr>
               </thead>
               <tbody id="agc-tbody">
-                <tr><td class="l">공식인증예약센터</td><td class="l">A4722</td><td class="l">강남센터</td><td>3</td><td>4</td><td>3</td><td>2</td><td>2</td><td>4</td><td>3</td><td>3</td><td>4</td><td>5</td><td><b>33</b></td></tr>
-                <tr><td class="l">공식인증예약센터</td><td class="l">A4815</td><td class="l">명동센터</td><td>2</td><td>3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>3</td><td>3</td><td><b>24</b></td></tr>
-                <tr><td class="l">공식인증예약센터</td><td class="l">A5021</td><td class="l">분당센터</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td><b>33</b></td></tr>
-                <tr><td class="l">일반대리점</td><td class="l">B1102</td><td class="l">강서투어</td><td>1</td><td>0</td><td>2</td><td>1</td><td>0</td><td>1</td><td>2</td><td>1</td><td>0</td><td>2</td><td><b>10</b></td></tr>
-                <tr><td class="l">일반대리점</td><td class="l">B1245</td><td class="l">분당하나여행</td><td>2</td><td>2</td><td>1</td><td>3</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>3</td><td><b>20</b></td></tr>
-                <tr><td class="l">일반대리점</td><td class="l">B1388</td><td class="l">수원월드투어</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td><b>13</b></td></tr>
-                <tr><td class="l">브랜드몰</td><td class="l">M2201</td><td class="l">프리미엄몰</td><td>3</td><td>2</td><td>3</td><td>4</td><td>2</td><td>3</td><td>3</td><td>2</td><td>3</td><td>3</td><td><b>28</b></td></tr>
-                <tr><td class="l">브랜드몰</td><td class="l">M2305</td><td class="l">스탠다드몰</td><td>2</td><td>2</td><td>3</td><td>3</td><td>2</td><td>2</td><td>3</td><td>2</td><td>2</td><td>3</td><td><b>24</b></td></tr>
-                <tr><td class="l">제휴사</td><td class="l">P3110</td><td class="l">OO카드</td><td>1</td><td>2</td><td>1</td><td>2</td><td>0</td><td>1</td><td>2</td><td>1</td><td>2</td><td>2</td><td><b>14</b></td></tr>
-                <tr><td class="l">자회사</td><td class="l">S4001</td><td class="l">하나여행</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>19</b></td></tr>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A4722</td><td class="l">강남센터</td><td>3</td><td>4</td><td>3</td><td>2</td><td>2</td><td>4</td><td>3</td><td>3</td><td>4</td><td>5</td><td class="sumc"><b>33</b></td></tr>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A4815</td><td class="l">명동센터</td><td>2</td><td>3</td><td>3</td><td>2</td><td>1</td><td>3</td><td>2</td><td>2</td><td>3</td><td>3</td><td class="sumc"><b>24</b></td></tr>
+                <tr><td class="l">공식인증예약센터</td><td class="l">A5021</td><td class="l">분당센터</td><td>3</td><td>3</td><td>3</td><td>3</td><td>3</td><td>4</td><td>4</td><td>3</td><td>3</td><td>4</td><td class="sumc"><b>33</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1102</td><td class="l">강서투어</td><td>1</td><td>0</td><td>2</td><td>1</td><td>0</td><td>1</td><td>2</td><td>1</td><td>0</td><td>2</td><td class="sumc"><b>10</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1245</td><td class="l">분당하나여행</td><td>2</td><td>2</td><td>1</td><td>3</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>3</td><td class="sumc"><b>20</b></td></tr>
+                <tr><td class="l">일반대리점</td><td class="l">B1388</td><td class="l">수원월드투어</td><td>2</td><td>1</td><td>1</td><td>2</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>2</td><td class="sumc"><b>13</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td class="l">M2201</td><td class="l">프리미엄몰</td><td>3</td><td>2</td><td>3</td><td>4</td><td>2</td><td>3</td><td>3</td><td>2</td><td>3</td><td>3</td><td class="sumc"><b>28</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td class="l">M2305</td><td class="l">스탠다드몰</td><td>2</td><td>2</td><td>3</td><td>3</td><td>2</td><td>2</td><td>3</td><td>2</td><td>2</td><td>3</td><td class="sumc"><b>24</b></td></tr>
+                <tr><td class="l">제휴사</td><td class="l">P3110</td><td class="l">OO카드</td><td>1</td><td>2</td><td>1</td><td>2</td><td>0</td><td>1</td><td>2</td><td>1</td><td>2</td><td>2</td><td class="sumc"><b>14</b></td></tr>
+                <tr><td class="l">자회사</td><td class="l">S4001</td><td class="l">하나여행</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td class="sumc"><b>19</b></td></tr>
               </tbody>
+              <tfoot id="agc-tfoot"><tr class="totrow"><td class="l" colspan="3">일자별 합계</td><td><b>21</b></td><td><b>21</b></td><td><b>21</b></td><td><b>24</b></td><td><b>15</b></td><td><b>22</b></td><td><b>23</b></td><td><b>19</b></td><td><b>22</b></td><td><b>30</b></td><td class="sumc"><b>218</b></td></tr></tfoot>
             </table>
           </div>
 
@@ -1085,22 +1092,20 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           <div id="ctab-long" class="hidden">
             <div class="top-filter" style="margin-bottom:8px">
               <label>조회기간</label>
-              <select><option>최근 6개월</option><option>최근 12개월</option></select>
-              <label>채널</label>
-              <select><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option></select>
-              <button class="btn">조회</button>
+              <select id="long-range" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333"><option value="6">최근 6개월</option><option value="12">최근 12개월</option></select>
+              <button class="btn" onclick="searchLongTrend()">조회</button>
             </div>
-            <table class="data">
-              <thead><tr><th>채널</th><th>2025-12</th><th>2026-01</th><th>2026-02</th><th>2026-03</th><th>2026-04</th><th>2026-05</th><th>MoM</th></tr></thead>
-              <tbody>
-                <tr><td class="l">공식인증예약센터</td><td>240</td><td>252</td><td>238</td><td>261</td><td>278</td><td>290</td><td style="color:#2e7d32">+4.3%</td></tr>
-                <tr><td class="l">브랜드몰</td><td>148</td><td>156</td><td>142</td><td>161</td><td>168</td><td>172</td><td style="color:#2e7d32">+2.4%</td></tr>
-                <tr><td class="l">일반대리점</td><td>192</td><td>185</td><td>178</td><td>190</td><td>198</td><td>185</td><td class="neg">-6.6%</td></tr>
-                <tr><td class="l">제휴사</td><td>72</td><td>78</td><td>74</td><td>82</td><td>85</td><td>88</td><td style="color:#2e7d32">+3.5%</td></tr>
-                <tr><td class="l">자회사</td><td>58</td><td>62</td><td>60</td><td>65</td><td>67</td><td>70</td><td style="color:#2e7d32">+4.5%</td></tr>
-                <tr><td class="l">직판</td><td>38</td><td>42</td><td>40</td><td>44</td><td>46</td><td>48</td><td style="color:#2e7d32">+4.3%</td></tr>
-              </tbody>
-            </table>
+            <div id="long-prequery" class="pre-query-msg" style="display:flex">
+              <div class="pq-icon">i</div>
+              <div class="pq-title">조회 전 상태입니다</div>
+              <div class="pq-desc">조회기간을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 장기 추이가 표시됩니다.</div>
+            </div>
+            <div id="long-result" style="display:none">
+              <table class="data">
+                <thead id="long-thead"></thead>
+                <tbody id="long-tbody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -1411,6 +1416,45 @@ document.querySelectorAll('[data-ctab]').forEach(t=>t.addEventListener('click',(
     document.getElementById('ctab-'+k).classList.toggle('hidden',k!==t.dataset.ctab);
   });
 }));
+
+// ============ 장기 추이 조회 (조회기간: 6/12개월) ============
+var LONG_MONTHS = ['2025-06','2025-07','2025-08','2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05'];
+var LONG_DATA = [
+  {ch:'공식인증예약센터', v:[210,218,225,230,236,232,240,252,238,261,278,290]},
+  {ch:'브랜드몰',         v:[120,128,132,138,140,145,148,156,142,161,168,172]},
+  {ch:'일반대리점',       v:[205,200,196,188,194,201,192,185,178,190,198,185]},
+  {ch:'제휴사',           v:[60,63,66,68,70,71,72,78,74,82,85,88]},
+  {ch:'자회사',           v:[48,50,52,54,55,57,58,62,60,65,67,70]},
+  {ch:'직판',             v:[30,32,33,35,36,37,38,42,40,44,46,48]}
+];
+function searchLongTrend(){
+  var n = parseInt((document.getElementById('long-range')||{}).value||'6',10);
+  var months = LONG_MONTHS.slice(-n);
+  // 채널별 합계 및 전체 총합 선계산
+  var rowSums = LONG_DATA.map(function(r){ return r.v.slice(-n).reduce(function(a,b){return a+b;},0); });
+  var grand   = rowSums.reduce(function(a,b){return a+b;},0);
+  document.getElementById('long-thead').innerHTML =
+    '<tr><th>채널</th>' + months.map(function(m){return '<th>'+m+'</th>';}).join('') + '<th class="sumc">합계</th><th class="ratec">비율</th></tr>';
+  // 본문 + 월별 합계 행
+  var bodyRows = LONG_DATA.map(function(r, ri){
+    var arr  = r.v.slice(-n);
+    var sum  = rowSums[ri];
+    var rate = grand ? (sum/grand*100) : 0;
+    var tds  = arr.map(function(x){return '<td>'+x+'</td>';}).join('');
+    var sumCell  = '<td class="sumc"><b>'+sum.toLocaleString()+'</b></td>';
+    var rateCell = '<td class="ratec"><b>'+rate.toFixed(1)+'%</b></td>';
+    return '<tr><td class="l">'+r.ch+'</td>'+tds+sumCell+rateCell+'</tr>';
+  }).join('');
+  // [요청] 월별 합계 행
+  var colTot = months.map(function(_,ci){ return LONG_DATA.reduce(function(a,r){return a + (r.v.slice(-n)[ci]||0);},0); });
+  var colTds = colTot.map(function(v){return '<td><b>'+v.toLocaleString()+'</b></td>';}).join('');
+  var totRow = '<tr class="totrow"><td class="l">월별 합계</td>'+colTds+
+               '<td class="sumc"><b>'+grand.toLocaleString()+'</b></td>'+
+               '<td class="ratec"><b>100.0%</b></td></tr>';
+  document.getElementById('long-tbody').innerHTML = bodyRows + totRow;
+  document.getElementById('long-prequery').style.display='none';
+  document.getElementById('long-result').style.display='';
+}
 
 // ============ Modal ============
 // ============ 업무관리 카드 클릭 시 노출되는 안내 모달 정의 ============
@@ -2077,20 +2121,29 @@ function searchAgency(){
   if(thead){
     thead.innerHTML =
       '<tr><th rowspan="2">채널</th><th rowspan="2">대리점코드</th><th rowspan="2">대리점</th>'+
-      '<th colspan="'+n+'">일자별 예약건수</th><th rowspan="2">합계</th></tr>'+
+      '<th colspan="'+n+'">일자별 예약건수</th><th rowspan="2" class="sumc">합계</th></tr>'+
       '<tr>'+labels.map(function(l){return '<th>'+l+'</th>';}).join('')+'</tr>';
   }
   // 본문
   var tbody = document.getElementById('agc-tbody');
+  var tfoot = document.getElementById('agc-tfoot');
   if(tbody){
     if(rows.length===0){
       tbody.innerHTML = '<tr><td class="c" colspan="'+(n+4)+'" style="padding:18px;color:#888">조회된 대리점이 없습니다. 채널 또는 조회기간 조건을 변경해 주세요.</td></tr>';
+      if(tfoot){ tfoot.innerHTML=''; }
     } else {
       tbody.innerHTML = rows.map(function(r){
         var sum = r.arr.reduce(function(a,b){return a+b;},0);
         var tds = r.arr.map(function(v){return '<td>'+v+'</td>';}).join('');
-        return '<tr><td class="l">'+r.ch+'</td><td class="l">'+r.code+'</td><td class="l">'+r.name+'</td>'+tds+'<td><b>'+sum+'</b></td></tr>';
+        return '<tr><td class="l">'+r.ch+'</td><td class="l">'+r.code+'</td><td class="l">'+r.name+'</td>'+tds+'<td class="sumc"><b>'+sum+'</b></td></tr>';
       }).join('');
+      // [요청] 일자별 합계 행
+      if(tfoot){
+        var colTot = labels.map(function(_,ci){ return rows.reduce(function(a,r){return a + (r.arr[ci]||0);},0); });
+        var grand  = colTot.reduce(function(a,b){return a+b;},0);
+        var ctds   = colTot.map(function(v){return '<td><b>'+v+'</b></td>';}).join('');
+        tfoot.innerHTML = '<tr class="totrow"><td class="l" colspan="3">일자별 합계</td>'+ctds+'<td class="sumc"><b>'+grand+'</b></td></tr>';
+      }
     }
   }
 }
