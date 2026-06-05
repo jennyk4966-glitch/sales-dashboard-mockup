@@ -425,6 +425,20 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .dt-scroll-wrap{width:100%;overflow-x:hidden}
 .dt-scroll-wrap.scroll-x{overflow-x:auto}
 .dt-scroll-wrap.scroll-x .trend-tbl{min-width:1400px}
+/* [요청] 일자별 예약현황: 구분(첫 열) + 합계(마지막 열) 틀고정 - 30일 가로스크롤 시 고정 */
+.dt-scroll-wrap table.trend-tbl thead tr th:first-child,
+.dt-scroll-wrap table.trend-tbl tbody tr th:first-child{position:sticky;left:0;z-index:2}
+.dt-scroll-wrap table.trend-tbl thead tr th:first-child{z-index:3;background:#eef2f7}
+.dt-scroll-wrap table.trend-tbl tbody tr th:first-child{background:#f4f5f7}
+.dt-scroll-wrap table.trend-tbl thead tr th:last-child,
+.dt-scroll-wrap table.trend-tbl tbody tr td:last-child{position:sticky;right:0;z-index:2}
+.dt-scroll-wrap table.trend-tbl thead tr th:last-child{z-index:3;background:#eef2f7}
+.dt-scroll-wrap table.trend-tbl tbody tr td:last-child{background:#fff}
+.dt-scroll-wrap table.trend-tbl tbody tr.net td:last-child{background:#f8fafd}
+.dt-scroll-wrap.scroll-x table.trend-tbl thead tr th:first-child,
+.dt-scroll-wrap.scroll-x table.trend-tbl tbody tr th:first-child{box-shadow:1px 0 0 #d9dde2}
+.dt-scroll-wrap.scroll-x table.trend-tbl thead tr th:last-child,
+.dt-scroll-wrap.scroll-x table.trend-tbl tbody tr td:last-child{box-shadow:-1px 0 0 #d9dde2}
 .dt-chart-scroll{width:100%;overflow-x:hidden;margin-top:10px}
 .dt-chart-scroll.scroll-x{overflow-x:auto}
 .dt-chart-scroll.scroll-x #dt-chart-inner{min-width:1400px}
@@ -936,7 +950,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <input type="date" id="dt-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
             <span>~</span>
             <input type="date" id="dt-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-            <span style="color:#888;font-size:11.5px;margin-left:4px">※ H, 항공, 국내 제외</span>
+            
           </div>
           <div id="dt-scroll-wrap" class="dt-scroll-wrap">
             <table class="data trend-tbl" id="dt-table">
@@ -966,15 +980,6 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <button class="trend-close" onclick="closeTrendPopup()">✕</button>
           </div>
           <div class="trend-modal-body">
-            <div class="top-filter" style="margin-bottom:10px">
-              <label>기간</label>
-              <select><option>2026년</option><option>2025년</option></select>
-              <select><option>05월</option><option>04월</option><option>03월</option><option>02월</option></select>
-              <span>~</span>
-              <select><option>2026년</option></select>
-              <select><option>07월</option><option>06월</option><option>05월</option></select>
-              <button class="btn sm">조회</button>
-            </div>
             <div class="chart-wrap" style="height:360px"><canvas id="chart-trend-3m"></canvas></div>
           </div>
         </div>
@@ -983,7 +988,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 5: HCSI 요약 미리보기 -->
       <div class="card" id="card-hcsi">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">담당 대리점 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">담당 대리점 전체 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
         </div>
         <div class="card-body">
@@ -1004,13 +1009,13 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           </div>
           <div class="hcsi-sum">
             <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">1,247</div></div>
-            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div></div>
-            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">84</div></div>
-            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">88</div></div>
-            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">87</div></div>
-            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div></div>
-            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.4h</div></div>
-            <div class="hcsi-sum-c guar clickable" onclick="toggleHcsiGuarDetail(this)"><div class="l">개런티준수율 <span class="toggle-ico">▼</span></div><div class="v">82%</div></div>
+            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">84</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 2 (전체평균대비)</div></div>
+            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">83</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 1 (전체평균대비)</div></div>
+            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">87</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 1 (전체평균대비)</div></div>
+            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">88</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 1 (전체평균대비)</div></div>
+            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0 (전체평균대비)</div></div>
+            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.6h</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▲ 0.2h (전체평균대비)</div></div>
+            <div class="hcsi-sum-c guar clickable" onclick="toggleHcsiGuarDetail(this)"><div class="l">개런티준수율 <span class="toggle-ico">▼</span></div><div class="v">80%</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 2 (전체평균대비)</div></div>
           </div>
           <div id="hcsi-guar-detail">
           <div class="divider-label">개런티 항목 주의</div>
@@ -1025,7 +1030,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <div class="score-cell"><div class="lbl">쇼핑</div><div class="val bad">46</div></div>
           </div>
           </div><!-- /#hcsi-guar-detail -->
-          <div class="divider-label">하위 대리점 Top 5</div>
+          <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">하위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">종합만족도 기준</span></div>
           <table class="data">
             <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th><th>담당자만족</th><th>응답수</th></tr></thead>
             <tbody>
