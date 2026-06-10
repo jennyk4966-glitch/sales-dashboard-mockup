@@ -137,6 +137,9 @@ th.agc-th-sort .agc-sort.on{color:#1a3a5f;font-weight:700}
 .score-cell.guarantee .val{color:#b8860b}
 /* HCSI summary cards (5) */
 .hcsi-sum{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}
+/* [수정] 전체 대리점 평균: 표본수 카드 제거(7개)에 맞춰 100% 가로 채움 */
+#hcsi-avg-sum{grid-template-columns:repeat(7,1fr)}
+.row2col #hcsi-avg-sum{grid-template-columns:repeat(4,1fr)}
 /* [수정] 1900px 기준 좁은 카드 영역에서 8컬럼 글자 잘림 방지 → 4컬럼 두 줄 */
 .row2col .hcsi-sum,
 .hcsi-compare-card .hcsi-sum,
@@ -245,7 +248,7 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .divider-label{font-weight:700;color:#1a3a5f;font-size:12px;margin:14px 0 6px;padding-left:6px;border-left:3px solid #1a3a5f}
 .divider-label:first-child{margin-top:0}
 /* Agency list */
-.ag-list-wrap{display:grid;grid-template-columns:340px 1fr;gap:14px}
+.ag-list-wrap{display:grid;grid-template-columns:520px 1fr;gap:14px}
 .ag-list{border:1px solid #d9dde2;border-radius:3px;max-height:480px;overflow-y:auto;background:#fff}
 .ag-search{padding:8px;border-bottom:1px solid #e5e8ec;display:flex;gap:4px}
 .ag-search input{flex:1;height:26px;border:1px solid #c9ccd1;padding:0 8px;font-size:11.5px;border-radius:3px}
@@ -255,6 +258,17 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .ag-row .sc{font-weight:700}
 .ag-row .sc.bad{color:#d32f2f}
 .ag-row .sc.warn{color:#e67e22}
+/* Agency table (계약관계/코드/대리점명/종합만족도/응답건수) */
+.ag-table{width:100%;border-collapse:collapse;font-size:11px}
+.ag-table thead th{position:sticky;top:0;background:#f4f5f7;border-bottom:1px solid #d9dde2;padding:7px 8px;text-align:left;font-weight:700;color:#555;white-space:nowrap;z-index:1}
+.ag-table th.num,.ag-table td.num{text-align:right}
+.ag-table tbody td{padding:7px 8px;border-bottom:1px solid #f0f1f3;white-space:nowrap}
+.ag-table tbody tr{cursor:pointer}
+.ag-table tbody tr:hover{background:#f4f5f7}
+.ag-table tbody tr.active{background:#eef2f7;font-weight:700;color:#1a3a5f}
+.ag-table .sc{font-weight:700}
+.ag-table .sc.bad{color:#d32f2f}
+.ag-table .sc.warn{color:#e67e22}
 
 /* HCSI 선택 대리점 비교 및 미선택 안내 */
 .hcsi-compare-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
@@ -647,6 +661,160 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
 #card-monthly #dtab-brand{min-height:220px}
 #card-monthly .dtbl-scroll:not(.etc-open){max-height:198px;overflow:auto}
 </style>
+
+<style>
+/* ===== [개선] HCSI 대리점별 상세조회 ===== */
+/* [수정] 좌측 대리점 리스트: 점수 강조/상태표시 제거, 우측 상세 영역은 탭 내부 세로스크롤 없이 노출 */
+.ag-list-wrap{align-items:flex-start}
+.ag-list{height:560px;max-height:560px}
+.ag-detail-panel:not(.hidden){display:flex!important;flex-direction:column;min-height:560px;height:auto}
+.ag-detail-panel:not(.hidden) > div:first-child{flex:0 0 auto}
+.ag-detail-panel:not(.hidden) > div:nth-child(2){flex:0 0 auto;overflow:visible}
+.ag-detail-panel .ag-tabpanel{overflow:visible;max-height:none}
+.ag-table .sc,.ag-table .ag-guar{font-weight:400;color:#333!important}
+.ag-resp{display:block;text-align:right}
+.ag-resp .rtxt{min-width:0;color:#333}
+.ag-empty{height:560px;min-height:560px}
+/* 반응형 grid: 좁아지면 1열 */
+.ag-list-wrap{grid-template-columns:minmax(340px,480px) 1fr}
+@media(max-width:980px){.ag-list-wrap{grid-template-columns:1fr}}
+/* 목록 결과 카운트 */
+#ag-count b{color:#1a3a5f}
+/* 종합만족도/개런티 셀: 상태점 + 조건부색 */
+.ag-table td .sc.good{color:#1f7a4d}
+.ag-dot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
+.ag-dot.bad{background:#d32f2f}.ag-dot.warn{background:#e67e22}.ag-dot.good{background:#1f9d57}.ag-dot.none{background:#c4c8cd}
+.ag-guar{font-weight:700}
+.ag-guar.bad{color:#d32f2f}.ag-guar.warn{color:#e67e22}.ag-guar.good{color:#1f7a4d}
+/* 응답건수 미니막대 */
+.ag-resp{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.ag-resp .rbar{width:34px;height:6px;background:#eef0f3;border-radius:3px;overflow:hidden}
+.ag-resp .rbar span{display:block;height:100%;background:#7b8aa3}
+.ag-resp .rbar span.low{background:#d9a13a}
+.ag-resp .rtxt{min-width:30px;text-align:right;color:#555}
+/* KPI 고정 strip */
+.ag-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.ag-kpi{border:1px solid #d9dde2;border-radius:4px;padding:9px 11px;background:#fafbfc}
+.ag-kpi .kl{font-size:11px;color:#666;margin-bottom:3px}
+.ag-kpi .kv{font-size:22px;font-weight:700;color:#1a3a5f;line-height:1.1}
+.ag-kpi .kd{font-size:11px;font-weight:700;margin-top:2px;min-height:14px}
+.ag-kpi .kd.pos{color:#16a085}.ag-kpi .kd.neg{color:#c0392b}.ag-kpi .kd.zero{color:#999}
+.ag-kpi.alert{border-color:#e6b4b4;background:#fdf3f3}
+.ag-kpi.alert .kv{color:#c0392b}
+.ag-kpi.warn{border-color:#f0d9a8;background:#fffaf0}
+.ag-kpi.warn .kv{color:#b8780b}
+/* 탭 */
+.ag-tabs{display:flex;gap:2px;border-bottom:2px solid #d9dde2;margin-bottom:12px}
+.ag-tab{background:transparent;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 14px;font-size:12px;font-family:inherit;color:#666;cursor:pointer;font-weight:600}
+.ag-tab:hover{color:#1a3a5f}
+.ag-tab.active{color:#1a3a5f;border-bottom-color:#1a3a5f;font-weight:700}
+.ag-tabpanel{display:none}
+.ag-tabpanel.active{display:block}
+.ag-sample-warn{margin-top:10px;padding:8px 10px;background:#fff8e7;border:1px solid #f1e0a8;border-radius:3px;color:#7a5a00;font-size:11.5px}
+.ag-sample-warn.hidden{display:none}
+</style>
+
+
+<style>
+/* ===== [수정] HCSI(상세) 대리점별 상세조회: 좌측/우측 세로 사이즈 통일 ===== */
+#page-hcsi .ag-list-wrap{
+  --hcsi-agency-detail-height:560px;
+  align-items:stretch;
+}
+#page-hcsi .ag-list,
+#page-hcsi .ag-list-wrap > div:last-child,
+#page-hcsi .ag-empty,
+#page-hcsi .ag-detail-panel:not(.hidden){
+  height:var(--hcsi-agency-detail-height) !important;
+  min-height:var(--hcsi-agency-detail-height) !important;
+  max-height:var(--hcsi-agency-detail-height) !important;
+}
+#page-hcsi .ag-list{
+  overflow-y:auto;
+}
+#page-hcsi .ag-detail-panel:not(.hidden){
+  display:flex !important;
+  flex-direction:column;
+  overflow:hidden;
+}
+#page-hcsi .ag-detail-panel:not(.hidden) > div:first-child{
+  flex:0 0 auto;
+}
+#page-hcsi .ag-detail-panel:not(.hidden) > div:nth-child(2){
+  flex:1 1 auto;
+  min-height:0;
+  overflow:hidden;
+}
+#page-hcsi #ag-content-full{
+  height:100%;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+#page-hcsi .ag-tabs{
+  flex:0 0 auto;
+  margin-bottom:8px;
+}
+#page-hcsi .ag-tabpanel.active{
+  flex:1 1 auto;
+  min-height:0;
+  overflow:visible;
+}
+#page-hcsi .hcsi-compare-summary{
+  margin-bottom:8px;
+  gap:8px;
+}
+#page-hcsi .hcsi-compare-card{
+  padding:8px;
+}
+#page-hcsi .hcsi-compare-card .ttl{
+  margin-bottom:5px;
+}
+#page-hcsi .hcsi-sum-c{
+  padding:8px 6px;
+}
+#page-hcsi .hcsi-sum-c .l{
+  margin-bottom:4px;
+}
+#page-hcsi .hcsi-sum-c .v{
+  font-size:18px;
+}
+#page-hcsi .score-grid{
+  gap:6px;
+}
+#page-hcsi .score-cell{
+  padding:7px 6px;
+}
+#page-hcsi .score-cell .lbl{
+  height:24px;
+  margin-bottom:3px;
+}
+#page-hcsi .score-cell .val{
+  font-size:17px;
+}
+#page-hcsi .divider-label{
+  margin:8px 0 5px;
+}
+#page-hcsi .ai-review{
+  margin-top:0;
+  gap:8px;
+}
+#page-hcsi .ai-box{
+  padding:8px;
+  line-height:1.45;
+}
+#page-hcsi .ag-compare-box{
+  padding:8px;
+}
+#page-hcsi .ag-compare-box div[style*="height:240px"]{
+  height:210px !important;
+}
+#page-hcsi .ag-month-summary{
+  margin-top:6px;
+  padding-top:6px;
+}
+</style>
+
 </head>
 <body class="pre-query lnb-collapsed">
 
@@ -1181,18 +1349,17 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <div class="hcsi-section">
         <div class="hcsi-section-head">
           <h3 class="desc-trigger" data-desc="hcsi-avg" onclick="openDescPanel('hcsi-avg')">전체 대리점 평균 <!--<span id="hcsi-avg-month" style="font-weight:400;color:#7b4dff;margin-left:6px;font-size:12px">2026.04</span>--> <span class="desc-ico">ⓘ</span></h3>
-          <div class="meta">응답수 <b id="hcsi-avg-resp">1,247건</b> / 대리점 <b id="hcsi-avg-store">87개소</b> / 기준월 <b id="hcsi-avg-mon2">2026.04</b></div>
+          <div class="meta">대리점 <b id="hcsi-avg-store">87개소</b> / 기준월 <b id="hcsi-avg-mon2">2026.04</b></div>
         </div>
         <div class="hcsi-section-body">
           <div class="hcsi-sum" id="hcsi-avg-sum">
-            <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">1,247</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div></div>
-            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 1 (전월대비)</div></div>
-            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">84</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0</div></div>
-            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">88</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 2</div></div>
-            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">87</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ 1</div></div>
-            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div><div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0</div></div>
-            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.4h</div><div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▼ 0.2h</div></div>
-            <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">82%</div><div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ 1</div></div>
+            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">86</div></div>
+            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">84</div></div>
+            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">88</div></div>
+            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">87</div></div>
+            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div></div>
+            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.4h</div></div>
+            <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">82%</div></div>
           </div>
         </div>
       </div>
@@ -1205,7 +1372,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
         </div>
         <div class="hcsi-section-body">
           <!-- 대리점별 상세조회 전용 필터 (정렬 이동) -->
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;padding:8px 10px;background:#fafbfc;border:1px solid #e5e8ec;border-radius:3px">
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;padding:8px 10px;background:#fafbfc;border:1px solid #e5e8ec;border-radius:3px">
             <label style="font-size:11.5px;color:#555;font-weight:600">정렬</label>
             <select id="ag-sort" style="height:26px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:11.5px;padding:0 6px;border-radius:3px">
               <option value="gen_asc">종합만족 낮은순</option>
@@ -1213,13 +1380,38 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
               <option value="guar_asc">개런티 준수 낮은순</option>
               <option value="resp_desc">응답수 많은순</option>
             </select>
-            <span style="color:#888;font-size:11px;margin-left:auto">ⓘ 정렬 변경 시 좌측 대리점 리스트가 재정렬됩니다.</span>
+            <span style="width:1px;height:18px;background:#e0e2e6"></span>
+            <label style="font-size:11.5px;color:#555;font-weight:600">대리점명</label>
+            <input id="ag-q-name" placeholder="대리점명" style="height:26px;width:104px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:11.5px;padding:0 8px;border-radius:3px">
+            <label style="font-size:11.5px;color:#555;font-weight:600">코드</label>
+            <input id="ag-q-code" placeholder="코드" style="height:26px;width:84px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:11.5px;padding:0 8px;border-radius:3px">
+            <label style="font-size:11.5px;color:#555;font-weight:600">계약관계</label>
+            <select id="ag-q-ch" style="height:26px;border:1px solid #c9ccd1;background:#fff;color:#333;font-size:11.5px;padding:0 6px;border-radius:3px">
+              <option value="">전체</option>
+              <option>공식인증예약센터</option>
+              <option>일반대리점</option>
+              <option>브랜드몰</option>
+              <option>제휴사</option>
+              <option>자회사</option>
+            </select>
+            <span id="ag-count" style="margin-left:auto;color:#666;font-size:11.5px;font-weight:600"></span>
           </div>
           <div class="ag-list-wrap">
             <!-- 좌측: 대리점 리스트 -->
             <div class="ag-list">
-              <div class="ag-search"><input id="ag-search-input" placeholder="대리점명/코드 검색"><button class="btn sm">검색</button></div>
-              <div id="ag-rows"></div>
+              <table class="ag-table">
+                <thead>
+                  <tr>
+                    <th>계약관계</th>
+                    <th>대리점코드</th>
+                    <th>대리점명</th>
+                    <th class="num">종합만족도</th>
+                    <th class="num">개런티</th>
+                    <th class="num">응답건수</th>
+                  </tr>
+                </thead>
+                <tbody id="ag-rows"></tbody>
+              </table>
             </div>
 
             <!-- 우측: 선택 대리점 상세 -->
@@ -1228,7 +1420,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
                 <div>
                   <div class="ico">ⓘ</div>
                   <b>대리점을 선택해 주세요.</b>
-                  <div style="margin-top:6px;font-size:11.5px;line-height:1.6">좌측 대리점 리스트에서 대리점을 선택하면<br>선택 대리점 평균, 전체 평균 대비 편차, 월별 추이가 표시됩니다.</div>
+                  <div style="margin-top:6px;font-size:11.5px;line-height:1.6">좌측 대리점 리스트에서 대리점을 선택하면<br>점수·개런티 분석, 리뷰·추이 분석가 표시됩니다.</div>
                 </div>
               </div>
               <div id="ag-detail-panel" class="ag-detail-panel hidden">
@@ -1242,74 +1434,84 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
                   <b style="color:#1a3a5f;font-size:14px">응답 수가 부족하여 결과가 제공되지 않습니다.</b>
                 </div>
                 <div id="ag-content-full">
-                <div class="hcsi-compare-summary">
-                  <div class="hcsi-compare-card">
-                    <div class="ttl">선택 대리점 평균</div>
-                    <div class="hcsi-sum" id="ag-sum" style="margin-bottom:0">
-                      <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">-</div></div>
-                      <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">-</div></div>
+                <!-- [개선] 탭 네비게이션 -->
+                <div class="ag-tabs" id="ag-tabs">
+                  <button type="button" class="ag-tab active" data-tab="0" onclick="switchAgTab(0)">점수·개런티 분석</button>
+                  <button type="button" class="ag-tab" data-tab="1" onclick="switchAgTab(1)">리뷰·추이 분석</button>
+                </div>
+
+                <!-- 탭1: 점수·개런티 분석 -->
+                <div class="ag-tabpanel active" data-panel="0">
+                  <div class="hcsi-compare-summary">
+                    <div class="hcsi-compare-card">
+                      <div class="ttl">선택 대리점 평균</div>
+                      <div class="hcsi-sum" id="ag-sum" style="margin-bottom:0">
+                        <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">-</div></div>
+                        <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">-</div></div>
+                      </div>
+                    </div>
+                    <div class="hcsi-compare-card">
+                      <div class="ttl">전체 대리점 평균 대비 편차</div>
+                      <div class="dev-bars" id="ag-dev-bars"></div>
                     </div>
                   </div>
-                  <div class="hcsi-compare-card">
-                    <div class="ttl">전체 대리점 평균 대비 편차</div>
-                    <div class="dev-bars" id="ag-dev-bars"></div>
+                  <div class="divider-label">담당자 만족 세부</div>
+                  <div class="score-grid">
+                    <div class="score-cell"><div class="lbl">담당자 연락원활</div><div class="val">91</div></div>
+                    <div class="score-cell"><div class="lbl">담당자 표현</div><div class="val">89</div></div>
+                    <div class="score-cell"><div class="lbl">담당자 전문성</div><div class="val">90</div></div>
+                    <div class="score-cell"><div class="lbl">담당자 재이용 의사</div><div class="val">92</div></div>
+                  </div>
+                  <div class="divider-label">기타 안내</div>
+                  <div class="score-grid">
+                    <div class="score-cell"><div class="lbl">브랜드 안내</div><div class="val">86</div></div>
+                    <div class="score-cell"><div class="lbl">마일리지 안내</div><div class="val">82</div></div>
+                    <div class="score-cell"><div class="lbl">전체 만족</div><div class="val">85</div></div>
+                    <div class="score-cell"><div class="lbl">담당자 만족</div><div class="val">90</div></div>
+                  </div>
+
+                  <div class="divider-label">개런티 프로그램 (8항목)</div>
+                  <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
+                    <div class="score-cell guarantee"><div class="lbl">일정안내</div><div class="val">95</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">항공안내</div><div class="val">91</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">호텔안내</div><div class="val">88</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">쇼핑안내</div><div class="val bad">46</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">경비안내</div><div class="val">85</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">여행계약</div><div class="val">83</div></div>
+                    <div class="score-cell guarantee"><div class="lbl">취소수수료</div><div class="val">79</div></div>
                   </div>
                 </div>
-				
 
-                <div class="ai-review">
-                  <div class="ai-box pos">
-                    <span class="tag">긍정 리뷰 AI 요약</span>
-                    <div id="ai-pos">가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음. 담당자 응대가 빠르고 정확하다는 평이 많음.</div>
+                <!-- 탭2: 리뷰·추이 분석 -->
+                <div class="ag-tabpanel" data-panel="1">
+                  <div class="ai-review">
+                    <div class="ai-box pos">
+                      <span class="tag">긍정 리뷰 AI 요약</span>
+                      <div id="ai-pos">가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음. 담당자 응대가 빠르고 정확하다는 평이 많음.</div>
+                    </div>
+                    <div class="ai-box neg">
+                      <span class="tag">부정 리뷰 AI 요약</span>
+                      <div id="ai-neg">쇼핑 일정이 과도하게 길고 부담스럽다는 불만이 집중됨(쇼핑 46점). 선택관광 가격 안내가 사전 안내와 상이했다는 의견 있음. 일부 식사 메뉴에 대한 보완 필요.</div>
+                    </div>
                   </div>
-                  <div class="ai-box neg">
-                    <span class="tag">부정 리뷰 AI 요약</span>
-                    <div id="ai-neg">쇼핑 일정이 과도하게 길고 부담스럽다는 불만이 집중됨(쇼핑 46점). 선택관광 가격 안내가 사전 안내와 상이했다는 의견 있음. 일부 식사 메뉴에 대한 보완 필요.</div>
+                  <div class="ag-sample-warn hidden" id="ag-sample-warn">ⓘ 응답 표본이 60건 미만으로 AI 요약의 신뢰도가 낮을 수 있습니다.</div>
+
+                  <div class="divider-label">월별 추이 <span style="font-weight:400;color:#7b4dff;font-size:11px">종합만족도</span></div>
+                  <div class="ag-compare-box" style="margin-bottom:10px">
+                    <div class="ag-compare-head">
+                      <span>월별 추이 <span style="color:#666;font-weight:500">(<b id="ag-trend-name">강남센터</b> vs 전체평균)</span></span>
+                      <span style="color:#888;font-weight:500;font-size:11px">최근 6개월</span>
+                    </div>
+                    <div style="height:240px"><canvas id="ag-trend"></canvas></div>
+                    <div class="ag-month-summary" id="ag-month-summary"></div>
                   </div>
-                </div>
-
-                <div class="divider-label">담당자 만족 세부</div>
-                <div class="score-grid">
-                  <div class="score-cell"><div class="lbl">담당자 연락원활</div><div class="val">91</div></div>
-                  <div class="score-cell"><div class="lbl">담당자 표현</div><div class="val">89</div></div>
-                  <div class="score-cell"><div class="lbl">담당자 전문성</div><div class="val">90</div></div>
-                  <div class="score-cell"><div class="lbl">담당자 재이용 의사</div><div class="val">92</div></div>
-                </div>
-
-                <div class="divider-label">개런티 프로그램 (8항목)</div>
-                <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
-                  <div class="score-cell guarantee"><div class="lbl">일정안내</div><div class="val">95</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">항공안내</div><div class="val">91</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">호텔안내</div><div class="val">88</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">쇼핑안내</div><div class="val bad">46</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">경비안내</div><div class="val">85</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">여행계약</div><div class="val">83</div></div>
-                  <div class="score-cell guarantee"><div class="lbl">취소수수료</div><div class="val">79</div></div>
-                </div>
-
-                <div class="divider-label">기타 안내</div>
-                <div class="score-grid">
-                  <div class="score-cell"><div class="lbl">브랜드 안내</div><div class="val">86</div></div>
-                  <div class="score-cell"><div class="lbl">마일리지 안내</div><div class="val">82</div></div>
-                  <div class="score-cell"><div class="lbl">전체 만족</div><div class="val">85</div></div>
-                  <div class="score-cell"><div class="lbl">담당자 만족</div><div class="val">90</div></div>
-                </div>
-
-                <div class="divider-label">월별 추이 <span style="font-weight:400;color:#7b4dff;font-size:11px">종합만족도</span></div>
-                <div class="ag-compare-box" style="margin-bottom:10px">
-                  <div class="ag-compare-head">
-                    <span>월별 추이 <span style="color:#666;font-weight:500">(<b id="ag-trend-name">강남센터</b> vs 전체평균)</span></span>
-                    <span style="color:#888;font-weight:500;font-size:11px">최근 6개월</span>
-                  </div>
-                  <div style="height:240px"><canvas id="ag-trend"></canvas></div>
-                  <div class="ag-month-summary" id="ag-month-summary"></div>
                 </div>
                 </div>
               </div>
@@ -2097,6 +2299,30 @@ const agencies=[
   {code:'P3110',name:'OO카드 제휴',resp:8,gen:84,guar:81,mgr:87,full:82,smooth:87,prof:85,expr:83,firstH:2.4},
   {code:'S4001',name:'하나여행',resp:1,gen:86,guar:83,mgr:89,full:84,smooth:89,prof:87,expr:85,firstH:2.2}
 ];
+// 계약관계(채널) 매핑: 대리점코드 접두어 기준
+(function(){
+  var chmap={A:'공식인증예약센터',B:'일반대리점',M:'브랜드몰',P:'제휴사',S:'자회사'};
+  agencies.forEach(function(a){ if(!a.ch) a.ch=chmap[a.code.charAt(0)]||'기타'; });
+})();
+// [데모] 대리점 리스트 50개 노출 검증용 임시 데이터 (실데이터 연동 시 이 블록 통째로 삭제)
+(function(){
+  var chs=['공식인증예약센터','일반대리점','브랜드몰','제휴사','자회사'];
+  var pmap={'공식인증예약센터':'A','일반대리점':'B','브랜드몰':'M','제휴사':'P','자회사':'S'};
+  var nm=['서울','부산','대구','인천','광주','대전','울산','수원','성남','고양','용인','창원','청주','전주','천안','김해','포항','제주','강릉','원주','평택','안산','시흥','파주','김포','구미','목포','순천','아산','거제','양산','진주','광명','하남','군포'];
+  var sfx=['여행','투어','센터','트래블','관광','여행사'];
+  var need=50-agencies.length;
+  for(var i=0;i<need;i++){
+    var ch=chs[i%chs.length];
+    var code=pmap[ch]+(7000+i);
+    var name=nm[i%nm.length]+sfx[i%sfx.length];
+    var gen=62+((i*7)%34);              // 62~95
+    var resp=6+((i*5)%40);              // 6~45
+    agencies.push({code:code,name:name,ch:ch,resp:resp,gen:gen,
+      guar:Math.max(55,gen-4),mgr:Math.min(99,gen+3),full:gen-2,
+      smooth:Math.min(99,gen+2),prof:gen,expr:gen-2,
+      firstH:Math.round((4.2-gen*0.025)*10)/10});
+  }
+})();
 function getSortedAgencies(){
   const sortEl=document.getElementById('ag-sort');
   const mode = sortEl ? sortEl.value : 'gen_asc';
@@ -2137,7 +2363,7 @@ function selectAgency(a,row){
   selectedAgency=a;
   document.getElementById('ag-empty').classList.add('hidden');
   document.getElementById('ag-detail-panel').classList.remove('hidden');
-  document.querySelectorAll('.ag-row').forEach(r=>r.classList.remove('active'));
+  document.querySelectorAll('#ag-rows tr').forEach(r=>r.classList.remove('active'));
   if(row) row.classList.add('active');
   document.getElementById('ag-title').textContent=`${a.code} ${a.name} (응답 ${a.resp}건)`;
   // 표본수가 1건 이하인 경우: 점수 및 AI리뷰를 노출하지 않고 안내 메시지 표시
@@ -2168,19 +2394,44 @@ function selectAgency(a,row){
     document.getElementById('ai-pos').textContent='가이드의 친절한 설명과 일정 관리가 우수했다는 의견이 다수. 호텔 위치 및 객실 컨디션에 대한 만족도가 높음.';
     document.getElementById('ai-neg').textContent='쇼핑 일정이 과도하게 길다는 불만이 일부 확인됨. 선택관광 가격 안내 보완 필요.';
   }
+  if(typeof switchAgTab==='function') switchAgTab(0);
   if(typeof renderAgTrend==='function') renderAgTrend();
+}
+function getFilteredAgencies(){
+  let list = getSortedAgencies();
+  const nEl=document.getElementById('ag-q-name');
+  const cEl=document.getElementById('ag-q-code');
+  const chEl=document.getElementById('ag-q-ch');
+  const qn=(nEl&&nEl.value||'').trim().toLowerCase();
+  const qc=(cEl&&cEl.value||'').trim().toLowerCase();
+  const qch=(chEl&&chEl.value||'');
+  return list.filter(a=>{
+    if(qn && a.name.toLowerCase().indexOf(qn)<0) return false;
+    if(qc && a.code.toLowerCase().indexOf(qc)<0) return false;
+    if(qch && (a.ch||'')!==qch) return false;
+    return true;
+  });
 }
 function renderAgList(){
   const box=document.getElementById('ag-rows');
   box.innerHTML='';
-  const list = getSortedAgencies();
+  const list = getFilteredAgencies();
+  const _cnt=document.getElementById('ag-count');
+  if(_cnt) _cnt.innerHTML='<b>'+list.length+'</b> / '+agencies.length+'개';
+  if(list.length===0){
+    box.innerHTML='<tr><td colspan="6" style="padding:20px;text-align:center;color:#999">검색 결과가 없습니다.</td></tr>';
+    return;
+  }
   list.forEach((a)=>{
     const isHide = a.code==='S4001';
-    const cls = isHide ? '' : (a.gen<70?'bad':a.gen<80?'warn':'');
     const scoreTxt = isHide ? '-' : (a.gen+'점');
-    const row=document.createElement('div');
-    row.className='ag-row'+(selectedAgency&&selectedAgency.code===a.code?' active':'');
-    row.innerHTML=`<span>${a.code} ${a.name}<br><span style="color:#999;font-size:10.5px">응답 ${a.resp}건</span></span><span class="sc ${cls}">${scoreTxt}</span>`;
+    const guarTxt = isHide ? '-' : (a.guar+'%');
+    const row=document.createElement('tr');
+    if(selectedAgency&&selectedAgency.code===a.code) row.className='active';
+    row.innerHTML=`<td>${a.ch||'-'}</td><td>${a.code}</td><td>${a.name}</td>`+
+      `<td class="num"><span class="sc">${scoreTxt}</span></td>`+
+      `<td class="num"><span class="ag-guar">${guarTxt}</span></td>`+
+      `<td class="num"><div class="ag-resp"><span class="rtxt">${a.resp}건</span></div></td>`;
     row.addEventListener('click',()=>selectAgency(a,row));
     box.appendChild(row);
   });
@@ -2189,11 +2440,15 @@ renderAgList();
 // 정렬 셀렉트 변경 시 리스트 재렌더 + 첫 번째 선택
 (function(){
   const s=document.getElementById('ag-sort');
-  if(s){
-    s.addEventListener('change',()=>{
-      renderAgList();
-    });
-  }
+  if(s) s.addEventListener('change',renderAgList);
+  const qn=document.getElementById('ag-q-name');
+  const qc=document.getElementById('ag-q-code');
+  const qch=document.getElementById('ag-q-ch');
+  const qb=document.getElementById('ag-search-btn');
+  if(qn) qn.addEventListener('input',renderAgList);
+  if(qc) qc.addEventListener('input',renderAgList);
+  if(qch) qch.addEventListener('change',renderAgList);
+  if(qb) qb.addEventListener('click',renderAgList);
 })();
 
 
@@ -2376,29 +2631,17 @@ function selectHcsiMonth(key){
   const parts = key.split('-');
   const yEl=document.getElementById('hcsi-year'); if(yEl) yEl.value=parts[0];
   const mEl=document.getElementById('hcsi-month'); if(mEl) mEl.value=parts[1];
-  // 평균 카드 갱신
+  // 평균 카드 갱신 (전체 대리점 평균은 비교군이 없어 증감/표본수 미노출)
   document.getElementById('hcsi-avg-mon2').textContent  = m.label;
-  document.getElementById('hcsi-avg-resp').textContent  = m.resp.toLocaleString()+'건';
   document.getElementById('hcsi-avg-store').textContent = m.store+'개소';
   const sum = document.getElementById('hcsi-avg-sum');
-  // prev 월 찾아 delta 계산
-  const idx = hcsiMonthly.findIndex(x=>x.key===key);
-  const prev = idx>0 ? hcsiMonthly[idx-1] : null;
-  function dHtml(cur,prev,suffix){
-    if(prev==null) return '<div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 기준</div>';
-    const d = +(cur-prev).toFixed(1);
-    if(d>0) return `<div class="d" style="font-size:11px;color:#16a085;margin-top:2px">▲ ${d}${suffix||''}</div>`;
-    if(d<0) return `<div class="d" style="font-size:11px;color:#c0392b;margin-top:2px">▼ ${Math.abs(d)}${suffix||''}</div>`;
-    return `<div class="d" style="font-size:11px;color:#888;margin-top:2px">─ 0${suffix||''}</div>`;
-  }
-  sum.children[0].innerHTML = `<div class="l">표본수</div><div class="v">${m.resp.toLocaleString()}</div>`+(prev?`<div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div>`:`<div class="d" style="font-size:11px;color:#888;margin-top:2px">건</div>`);
-  sum.children[1].innerHTML = `<div class="l">종합만족도</div><div class="v">${m.gen}</div>`+dHtml(m.gen,prev&&prev.gen);
-  sum.children[2].innerHTML = `<div class="l">전반적만족도</div><div class="v">${m.full}</div>`+dHtml(m.full,prev&&prev.full);
-  sum.children[3].innerHTML = `<div class="l">원활성</div><div class="v">${m.smooth}</div>`+dHtml(m.smooth,prev&&prev.smooth);
-  sum.children[4].innerHTML = `<div class="l">전문성</div><div class="v">${m.prof}</div>`+dHtml(m.prof,prev&&prev.prof);
-  sum.children[5].innerHTML = `<div class="l">표현성</div><div class="v">${m.expr}</div>`+dHtml(m.expr,prev&&prev.expr);
-  sum.children[6].innerHTML = `<div class="l">첫안내소요시간</div><div class="v">${m.firstH}h</div>`+dHtml(m.firstH,prev&&prev.firstH,'h');
-  sum.children[7].innerHTML = `<div class="l">개런티준수율</div><div class="v">${m.guar}%</div>`+dHtml(m.guar,prev&&prev.guar);
+  sum.children[0].innerHTML = `<div class="l">종합만족도</div><div class="v">${m.gen}</div>`;
+  sum.children[1].innerHTML = `<div class="l">전반적만족도</div><div class="v">${m.full}</div>`;
+  sum.children[2].innerHTML = `<div class="l">원활성</div><div class="v">${m.smooth}</div>`;
+  sum.children[3].innerHTML = `<div class="l">전문성</div><div class="v">${m.prof}</div>`;
+  sum.children[4].innerHTML = `<div class="l">표현성</div><div class="v">${m.expr}</div>`;
+  sum.children[5].innerHTML = `<div class="l">첫안내소요시간</div><div class="v">${m.firstH}h</div>`;
+  sum.children[6].innerHTML = `<div class="l">개런티준수율</div><div class="v">${m.guar}%</div>`;
   // 대리점 상세 영역의 기준월 표기 갱신
   const at=document.getElementById('ag-title-month');
   if(at) at.textContent='기준월 '+m.label+(m.status==='ongoing'?' (진행중)':' (확정)');
@@ -2725,27 +2968,41 @@ selectHcsiMonth('2026-04');
       <li>조회연월 변경 후 조회 시 전체 평균 카드와 대리점 목록이 함께 갱신됩니다.</li>
       <li>데이터가 없는 월은 비활성 또는 No Data 상태로 표시합니다.</li>
     </ul>
+    <h5>노출 규칙</h5>
+    <ul>
+      <li>전체 대리점 평균은 비교 기준선이므로 전월 대비 증감(▲/▼/─)을 표기하지 않습니다.</li>
+      <li>전체 대리점 평균은 표본수(응답수)를 노출하지 않습니다.</li>
+      <li>표본수 카드 제거에 맞춰 지표 카드는 영역 가로 100%를 채워 정렬합니다.</li>
+    </ul>
   </template>
 
   <template id="desc-tpl-hcsi-agency" data-title="대리점별 상세 조회">
     <h5>영역 개요</h5>
     <ul>
-      <li>담당 대리점 목록에서 특정 대리점을 선택하면 해당 대리점의 HCSI 상세 데이터를 노출합니다.</li>
-      <li>선택 대리점의 최근 6개월 추이와 전체 평균 대비 편차를 함께 확인할 수 있습니다.</li>
+      <li>담당 대리점 목록에서 특정 대리점을 선택하면 해당 대리점의 HCSI 상세 데이터를 우측에 노출합니다.</li>
       <li>대리점 미선택 상태에서는 상세 패널 대신 선택 안내 메시지를 표시합니다.</li>
+      <li>좌측 대리점별 조회 리스트와 우측 HCSI 상세 데이터 영역의 세로 높이를 동일하게 맞춰 한 화면 내 탐색성을 유지합니다.</li>
     </ul>
-    <h5>노출 항목</h5>
+    <h5>좌측 대리점별 조회 리스트</h5>
     <ul>
-      <li>선택 대리점 HCSI 요약 지표</li>
-      <li>전체 평균 대비 편차</li>
-      <li>월별 추이 그래프: 선택 대리점 vs 전체 평균</li>
-      <li>최근 6개월 평균, 최고월, 최저월, 전월 대비 증감</li>
+      <li>정렬영역에서 대리점명/코드/계약관계로 검색합니다.</li>
+      <li>좌측 목록은 계약관계/대리점코드/대리점명과 함께 <b>종합만족도, 개런티, 응답건수</b>만 심플하게 노출합니다.</li>
+      <li>종합만족도/개런티/응답건수에는 상태점, 색상 강조, 미니 막대 등 강조 포인트를 노출하지 않습니다.</li>
+      <li>목록은 스크롤로 탐색하며, 선택한 행만 활성 상태로 구분합니다.</li>
+    </ul>
+    <h5>우측 HCSI 상세 리스트</h5>
+    <ul>
+      <li>상단 요약 KPI 영역(종합만족도/개런티준수율/첫안내소요시간/응답건수)은 노출하지 않습니다.</li>
+      <li>우측 상세 영역은 <b>점수·개런티 분석</b>, <b>리뷰·추이 분석</b> 2개 탭으로 재구성합니다.</li>
+      <li>점수·개런티 분석 탭에서는 선택 대리점 평균, 전체 대리점 평균 대비 편차, 담당자 만족 세부, 기타 안내, 개런티 8항목을 한 화면에서 확인합니다.</li>
+      <li>리뷰·추이 분석 탭에서는 긍정/부정 AI 리뷰 요약과 선택 대리점·전체 평균의 최근 6개월 흐름을 함께 확인합니다.</li>
+      <li>2개 탭 콘텐츠는 우측 상세 영역 내부 세로 스크롤 없이 노출하며, 화면 전체 스크롤 기준으로 확인합니다.</li>
     </ul>
     <h5>동작</h5>
     <ul>
-      <li>대리점 행 클릭 시 우측 상세 패널의 표/차트/요약 카드가 즉시 갱신됩니다.</li>
-      <li>검색어 입력 시 대리점 목록을 필터링합니다.</li>
-      <li>응답수가 부족한 대리점은 순위/하위 TOP5 산출 대상에서 제외할 수 있습니다.</li>
+      <li>대리점 행 클릭 시 우측 상세 패널의 탭별 표/차트/요약 정보가 즉시 갱신됩니다.</li>
+      <li>검색어 입력 또는 계약관계 변경 시 대리점 목록을 필터링합니다.</li>
+      <li>응답수가 부족한 대리점은 점수 및 AI 리뷰 대신 표본 부족 안내를 표시합니다.</li>
     </ul>
   </template>
 
@@ -2838,5 +3095,19 @@ document.addEventListener('keydown', function(e){
 })();
 </script>
 
+
+<script>
+// [개선] HCSI 상세 탭 전환
+function switchAgTab(idx){
+  document.querySelectorAll('#ag-tabs .ag-tab').forEach(function(b){
+    b.classList.toggle('active', +b.getAttribute('data-tab')===idx);
+  });
+  document.querySelectorAll('.ag-tabpanel').forEach(function(p){
+    p.classList.toggle('active', +p.getAttribute('data-panel')===idx);
+  });
+  // 월별 추이 탭은 표시 직후 차트를 다시 그려 캔버스 크기를 보정
+  if(idx===1 && typeof renderAgTrend==='function'){ try{ renderAgTrend(); }catch(e){} }
+}
+</script>
 </body>
 </html>
