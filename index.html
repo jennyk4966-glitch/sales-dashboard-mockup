@@ -139,6 +139,8 @@ th.agc-th-sort .agc-sort.on{color:#1a3a5f;font-weight:700}
 .hcsi-sum{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin-bottom:10px}
 /* [수정] 전체 대리점 평균: 표본수 카드 제거(7개)에 맞춰 100% 가로 채움 */
 #hcsi-avg-sum{grid-template-columns:repeat(7,1fr)}
+#hcsi-pre-sum{grid-template-columns:repeat(7,1fr)}
+.hcsi-top5-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
 .row2col #hcsi-avg-sum{grid-template-columns:repeat(4,1fr)}
 /* [수정] 1900px 기준 좁은 카드 영역에서 8컬럼 글자 잘림 방지 → 4컬럼 두 줄 */
 .row2col .hcsi-sum,
@@ -1202,8 +1204,8 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 5: HCSI 요약 미리보기 -->
       <div class="card" id="card-hcsi">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">담당 대리점 전체 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
-          <div class="tools"><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
+          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">전체 대리점 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
+          <div class="tools"><label style="font-size:11.5px;color:#666;margin-right:2px">조회월</label><select id="hcsi-pre-year" class="btn ghost sm" style="padding:3px 6px"></select><select id="hcsi-pre-month" class="btn ghost sm" style="padding:3px 6px"></select><button class="btn sm" onclick="searchHcsiPreview()">조회</button><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
         </div>
         <div class="card-body">
           <div class="no-data-msg" aria-hidden="true">
@@ -1221,41 +1223,44 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <div class="ttl">HCSI는 구분 “하나담당자” 조회 시에만 노출됩니다.</div>
             <div class="dsc">상단 구분을 <b>하나담당자</b>로 선택 후 조회해 주세요.</div>
           </div>
-          <div class="hcsi-sum-note"><span class="base">비교 기준: 전체 평균 대비</span></div>
-          <div class="hcsi-sum">
-            <div class="hcsi-sum-c"><div class="l">표본수</div><div class="v">1,247</div></div>
-            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">84</div><div class="d down">▼ 2</div></div>
-            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">83</div><div class="d down">▼ 1</div></div>
-            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">87</div><div class="d down">▼ 1</div></div>
-            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">88</div><div class="d up">▲ 1</div></div>
-            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div><div class="d flat">─ 0</div></div>
-            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.6h</div><div class="d down">▲ 0.2h</div></div>
-            <div class="hcsi-sum-c guar clickable" onclick="toggleHcsiGuarDetail(this)"><div class="l">개런티준수율 <span class="toggle-ico">▼</span></div><div class="v">80%</div><div class="d down">▼ 2</div></div>
+          <div class="hcsi-sum" id="hcsi-pre-sum">
+            <div class="hcsi-sum-c"><div class="l">종합만족도</div><div class="v">84</div></div>
+            <div class="hcsi-sum-c"><div class="l">전반적만족도</div><div class="v">83</div></div>
+            <div class="hcsi-sum-c"><div class="l">원활성</div><div class="v">87</div></div>
+            <div class="hcsi-sum-c"><div class="l">전문성</div><div class="v">88</div></div>
+            <div class="hcsi-sum-c"><div class="l">표현성</div><div class="v">85</div></div>
+            <div class="hcsi-sum-c"><div class="l">첫안내소요시간</div><div class="v">2.6h</div></div>
+            <div class="hcsi-sum-c guar"><div class="l">개런티준수율</div><div class="v">80%</div></div>
           </div>
-          <div id="hcsi-guar-detail">
-          <div class="divider-label">개런티 항목 (안내여부) </div>
-          <div class="score-grid" style="grid-template-columns:repeat(8,1fr)">
-            <div class="score-cell"><div class="lbl">일정</div><div class="val">95</div></div>
-            <div class="score-cell"><div class="lbl">항공</div><div class="val">91</div></div>
-            <div class="score-cell"><div class="lbl">호텔</div><div class="val">88</div></div>
-            <div class="score-cell"><div class="lbl">경비</div><div class="val">85</div></div>
-            <div class="score-cell"><div class="lbl">여행계약</div><div class="val">83</div></div>
-            <div class="score-cell"><div class="lbl">취소수수료</div><div class="val">79</div></div>
-            <div class="score-cell"><div class="lbl">선택관광</div><div class="val warn">71</div></div>
-            <div class="score-cell"><div class="lbl">쇼핑</div><div class="val bad">46</div></div>
+          
+          <div class="hcsi-top5-2col">
+            <div class="hcsi-top5-col">
+              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">상위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
+              <table class="data">
+                <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
+                <tbody id="hcsi-pre-top5-body">
+                  <tr><td class="l">강남프리미엄투어</td><td style="color:#1f8a4c;font-weight:700">96</td><td>95</td></tr>
+                  <tr><td class="l">송파골드여행</td><td style="color:#1f8a4c;font-weight:700">94</td><td>93</td></tr>
+                  <tr><td class="l">일산베스트투어</td><td style="color:#1f8a4c;font-weight:700">92</td><td>90</td></tr>
+                  <tr><td class="l">서초하나여행</td><td style="color:#1f8a4c;font-weight:700">91</td><td>92</td></tr>
+                  <tr><td class="l">판교트래블</td><td style="color:#1f8a4c;font-weight:700">90</td><td>89</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="hcsi-top5-col">
+              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">하위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
+              <table class="data">
+                <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
+                <tbody id="hcsi-pre-bottom5-body">
+                  <tr><td class="l">강서투어</td><td class="neg">62</td><td class="neg">58</td></tr>
+                  <tr><td class="l">분당하나여행</td><td class="neg">68</td><td>72</td></tr>
+                  <tr><td class="l">수원월드투어</td><td class="neg">71</td><td>74</td></tr>
+                  <tr><td class="l">동탄여행센터</td><td class="neg">74</td><td>76</td></tr>
+                  <tr><td class="l">마포트래블</td><td class="neg">76</td><td>78</td></tr>
+                </tbody>
+              </table>
+            </div>
           </div>
-          </div><!-- /#hcsi-guar-detail -->
-          <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">하위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">종합만족도 기준</span></div>
-          <table class="data">
-            <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th><th>담당자만족</th><th>응답수</th></tr></thead>
-            <tbody>
-              <tr><td class="l">강서투어</td><td class="neg">62</td><td class="neg">58</td><td>68</td><td>12</td></tr>
-              <tr><td class="l">분당하나여행</td><td class="neg">68</td><td>72</td><td>74</td><td>18</td></tr>
-              <tr><td class="l">수원월드투어</td><td class="neg">71</td><td>74</td><td>76</td><td>9</td></tr>
-              <tr><td class="l">동탄여행센터</td><td class="neg">74</td><td>76</td><td>78</td><td>15</td></tr>
-              <tr><td class="l">마포트래블</td><td class="neg">76</td><td>78</td><td>80</td><td>11</td></tr>
-            </tbody>
-          </table>
         </div>
       </div>
 
@@ -1598,7 +1603,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
     <li><b>출발월별 상품 예약현황</b>: 출발월 기준 인원/판매금액/수익/수익률 현황</li>
     <li><b>일자별 예약 채널 현황</b>: 일자와 채널별 순예약 현황</li>
     <li><b>일자별 예약 현황</b>: 총예약/총취소/순예약 및 전년도 순예약 비교</li>
-    <li><b>HCSI 요약 미리보기</b>: 하나담당자 기준 담당 대리점 HCSI 평균 및 하위 대리점 현황</li>
+    <li><b>HCSI 요약 미리보기</b>: 하나담당자 조회 기준, 전체 대리점 HCSI 평균 및 담당 대리점 상·하위 TOP5 현황</li>
   </ul>
 
   <h4>알럿 및 유의사항</h4>
@@ -2917,9 +2922,10 @@ selectHcsiMonth('2026-04');
     </div>
     <h5>영역 개요</h5>
     <ul>
-      <li>대시보드 홈 내 담당 대리점의 고객만족도 설문 평균 데이터를 요약 노출합니다.</li>
+      <li>대시보드 홈 내 <b>전체 대리점 평균</b> 고객만족도 설문 데이터를 요약 노출합니다.</li>
       <li>설문 데이터는 실시간이 아니며 전일자 기준으로 산출합니다.</li>
       <li>HCSI 데이터는 대리점 단위 평균 기준으로 제공하고 월 단위로 조회합니다.</li>
+      <li>카드 우측의 <b>연/월 셀렉트</b>에서 조회월을 선택한 뒤 <b>[조회]</b> 버튼을 클릭하면 해당 월 데이터로 갱신됩니다.</li>
       <li>[HCSI 상세 보기] 클릭 시 <b>HCSI(상세)</b> 탭으로 이동합니다.</li>
     </ul>
     <h5>데이터 기준</h5>
@@ -2929,17 +2935,19 @@ selectHcsiMonth('2026-04');
       <li>여행자별 설문은 백분율 점수로 환산된 최종 데이터를 사용합니다.</li>
       <li>조회월은 상품 출발일 기준으로 집계하되, 설문 점수는 해당 예약에 매핑된 최신 유효 응답 기준으로 산출합니다.</li>
     </ul>
+    <h5>조회 기준(연/월)</h5>
+    <ul>
+      <li>조회월은 연도 셀렉트와 월 셀렉트로 선택하며, <b>최초 진입 시 조회 시점의 전월</b>이 기본값으로 설정됩니다.</li>
+      <li>조회 가능 범위는 <b>2024년 1월부터 전월까지</b>이며, 당해 연도는 전월까지만 선택할 수 있습니다.</li>
+      <li>연/월을 변경한 뒤 <b>[조회]</b> 버튼을 클릭해야 지표와 순위가 갱신됩니다.</li>
+      <li>선택한 월에 데이터가 없는 경우 요약 지표는 <code>-</code>, 상위/하위 TOP5는 <b>데이터 없음</b>으로 표시됩니다.</li>
+    </ul>
     <h5>노출 항목</h5>
     <ul>
-      <li>종합만족도, 예약상담, 일정표, APPIS, 해피콜, 현지행사품질, 가이드 만족도, 개런티 준수율</li>
-      <li>담당 대리점 평균값을 유지하고, 전체 대리점 평균 대비 차이만 ▲/▼로 별도 표기합니다.</li>
-      <li>하위 대리점 TOP5는 종합만족도 기준으로 노출합니다.</li>
-      <li>응답수 10건 이하 대리점은 하위 TOP5 산출 대상에서 제외합니다.</li>
-    </ul>
-    <h5>개런티 상세</h5>
-    <ul>
-      <li>개런티 준수율 카드 클릭 시 상세 항목을 펼침/접힘 처리합니다.</li>
-      <li>상세 항목은 식사, 쇼핑, 선택관광 등 개런티 관련 세부 기준별 준수율을 표시합니다.</li>
+      <li>종합만족도, 전반적만족도, 원활성, 전문성, 표현성, 첫안내소요시간, 개런티 준수율</li>
+      <li>요약 지표는 <b>전체 대리점 평균</b> 단일 값으로 노출 합니다. </li>
+      <li>표본수 항목은 노출하지 않습니다.</li>
+      <li>상위/하위 대리점 TOP5는 <b>로그인한 담당자가 담당하는 대리점</b>을 대상으로 <b>종합만족도 점수 기준</b> 상위 5개소 / 하위 5개소를 노출하며, <b>선택한 조회월 기준으로 함께 갱신</b>됩니다.</li>
     </ul>
   </template>
 
@@ -3132,6 +3140,105 @@ function switchAgTab(idx){
   // 월별 추이 탭은 표시 직후 차트를 다시 그려 캔버스 크기를 보정
   if(idx===1 && typeof renderAgTrend==='function'){ try{ renderAgTrend(); }catch(e){} }
 }
+
+/* ===== HCSI 요약 미리보기: 연/월 셀렉트 + 조회 (2024년~전월, 기본=전월) ===== */
+function buildHcsiPreSelects(){
+  var yEl=document.getElementById('hcsi-pre-year');
+  var mEl=document.getElementById('hcsi-pre-month');
+  if(!yEl||!mEl) return;
+  var now=new Date();
+  // 조회시점 전월
+  var prev=new Date(now.getFullYear(), now.getMonth()-1, 1);
+  var py=prev.getFullYear(), pm=prev.getMonth()+1;
+  // 연도: 2024 ~ 전월 연도
+  var yhtml='';
+  for(var y=2024; y<=py; y++){
+    yhtml+='<option value="'+y+'"'+(y===py?' selected':'')+'>'+y+'년</option>';
+  }
+  yEl.innerHTML=yhtml;
+  var mhtml='';
+  for(var mo=1; mo<=12; mo++){
+    var mm=('0'+mo).slice(-2);
+    mhtml+='<option value="'+mm+'"'+(mo===pm?' selected':'')+'>'+mm+'월</option>';
+  }
+  mEl.innerHTML=mhtml;
+  yEl.value=String(py);
+  mEl.value=('0'+pm).slice(-2);
+}
+// [추가] 홈 HCSI 미리보기: 월별 대리점 순위(상/하위 Top5) 산출
+var HCSI_PRE_AGENCIES = [
+  {n:'강남프리미엄투어', b:11},
+  {n:'송파골드여행',     b:9},
+  {n:'일산베스트투어',   b:7},
+  {n:'서초하나여행',     b:6},
+  {n:'판교트래블',       b:5},
+  {n:'부산해운대투어',   b:2},
+  {n:'대전드림여행',     b:0},
+  {n:'마포트래블',       b:-9},
+  {n:'동탄여행센터',     b:-11},
+  {n:'수원월드투어',     b:-13},
+  {n:'분당하나여행',     b:-15},
+  {n:'강서투어',         b:-18}
+];
+function hcsiPreHash(s){
+  var h=2166136261;
+  for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); }
+  return (h>>>0);
+}
+function hcsiPreClamp(x){ return Math.max(40, Math.min(99, Math.round(x))); }
+function hcsiPreRankData(m){
+  if(!m) return null;
+  var key=m.key;
+  var rows=HCSI_PRE_AGENCIES.map(function(a){
+    var seed=hcsiPreHash(a.n+'@'+key);
+    var jg=(seed%9)-4;
+    var jh=((seed>>3)%9)-4;
+    return { n:a.n, gen:hcsiPreClamp(m.gen+a.b+jg), guar:hcsiPreClamp(m.guar+a.b+jh) };
+  });
+  var bestFirst=rows.slice().sort(function(p,q){ return (q.gen-p.gen)||(q.guar-p.guar); });
+  var worstFirst=rows.slice().sort(function(p,q){ return (p.gen-q.gen)||(p.guar-q.guar); });
+  return { top:bestFirst.slice(0,5), bottom:worstFirst.slice(0,5) };
+}
+function renderHcsiPreRank(m){
+  var topB=document.getElementById('hcsi-pre-top5-body');
+  var botB=document.getElementById('hcsi-pre-bottom5-body');
+  if(!topB||!botB) return;
+  var data=hcsiPreRankData(m);
+  if(!data){
+    var empty='<tr><td class="l" colspan="3" style="color:#999">데이터 없음</td></tr>';
+    topB.innerHTML=empty; botB.innerHTML=empty; return;
+  }
+  topB.innerHTML=data.top.map(function(r){
+    return '<tr><td class="l">'+r.n+'</td><td style="color:#1f8a4c;font-weight:700">'+r.gen+'</td><td>'+r.guar+'</td></tr>';
+  }).join('');
+  botB.innerHTML=data.bottom.map(function(r){
+    var gc=' class="neg"';
+    var hc=(r.guar<70)?' class="neg"':'';
+    return '<tr><td class="l">'+r.n+'</td><td'+gc+'>'+r.gen+'</td><td'+hc+'>'+r.guar+'</td></tr>';
+  }).join('');
+}
+function searchHcsiPreview(){
+  var yEl=document.getElementById('hcsi-pre-year');
+  var mEl=document.getElementById('hcsi-pre-month');
+  var sum=document.getElementById('hcsi-pre-sum');
+  if(!yEl||!mEl||!sum) return;
+  var key=yEl.value+'-'+mEl.value;
+  var m=(typeof hcsiMonthly!=='undefined')?hcsiMonthly.find(function(x){return x.key===key;}):null;
+  function v(val,suffix){ return (m&&val!=null)?(val+(suffix||'')):'-'; }
+  sum.children[0].innerHTML='<div class="l">종합만족도</div><div class="v">'+v(m&&m.gen)+'</div>';
+  sum.children[1].innerHTML='<div class="l">전반적만족도</div><div class="v">'+v(m&&m.full)+'</div>';
+  sum.children[2].innerHTML='<div class="l">원활성</div><div class="v">'+v(m&&m.smooth)+'</div>';
+  sum.children[3].innerHTML='<div class="l">전문성</div><div class="v">'+v(m&&m.prof)+'</div>';
+  sum.children[4].innerHTML='<div class="l">표현성</div><div class="v">'+v(m&&m.expr)+'</div>';
+  sum.children[5].innerHTML='<div class="l">첫안내소요시간</div><div class="v">'+v(m&&m.firstH,'h')+'</div>';
+  sum.children[6].innerHTML='<div class="l">개런티준수율</div><div class="v">'+v(m&&m.guar,'%')+'</div>';
+  renderHcsiPreRank(m);
+}
+(function initHcsiPreview(){
+  function go(){ buildHcsiPreSelects(); searchHcsiPreview(); }
+  if(document.readyState==='loading'){ document.addEventListener('DOMContentLoaded', go); }
+  else { go(); }
+})();
 </script>
 </body>
 </html>
