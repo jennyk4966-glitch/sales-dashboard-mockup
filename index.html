@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0611</title>
+<title>영업사원 대시보드_0615</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -600,6 +600,13 @@ body.no-data #card-monthly .no-data-msg,
 body.no-data #card-dailychannel .no-data-msg,
 body.no-data #card-dailytrend .no-data-msg,
 body.no-data #card-hcsi .no-data-msg{display:flex}
+/* [수정] 일자별 예약 채널 현황 / 일자별 예약 현황: NO DATA 상태에서도 조회기간(7/10/30일) 셀렉트는 노출하여 기간 변경 가능, 안내 메시지는 셀렉트 아래에 표시, 데이터 표만 숨김 */
+body.no-data #card-dailychannel .card-body > .top-filter,
+body.no-data #card-dailytrend .card-body > .top-filter{visibility:visible !important;position:relative;z-index:6}
+body.no-data #card-dailychannel .card-body > .no-data-msg,
+body.no-data #card-dailytrend .card-body > .no-data-msg{position:static !important;left:auto;right:auto;top:auto;bottom:auto;z-index:auto}
+body.no-data #card-dailychannel .card-body > .ch-scroll-wrap,
+body.no-data #card-dailytrend .card-body > .dt-scroll-wrap{display:none !important}
 
 
 /* 나의 업무관리: 라벨/탭은 유지, 값만 "-" 로 표시 */
@@ -851,7 +858,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
     <a>호텔</a><a>항공</a><a>패키지</a><a>통합정산</a><a>고객</a><a>업무공통</a><a>시스템</a>
     <a class="active">영업지원관리</a><a>BI포탈</a>
   </div>
-  <div class="gnb-right"><span>Update 20260611</span></div>
+  <div class="gnb-right"><span>Update 20260615</span></div>
 </div>
 <div class="wrap">
   <aside class="lnb collapsed" id="lnb">
@@ -892,9 +899,10 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 공통 팀/담당자 필터 -->
       <!-- [추가] 권한 선택 (목업: 조회권한/관리권한 전환) -->
       <div class="role-switch-row">
-        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
+        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br><b>조회권한_팀원·조회권한_팀장</b>은 IAM 권한 구분이 아니라, 조회권한 사용자가 접근했을 때 <b>직책(팀원/팀장)별 노출 차이</b>를 목업 참고용으로 구분한 표기입니다.<br>· <b>조회권한_팀원</b>: 로그인 사용자(본인) 기준으로 조직/담당자가 고정 조회됩니다.<br>· <b>조회권한_팀장</b>: 소속 부서/팀은 고정되고 담당자만 선택 가능하며, 담당자 <b>전체</b> 선택 시 팀 전체 실적 합계가 조회됩니다.<br>· <b>관리권한</b>: 본부/부서/팀/담당자를 직접 선택하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계가 조회됩니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
         <div class="role-switch" id="roleSwitch">
-          <label class="on"><input type="radio" name="role" value="view" checked onchange="switchRole('view')">조회권한</label>
+          <label class="on"><input type="radio" name="role" value="view_member" checked onchange="switchRole('view_member')">조회권한_팀원</label>
+          <label><input type="radio" name="role" value="view_lead" onchange="switchRole('view_lead')">조회권한_팀장</label>
           <label><input type="radio" name="role" value="admin" onchange="switchRole('admin')">관리권한</label>
         </div>
       </div>
@@ -1096,11 +1104,6 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
         </div>
         <div class="card-body">
-          <div class="no-data-msg" aria-hidden="true">
-            <div class="nd-icon">i</div>
-            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
-          </div>
                     <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
@@ -1116,6 +1119,11 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
             <span>~</span>
             <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+          </div>
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 셀렉트를 변경한 뒤 다시 확인해 주세요.</div>
           </div>
           <div id="ch-scroll-wrap" class="ch-scroll-wrap">
             <table class="data">
@@ -1146,11 +1154,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           </div>
         </div>
         <div class="card-body">
-          <div class="no-data-msg" aria-hidden="true">
-            <div class="nd-icon">i</div>
-            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 예약 건이 없습니다.<br>담당자 또는 구분 조건을 변경한 뒤 다시 조회해 주세요.</div>
-          </div>
+          
                     <div class="pre-query-msg">
             <div class="pq-icon">i</div>
             <div class="pq-title">조회 전 상태입니다</div>
@@ -1167,6 +1171,11 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
             <span>~</span>
             <input type="date" id="dt-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
             
+          </div>
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 셀렉트를 변경한 뒤 다시 확인해 주세요.</div>
           </div>
           <div id="dt-scroll-wrap" class="dt-scroll-wrap">
             <table class="data trend-tbl" id="dt-table">
@@ -1584,8 +1593,10 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
 
   <h4>공통 조회 정책</h4>
   <ul>
-    <li><b>조회권한</b>: 로그인 사용자 기준 소속 조직/담당자 정보가 기본 선택됩니다.</li>
-    <li><b>관리권한</b>: 본부/부서/팀/담당자 조건을 직접 선택하여 조회합니다.</li>
+    <li><b>조회권한_팀원</b>: 로그인 사용자(본인) 기준으로 소속 본부/부서/팀/담당자가 고정 선택되어 본인 실적만 조회합니다.</li>
+    <li><b>조회권한_팀장</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자에서 <b>전체</b> 선택 시 소속 팀 전체 실적 합계를 조회합니다.</li>
+    <li><b>관리권한</b>: 본부/부서/팀/담당자 조건을 직접 선택하여 조회하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계를 조회합니다.</li>
+    <li>※ <b>조회권한_팀원·조회권한_팀장</b>은 IAM 권한 구분이 아니라, 조회권한 사용자의 직책(팀원/팀장)에 따른 노출 차이를 목업에서 참고용으로 구분한 표기입니다. (실제 권한은 IAM으로 자동 관리)</li>
     <li>필터 변경만으로는 자동 조회하지 않으며, <b>[조회]</b> 클릭 시 전체 카드 데이터가 일괄 갱신됩니다.</li>
     <li>데이터가 없는 경우 영역별 정책에 따라 <code>0건</code>, <code>-</code>, 또는 No Data 안내를 노출합니다.</li>
   </ul>
@@ -2570,8 +2581,8 @@ function onDeptChange(){
   onTeamChange();
 }
 function onTeamChange(){
-  // 관리권한 모드에서만 담당자 동적 변경
-  if(!document.body.classList.contains('role-admin')) return;
+  // 관리권한 / 조회권한_팀장 모드에서만 담당자 동적 변경
+  if(!document.body.classList.contains('role-admin') && !document.body.classList.contains('role-lead')) return;
   var hq = document.getElementById('f-hq').value;
   var dept = document.getElementById('f-dept').value;
   var team = document.getElementById('f-team').value;
@@ -2580,7 +2591,8 @@ function onTeamChange(){
   if(users.length === 0){
     userSel.innerHTML = '<option value="">담당자 없음</option>';
   } else {
-    fillSelect(userSel, users, false);
+    // 담당자 '전체'(팀 전체 실적 합) + 팀원 목록
+    fillSelect(userSel, ['전체'].concat(users), false);
   }
 }
 
@@ -2591,7 +2603,9 @@ function switchRole(role){
     l.classList.toggle('on', input && input.value === role);
   });
   var isAdmin = (role === 'admin');
+  var isLead  = (role === 'view_lead');
   document.body.classList.toggle('role-admin', isAdmin);
+  document.body.classList.toggle('role-lead', isLead);
 
   var hq = document.getElementById('f-hq');
   var dept = document.getElementById('f-dept');
@@ -2602,9 +2616,20 @@ function switchRole(role){
     // 관리권한: 모두 활성, 본부=영업본부/부서=영업1부/팀=영업1팀 기본
     hq.disabled = false; dept.disabled = false; team.disabled = false; user.disabled = false;
     hq.value = 'sales';
-    onHqChange(); // 부서/팀/담당자 재구성
+    onHqChange(); // 부서/팀/담당자('전체'+팀원) 재구성
+  } else if(isLead){
+    // 조회권한_팀장: 소속 본부/부서/팀 고정, 담당자만 선택 가능('전체'=팀 전체 실적 합)
+    hq.value = 'sales';
+    onHqChange();
+    dept.value = 'sales1';
+    onDeptChange();
+    team.value = '영업1팀';
+    onTeamChange(); // 담당자 '전체'+팀원 재구성
+    user.value = '전체'; // 기본: 팀 전체 실적 합
+    hq.disabled = true; dept.disabled = true; team.disabled = true;
+    user.disabled = false; // 담당자 셀렉트만 활성화
   } else {
-    // 조회권한: 로그인 사용자(=강영업) 고정, 부/팀/담당자 disabled
+    // 조회권한_팀원: 로그인 사용자(=강영업) 고정, 부/팀/담당자 disabled
     // 영업본부 > 영업1부 > 영업1팀 > 강영업 으로 고정
     hq.value = 'sales';
     onHqChange();
@@ -2620,7 +2645,7 @@ function switchRole(role){
 
 // 초기화: 기본 조회권한
 document.addEventListener('DOMContentLoaded', function(){
-  switchRole('view');
+  switchRole('view_member');
 });
 
 // [추가] 디스크립션 사이드 패널 접기/펼치기
