@@ -3424,8 +3424,13 @@ document.addEventListener('keydown', function(e){
     var body = document.getElementById('descSideBody');
     var title = document.getElementById('descSideTitle');
     var html = getTplHTML('desc-tpl-main');
-    if(body && html){ body.innerHTML = html; }
+    if(body && html){ body.innerHTML = html; body.scrollTop = 0; }
     if(title){ title.textContent = '영업대시보드 안내'; }
+    // 메인 안내는 항상 우측 패널에 노출
+    var side = document.getElementById('descSide');
+    if(side){ side.classList.add('show'); side.classList.remove('collapsed'); }
+    document.body.classList.add('desc-open');
+    document.body.classList.remove('desc-collapsed');
   };
   // Override openDescPanel to inject into fixed side panel
   window.openDescPanel = function(key){
