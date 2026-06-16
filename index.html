@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0615</title>
+<title>영업사원 대시보드_0616</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -66,6 +66,11 @@ body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color
 .btn{height:28px;padding:0 14px;border:1px solid #1a3a5f;background:#1a3a5f;color:#fff;border-radius:3px;font-size:12px;cursor:pointer;font-weight:600}
 .btn.ghost{background:#fff;color:#1a3a5f}
 .btn.sm{height:24px;padding:0 10px;font-size:11.5px}
+/* [추가] 일자별 예약 채널 현황 - 조회기간 모드 토글 */
+.ch-toggle{display:inline-flex;border:1px solid #c9ccd1;border-radius:3px;overflow:hidden;height:28px;vertical-align:middle}
+.ch-toggle button{height:28px;padding:0 12px;border:0;background:#fff;color:#555;font-size:12px;cursor:pointer;border-right:1px solid #c9ccd1}
+.ch-toggle button:last-child{border-right:0}
+.ch-toggle button.on{background:#1a3a5f;color:#fff;font-weight:600}
 /* Page tabs */
 .ptabs{display:flex;border-bottom:2px solid #1a3a5f;margin-bottom:12px;background:#fff;border-radius:4px 4px 0 0}
 .ptab{padding:10px 20px;cursor:pointer;font-size:13px;color:#666;font-weight:600;border:1px solid transparent;border-bottom:0}
@@ -346,6 +351,12 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .desc-trigger:hover{color:#7b4dff}
 .desc-ico{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;background:#e8e9ee;color:#666;font-size:10px;font-weight:700;font-style:normal;transition:all .15s}
 .desc-trigger:hover .desc-ico{background:#7b4dff;color:#fff}
+.desc-ico{position:relative;cursor:help}
+.desc-tip{display:none;position:absolute;top:22px;left:-8px;z-index:200;width:280px;background:#2b2f36;color:#f0f2f5;font-size:11.5px;font-weight:400;font-family:Pretendard,-apple-system,sans-serif;font-style:normal;line-height:1.55;padding:9px 11px;border-radius:5px;box-shadow:0 4px 12px rgba(0,0,0,0.25);text-align:left;white-space:normal;letter-spacing:0}
+.desc-tip::before{content:'';position:absolute;top:-5px;left:12px;width:0;height:0;border-left:5px solid transparent;border-right:5px solid transparent;border-bottom:5px solid #2b2f36}
+.desc-tip b{color:#ffd866;font-weight:600}
+.desc-ico:hover .desc-tip,.desc-ico:focus .desc-tip{display:block}
+.card-head .desc-ico:hover,.card-head .desc-ico:focus,.hcsi-section-head .desc-ico:hover,.hcsi-section-head .desc-ico:focus{background:#7b4dff;color:#fff;outline:none}
 .desc-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.28);z-index:1500;opacity:0;pointer-events:none;transition:opacity .2s}
 .desc-overlay.show{opacity:1;pointer-events:auto}
 .desc-panel{position:fixed;top:0;right:0;width:400px;max-width:92vw;height:100vh;background:#fff;box-shadow:-4px 0 18px rgba(0,0,0,0.15);z-index:1600;transform:translateX(105%);transition:transform .25s ease;display:flex;flex-direction:column}
@@ -366,7 +377,7 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 
 
 /* === Fixed Description Side Panel (v4) === */
-.wrap{padding-right:470px}
+body.desc-open .wrap{padding-right:470px}
 .notice-box{background:#fff8e1;border:1px solid #f0c36d;border-left:4px solid #e67e22;padding:9px 12px;border-radius:4px;font-size:12px;line-height:1.7;color:#5a3a00;margin-bottom:10px}
 .notice-box b{color:#b54300}
 .desc-side{
@@ -374,9 +385,10 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
   max-height:calc(100vh - 90px);
   background:#fff;border:1px solid #d9dde2;border-radius:6px;
   box-shadow:0 2px 8px rgba(0,0,0,0.04);
-  display:flex;flex-direction:column;
+  display:none;flex-direction:column;
   z-index:50;font-size:12px;color:#333;
 }
+.desc-side.show{display:flex}
 .desc-side-header{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;border-bottom:1px solid #e5e7eb;
@@ -404,7 +416,7 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .desc-panel{display:none !important}
 .desc-overlay{display:none !important}
 @media (max-width:1400px){
-  .wrap{padding-right:420px}
+  body.desc-open .wrap{padding-right:420px}
   .desc-side{width:400px}
 }
 
@@ -459,6 +471,9 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .trend-tbl tr.net td,.trend-tbl tr.net th{font-weight:700}
 .trend-tbl td.neg,.trend-tbl td b.neg{color:#1565c0}
 .trend-tbl td.neg b{color:#1565c0}
+/* [요청] 일자별 예약 현황: 합계(마지막 열) 배경색 강조 - 문서 합계 강조색(.sumc)과 동일 */
+.trend-tbl thead tr th:last-child,
+.trend-tbl tbody tr td:last-child{background:#fff5d6}
 /* 일자별 예약 현황: 30일 가로 스크롤 / 음수 강조 */
 .dt-scroll-wrap{width:100%;overflow-x:hidden}
 .dt-scroll-wrap.scroll-x{overflow-x:auto}
@@ -471,8 +486,8 @@ table.data tr.etc-sub td.sub .leg-sp{width:6px}
 .dt-scroll-wrap table.trend-tbl thead tr th:last-child,
 .dt-scroll-wrap table.trend-tbl tbody tr td:last-child{position:sticky;right:0;z-index:2}
 .dt-scroll-wrap table.trend-tbl thead tr th:last-child{z-index:3;background:#eef2f7}
-.dt-scroll-wrap table.trend-tbl tbody tr td:last-child{background:#fff}
-.dt-scroll-wrap table.trend-tbl tbody tr.net td:last-child{background:#f8fafd}
+.dt-scroll-wrap table.trend-tbl tbody tr td:last-child{background:#f4f5f7}
+.dt-scroll-wrap table.trend-tbl tbody tr.net td:last-child{background:#f4f5f7}
 .dt-scroll-wrap.scroll-x table.trend-tbl thead tr th:first-child,
 .dt-scroll-wrap.scroll-x table.trend-tbl tbody tr th:first-child{box-shadow:1px 0 0 #d9dde2}
 .dt-scroll-wrap.scroll-x table.trend-tbl thead tr th:last-child,
@@ -607,6 +622,13 @@ body.no-data #card-dailychannel .card-body > .no-data-msg,
 body.no-data #card-dailytrend .card-body > .no-data-msg{position:static !important;left:auto;right:auto;top:auto;bottom:auto;z-index:auto}
 body.no-data #card-dailychannel .card-body > .ch-scroll-wrap,
 body.no-data #card-dailytrend .card-body > .dt-scroll-wrap{display:none !important}
+/* [추가] 미래월 등 개별 카드 단위 NO DATA: 해당 카드만 안내 카드(.no-data-msg) 노출, 조회기간 필터는 유지 */
+#card-dailychannel.localnd .card-body > *:not(.no-data-msg):not(.top-filter),
+#card-dailytrend.localnd .card-body > *:not(.no-data-msg):not(.top-filter){display:none !important}
+#card-dailychannel.localnd .card-body > .top-filter,
+#card-dailytrend.localnd .card-body > .top-filter{visibility:visible !important;position:relative;z-index:6}
+#card-dailychannel.localnd .card-body > .no-data-msg,
+#card-dailytrend.localnd .card-body > .no-data-msg{display:flex;position:static !important;left:auto;right:auto;top:auto;bottom:auto;z-index:auto}
 
 
 /* 나의 업무관리: 라벨/탭은 유지, 값만 "-" 로 표시 */
@@ -858,7 +880,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
     <a>호텔</a><a>항공</a><a>패키지</a><a>통합정산</a><a>고객</a><a>업무공통</a><a>시스템</a>
     <a class="active">영업지원관리</a><a>BI포탈</a>
   </div>
-  <div class="gnb-right"><span>Update 20260615</span></div>
+  <div class="gnb-right"><span>Update 20260616</span></div>
 </div>
 <div class="wrap">
   <aside class="lnb collapsed" id="lnb">
@@ -948,7 +970,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <div class="row2col">
       <!-- 영역 1: 나의 업무관리 -->
       <div class="card" id="card-mytask">
-        <div class="card-head"><h3 class="desc-trigger" data-desc="mytask" onclick="openDescPanel('mytask')">나의 업무관리 <span class="desc-ico">ⓘ</span></h3></div>
+        <div class="card-head"><h3 class="desc-trigger" data-desc="mytask" onclick="openDescPanel('mytask')">나의 업무관리 <span class="desc-ico" tabindex="0" role="img" aria-label="나의 업무관리 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>나의 업무관리</b><br>예약관리·온라인견적서의 내 담당 업무 건수를 요약합니다.<br>일일 신규·출발·대기·미수 예약과 견적 처리 현황을 확인하고, 항목 클릭 시 조건이 적용된 업무 화면으로 이동합니다. (전일 배치 기준)</span></span></h3></div>
         <div class="card-body">
           <div class="itabs">
             <div class="itab active" data-mtab="pkg">예약관리</div>
@@ -1019,7 +1041,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 3 (이동): 출발월별 상품 예약현황 -->
       <div class="card" id="card-monthly">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="monthly" onclick="openDescPanel('monthly')">출발월별 상품 예약현황 <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="monthly" onclick="openDescPanel('monthly')">출발월별 상품 예약현황 <span class="desc-ico" tabindex="0" role="img" aria-label="출발월별 상품 예약현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>출발월별 상품 예약현황</b><br>출발년월 기준 예약 인원·판매금액·수익·수익률을 조회합니다.<br>전체·속성별·브랜드별 탭으로 비중을 확인하며, 허수대리점은 집계에서 제외됩니다.</span></span></h3>
           <div class="tools sec-filter">
             <label>연도</label><select><option>2026년</option><option>2025년</option></select>
             <label>월</label><select><option>05월</option><option>06월</option><option>07월</option></select>
@@ -1100,7 +1122,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 2 (신규): 채널별 예약 현 -->
       <div class="card" id="card-dailychannel">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span class="desc-ico" tabindex="0" role="img" aria-label="일자별 예약 채널 현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>일자별 예약 채널 현황</b><br>채널 6종(인증센터·브랜드몰·대리점 등)의 일자별 순예약 인원을 표로 제공합니다.<br>조회기간은 [최근 7일]·[월별] 버튼으로 구분하며(최근 7일 자동 적용, 월별은 년/월 선택), [상세보기]로 대리점 단위까지 확인합니다.</span></span></h3>
           <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
         </div>
         <div class="card-body">
@@ -1111,19 +1133,28 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           </div>
           <div class="top-filter" style="margin-bottom:8px">
             <label>조회기간</label>
-            <select id="ch-range" onchange="changeChannelRange(this.value)" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
-              <option value="7" selected>7일</option>
-              <option value="10">10일</option>
-              <option value="30">30일</option>
-            </select>
-            <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-            <span>~</span>
-            <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            <span id="ch-toggle" class="ch-toggle" role="group" aria-label="조회기간 구분">
+              <button type="button" id="ch-mode-day" class="on" aria-pressed="true" onclick="changeChannelMode('day')">최근 7일</button>
+              <button type="button" id="ch-mode-month" aria-pressed="false" onclick="changeChannelMode('month')">월별</button>
+            </span>
+            <span id="ch-day-wrap">
+              <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+              <span>~</span>
+              <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            </span>
+            <span id="ch-month-wrap" style="display:none">
+              <select id="ch-year" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="2024">2024년</option><option value="2025">2025년</option><option value="2026" selected>2026년</option>
+              </select>
+              <select id="ch-month" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+              </select>
+            </span>
           </div>
           <div class="no-data-msg" aria-hidden="true">
             <div class="nd-icon">i</div>
             <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 셀렉트를 변경한 뒤 다시 확인해 주세요.</div>
+            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 구분(최근 7일·월별)을 변경한 뒤 다시 확인해 주세요.</div>
           </div>
           <div id="ch-scroll-wrap" class="ch-scroll-wrap">
             <table class="data">
@@ -1148,7 +1179,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 4 (신규): 일자별 모객 현황 추이 -->
       <div class="card" id="card-dailytrend">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="dailytrend" onclick="openDescPanel('dailytrend')">일자별 예약 현황  <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">총예약 / 총취소 / 순예약 + 전년도 순예약 YoY</span> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="dailytrend" onclick="openDescPanel('dailytrend')">일자별 예약 현황  <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">총예약 / 총취소 / 순예약 + 전년도 순예약 YoY</span> <span class="desc-ico" tabindex="0" role="img" aria-label="일자별 예약 현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>일자별 예약 현황</b><br>조회기간은 [최근 7일]·[월별] 버튼으로 구분하며(최근 7일 자동 적용, 월별은 년/월 선택), 총예약·총취소·순예약과 전년도 순예약(YoY)을 표·그래프로 비교합니다.<br>순예약 음수 구간을 구분 표시하고, 최근 3개월 추이 팝업을 제공합니다.</span></span></h3>
           <div class="tools">
             <button class="btn ghost sm" onclick="openTrendPopup()">최근 3개월 추이 보기</button>
           </div>
@@ -1162,25 +1193,34 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           </div>
           <div class="top-filter" style="margin-bottom:8px">
             <label>조회기간</label>
-            <select id="dt-range" onchange="changeDailyRange(this.value)" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
-              <option value="7" selected>7일</option>
-              <option value="10">10일</option>
-              <option value="30">30일</option>
-            </select>
-            <input type="date" id="dt-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-            <span>~</span>
-            <input type="date" id="dt-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            <span id="dt-toggle" class="ch-toggle" role="group" aria-label="조회기간 구분">
+              <button type="button" id="dt-mode-day" class="on" aria-pressed="true" onclick="changeDailyMode('day')">최근 7일</button>
+              <button type="button" id="dt-mode-month" aria-pressed="false" onclick="changeDailyMode('month')">월별</button>
+            </span>
+            <span id="dt-day-wrap">
+              <input type="date" id="dt-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+              <span>~</span>
+              <input type="date" id="dt-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            </span>
+            <span id="dt-month-wrap" style="display:none">
+              <select id="dt-year" onchange="renderDailyMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="2024">2024년</option><option value="2025">2025년</option><option value="2026" selected>2026년</option>
+              </select>
+              <select id="dt-month" onchange="renderDailyMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+              </select>
+            </span>
             
           </div>
           <div class="no-data-msg" aria-hidden="true">
             <div class="nd-icon">i</div>
             <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 셀렉트를 변경한 뒤 다시 확인해 주세요.</div>
+            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 구분(최근 7일·월별)을 변경한 뒤 다시 확인해 주세요.</div>
           </div>
           <div id="dt-scroll-wrap" class="dt-scroll-wrap">
             <table class="data trend-tbl" id="dt-table">
               <thead id="dt-thead">
-                <tr><th></th><th>5/9(토)</th><th>5/10(일)</th><th>5/11(월)</th><th>5/12(화)</th><th>5/13(수)</th><th>5/14(목)</th><th>5/15(금)</th><th>합</th></tr>
+                <tr><th></th><th>5/9(토)</th><th>5/10(일)</th><th>5/11(월)</th><th>5/12(화)</th><th>5/13(수)</th><th>5/14(목)</th><th>5/15(금)</th><th>합계</th></tr>
               </thead>
               <tbody id="dt-tbody">
                 <tr><th class="rowh">총예약</th><td>20</td><td>15</td><td>0</td><td>60</td><td>60</td><td>100</td><td>100</td><td><b>355</b></td></tr>
@@ -1201,7 +1241,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <div id="trend-popup-ov" class="trend-ov" onclick="if(event.target===this)closeTrendPopup()">
         <div class="trend-modal">
           <div class="trend-modal-head">
-            <h4>■ 일자별 모객 현황 추이 그래프 <span style="font-weight:400;color:#666;font-size:11.5px;margin-left:6px">최근 3개월 (조회일 ~ -90일)</span></h4>
+            <h4>■ 일자별 모객 현황 추이 그래프 <span id="trend-3m-range" style="font-weight:400;color:#666;font-size:11.5px;margin-left:6px">최근 3개월</span></h4>
             <button class="trend-close" onclick="closeTrendPopup()">✕</button>
           </div>
           <div class="trend-modal-body">
@@ -1213,7 +1253,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 영역 5: HCSI 요약 미리보기 -->
       <div class="card" id="card-hcsi">
         <div class="card-head">
-          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">전체 대리점 평균 데이터</span> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="hcsi-pre" onclick="openDescPanel('hcsi-pre')">HCSI 요약 미리보기 <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">전체 대리점 평균 데이터</span> <span class="desc-ico" tabindex="0" role="img" aria-label="HCSI 요약 미리보기 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>HCSI 요약 미리보기</b><br>전체 대리점 평균 고객만족도(HCSI)를 월 단위로 요약합니다.<br>구분=하나담당자 조회 시에만 노출되며, 연·월 선택 후 [조회]로 갱신합니다. (전일자 기준)</span></span></h3>
           <div class="tools"><label style="font-size:11.5px;color:#666;margin-right:2px">조회월</label><select id="hcsi-pre-year" class="btn ghost sm" style="padding:3px 6px"></select><select id="hcsi-pre-month" class="btn ghost sm" style="padding:3px 6px"></select><button class="btn sm" onclick="searchHcsiPreview()">조회</button><button class="btn ghost sm" onclick="switchPage('hcsi')">HCSI 상세 보기</button></div>
         </div>
         <div class="card-body">
@@ -1244,28 +1284,28 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           
           <div class="hcsi-top5-2col">
             <div class="hcsi-top5-col">
-              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">상위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
+              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">상위 대리점 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
               <table class="data">
-                <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
+                <thead><tr><th>No</th><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
                 <tbody id="hcsi-pre-top5-body">
-                  <tr><td class="l">강남프리미엄투어</td><td style="color:#1f8a4c;font-weight:700">96</td><td>95</td></tr>
-                  <tr><td class="l">송파골드여행</td><td style="color:#1f8a4c;font-weight:700">94</td><td>93</td></tr>
-                  <tr><td class="l">일산베스트투어</td><td style="color:#1f8a4c;font-weight:700">92</td><td>90</td></tr>
-                  <tr><td class="l">서초하나여행</td><td style="color:#1f8a4c;font-weight:700">91</td><td>92</td></tr>
-                  <tr><td class="l">판교트래블</td><td style="color:#1f8a4c;font-weight:700">90</td><td>89</td></tr>
+                  <tr><td class="c">1</td><td class="l">강남프리미엄투어</td><td style="color:#1f8a4c;font-weight:700">96</td><td>95</td></tr>
+                  <tr><td class="c">2</td><td class="l">송파골드여행</td><td style="color:#1f8a4c;font-weight:700">94</td><td>93</td></tr>
+                  <tr><td class="c">3</td><td class="l">일산베스트투어</td><td style="color:#1f8a4c;font-weight:700">92</td><td>90</td></tr>
+                  <tr><td class="c">4</td><td class="l">서초하나여행</td><td style="color:#1f8a4c;font-weight:700">91</td><td>92</td></tr>
+                  <tr><td class="c">5</td><td class="l">판교트래블</td><td style="color:#1f8a4c;font-weight:700">90</td><td>89</td></tr>
                 </tbody>
               </table>
             </div>
             <div class="hcsi-top5-col">
-              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">하위 대리점 Top 5 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
+              <div class="divider-label" style="display:flex;justify-content:space-between;align-items:baseline">하위 대리점 <span style="font-weight:400;color:#888;font-size:11px">담당 대리점 중 · 종합만족도 기준</span></div>
               <table class="data">
-                <thead><tr><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
+                <thead><tr><th>No</th><th>대리점</th><th>종합만족</th><th>개런티준수</th></tr></thead>
                 <tbody id="hcsi-pre-bottom5-body">
-                  <tr><td class="l">강서투어</td><td class="neg">62</td><td class="neg">58</td></tr>
-                  <tr><td class="l">분당하나여행</td><td class="neg">68</td><td>72</td></tr>
-                  <tr><td class="l">수원월드투어</td><td class="neg">71</td><td>74</td></tr>
-                  <tr><td class="l">동탄여행센터</td><td class="neg">74</td><td>76</td></tr>
-                  <tr><td class="l">마포트래블</td><td class="neg">76</td><td>78</td></tr>
+                  <tr><td class="c">1</td><td class="l">강서투어</td><td class="neg">62</td><td class="neg">58</td></tr>
+                  <tr><td class="c">2</td><td class="l">분당하나여행</td><td class="neg">68</td><td>72</td></tr>
+                  <tr><td class="c">3</td><td class="l">수원월드투어</td><td class="neg">71</td><td>74</td></tr>
+                  <tr><td class="c">4</td><td class="l">동탄여행센터</td><td class="neg">74</td><td>76</td></tr>
+                  <tr><td class="c">5</td><td class="l">마포트래블</td><td class="neg">76</td><td>78</td></tr>
                 </tbody>
               </table>
             </div>
@@ -1279,7 +1319,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
     <!-- =================== 예약현황 상세 =================== -->
     <section id="page-channel" class="hidden">
       <div class="card">
-        <div class="card-head"><h3 class="desc-trigger" data-desc="channel-detail" onclick="openDescPanel('channel-detail')"> 예약 현황 상세 <span class="desc-ico">ⓘ</span></h3></div>
+        <div class="card-head"><h3 class="desc-trigger" data-desc="channel-detail" onclick="openDescPanel('channel-detail')"> 예약 현황 상세 <span class="desc-ico" tabindex="0" role="img" aria-label="예약 현황 상세 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>예약 현황 상세</b><br>홈의 채널 현황 상세보기로 진입하며 담당자 구분·조회기간을 그대로 이어받습니다.<br>채널·대리점별 순예약을 정렬·검색하고 최근 6·12개월 장기 추이를 확인합니다.</span></span></h3></div>
         <div class="card-body">
           <div class="itabs">
             <div class="itab active" data-ctab="agency">대리점별 상세</div>
@@ -1290,10 +1330,23 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
           <div id="ctab-agency">
             <div class="top-filter" style="margin-bottom:8px">
               <label>조회기간</label>
-              <select id="agc-range" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333"><option value="7">7일</option><option value="10" selected>10일</option><option value="30">30일</option></select>
-              <input type="date" value="2026-05-06" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
-              <span>~</span>
-              <input type="date" value="2026-05-15" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              <span id="agc-toggle" class="ch-toggle" role="group" aria-label="조회기간 구분">
+                <button type="button" id="agc-mode-day" class="on" aria-pressed="true" onclick="changeAgencyMode('day')">일별</button>
+                <button type="button" id="agc-mode-month" aria-pressed="false" onclick="changeAgencyMode('month')">월별</button>
+              </span>
+              <span id="agc-day-wrap">
+                <input type="date" id="agc-start" value="2026-05-09" onchange="searchAgency()" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <span>~</span>
+                <input type="date" id="agc-end" value="2026-05-15" onchange="searchAgency()" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+              </span>
+              <span id="agc-month-wrap" style="display:none">
+                <select id="agc-year" onchange="searchAgency()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                  <option value="2024">2024년</option><option value="2025">2025년</option><option value="2026" selected>2026년</option>
+                </select>
+                <select id="agc-month" onchange="searchAgency()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                  <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5" selected>5월</option><option value="6">6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+                </select>
+              </span>
               <label>채널</label>
               <select id="agc-channel"><option>전체</option><option>공식인증예약센터</option><option>브랜드몰</option><option>일반대리점</option></select>
               <label>대리점 검색</label>
@@ -1387,7 +1440,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 상단: 전체 대리점 평균 (선택 월) -->
       <div class="hcsi-section">
         <div class="hcsi-section-head">
-          <h3 class="desc-trigger" data-desc="hcsi-avg" onclick="openDescPanel('hcsi-avg')">전체 대리점 평균 <!--<span id="hcsi-avg-month" style="font-weight:400;color:#7b4dff;margin-left:6px;font-size:12px">2026.04</span>--> <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="hcsi-avg" onclick="openDescPanel('hcsi-avg')">전체 대리점 평균 <!--<span id="hcsi-avg-month" style="font-weight:400;color:#7b4dff;margin-left:6px;font-size:12px">2026.04</span>--> <span class="desc-ico" tabindex="0" role="img" aria-label="전체 대리점 평균 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>전체 대리점 평균</b><br>선택 월 기준 전체 대리점의 HCSI(예약/상담) 평균을 제공합니다.<br>종합만족도·원활성·전문성·개런티준수율 등으로 구성되며, 대리점별 상세의 비교 기준선으로 사용됩니다.</span></span></h3>
           <div class="meta">대리점 <b id="hcsi-avg-store">87개소</b> / 기준월 <b id="hcsi-avg-mon2">2026.04</b></div>
         </div>
         <div class="hcsi-section-body">
@@ -1406,7 +1459,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
       <!-- 하단: 대리점 선택 (확실하게 구분) -->
       <div class="hcsi-section">
         <div class="hcsi-section-head" style="background:#fffaf0;border-bottom-color:#e8d4a0">
-          <h3 class="desc-trigger" data-desc="hcsi-agency" onclick="openDescPanel('hcsi-agency')" style="color:#b8860b">▼ 대리점별 상세 조회 <span class="desc-ico">ⓘ</span></h3>
+          <h3 class="desc-trigger" data-desc="hcsi-agency" onclick="openDescPanel('hcsi-agency')" style="color:#b8860b">▼ 대리점별 상세 조회 <span class="desc-ico" tabindex="0" role="img" aria-label="대리점별 상세 조회 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>대리점별 상세 조회</b><br>좌측에서 대리점을 선택하면 우측에 해당 대리점의 HCSI 상세를 노출합니다.<br>점수·개런티 분석과 AI 리뷰·최근 6개월 추이 2개 탭으로 구성되며, 대리점명·코드·계약관계로 검색합니다.</span></span></h3>
           <div class="meta">좌측에서 대리점 선택 시 상세 점수가 우측에 표시됩니다</div>
         </div>
         <div class="hcsi-section-body">
@@ -1568,7 +1621,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
 <!-- === Fixed Description Side Panel === -->
 <aside class="desc-side" id="descSide">
   <div class="desc-side-header">
-    <button type="button" class="desc-toggle" id="descToggleBtn" onclick="toggleDescSide()" title="접기/펼치기" aria-label="안내 패널 접기/펼치기">‹</button>
+    <button type="button" class="desc-toggle" id="descToggleBtn" onclick="hideDescSide()" title="닫기" aria-label="안내 패널 닫기">×</button>
     <span class="t" id="descSideTitle">영업대시보드 안내</span>
     <button type="button" class="btn-main" onclick="loadMainDesc()">↺ 메인 안내</button>
   </div>
@@ -1614,7 +1667,7 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
     <li><b>출발월별 상품 예약현황</b>: 출발월 기준 인원/판매금액/수익/수익률 현황</li>
     <li><b>일자별 예약 채널 현황</b>: 일자와 채널별 순예약 현황</li>
     <li><b>일자별 예약 현황</b>: 총예약/총취소/순예약 및 전년도 순예약 비교</li>
-    <li><b>HCSI 요약 미리보기</b>: 하나담당자 조회 기준, 전체 대리점 HCSI 평균 및 담당 대리점 상·하위 TOP5 현황</li>
+    <li><b>HCSI 요약 미리보기</b>: 하나담당자 조회 기준, 전체 대리점 HCSI 평균 및 담당 대리점 상·하위 대리점 현황</li>
   </ul>
 
   <h4>알럿 및 유의사항</h4>
@@ -2021,16 +2074,101 @@ function buildDailyChart(d){
     {type:'bar',label:'순예약',data:d.net,backgroundColor:bgColors,borderColor:bdColors,borderWidth:1,order:3},
     {type:'line',label:'총예약',data:d.total,borderColor:'#c0392b',backgroundColor:'rgba(192,57,43,0.10)',fill:false,tension:0.25,pointRadius:3,borderWidth:2,order:1},
     {type:'line',label:'총취소',data:d.cancel,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,0.10)',fill:false,tension:0.25,pointRadius:3,borderWidth:2,order:2}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{boxWidth:14,font:{size:11}}},tooltip:{callbacks:{label:function(ctx){var lbl=ctx.dataset.label+': '+ctx.parsed.y; if(ctx.dataset.label==='순예약' && ctx.parsed.y<0){ lbl+=' ⚠ 마이너스'; } return lbl;}}}},scales:{y:{suggestedMin:-40,suggestedMax:120,title:{display:true,text:'건수',font:{size:10}}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',onClick:function(){},labels:{boxWidth:14,font:{size:11}}},tooltip:{callbacks:{label:function(ctx){var lbl=ctx.dataset.label+': '+ctx.parsed.y; if(ctx.dataset.label==='순예약' && ctx.parsed.y<0){ lbl+=' ⚠ 마이너스'; } return lbl;}}}},scales:{y:{suggestedMin:-40,suggestedMax:120,title:{display:true,text:'건수',font:{size:10}}}}}});
 }
 buildDailyChart(DT_DATA['7']);
+
+// ============ [추가] 일자별 예약 현황 - 최근 7일 / 월별 모드 전환 ============
+function changeDailyMode(mode){
+  var dayWrap = document.getElementById('dt-day-wrap');
+  var monthWrap = document.getElementById('dt-month-wrap');
+  var btnDay = document.getElementById('dt-mode-day');
+  var btnMonth = document.getElementById('dt-mode-month');
+  if(mode==='month'){
+    dayWrap.style.display = 'none';
+    monthWrap.style.display = '';
+    if(btnDay){ btnDay.classList.remove('on'); btnDay.setAttribute('aria-pressed','false'); }
+    if(btnMonth){ btnMonth.classList.add('on'); btnMonth.setAttribute('aria-pressed','true'); }
+    renderDailyMonth();
+  } else {
+    monthWrap.style.display = 'none';
+    dayWrap.style.display = '';
+    if(btnMonth){ btnMonth.classList.remove('on'); btnMonth.setAttribute('aria-pressed','false'); }
+    if(btnDay){ btnDay.classList.add('on'); btnDay.setAttribute('aria-pressed','true'); }
+    // 최근 7일 자동 적용
+    changeDailyRange('7');
+  }
+}
+// 선택한 년/월의 일자별 예약 현황(총예약/총취소/순예약/전년도/YoY)을 렌더
+function renderDailyMonth(){
+  // 기준일: 2026-06-16 / 예약은 전일자 기준이므로 당월은 전일(15일)까지만 노출
+  var CUR = {y:2026, m:6, lastDay:15};
+  var year = parseInt(document.getElementById('dt-year').value, 10);
+  var month = parseInt(document.getElementById('dt-month').value, 10);
+  var daysInMonth = new Date(year, month, 0).getDate();
+  var dn = ['일','월','화','수','목','금','토'];
+  var lastDay = daysInMonth;
+  if(year > CUR.y || (year===CUR.y && month > CUR.m)){ lastDay = 0; }       // 미래월: 데이터 없음
+  else if(year===CUR.y && month===CUR.m){ lastDay = CUR.lastDay; }          // 당월: 전일자까지
+  var wrap = document.getElementById('dt-scroll-wrap');
+  var cwrap = document.getElementById('dt-chart-scroll');
+  document.getElementById('card-dailytrend').classList.remove('localnd');
+  // 데이터 없음(미래월) 처리
+  if(lastDay <= 0){
+    document.getElementById('card-dailytrend').classList.add('localnd');
+    wrap.classList.remove('scroll-x'); cwrap.classList.remove('scroll-x');
+    buildDailyChart({labels:[],total:[],cancel:[],net:[],py:[],yoy:[]});
+    return;
+  }
+  // 일자별 결정적(deterministic) 더미 데이터 생성
+  var labels=[], total=[], cancel=[], net=[], py=[], yoy=[];
+  for(var i=1;i<=lastDay;i++){
+    var d = new Date(year, month-1, i);
+    labels.push(month+'/'+i+'('+dn[d.getDay()]+')');
+    var seed = (year*10000 + month*100 + i);
+    var t = Math.max(0, Math.round(40 + ((seed % 9) - 4) * 8));   // 총예약
+    var c = Math.max(0, Math.round(15 + ((seed % 5) - 2) * 5));   // 총취소
+    var nv = t - c;                                               // 순예약
+    var p = Math.max(0, Math.round(nv * 0.9 + ((seed % 6) - 3) * 4)); // 전년도 순예약
+    total.push(t); cancel.push(c); net.push(nv); py.push(p);
+    yoy.push(p===0 ? '0%' : (Math.round((nv - p) / Math.abs(p) * 100) + '%'));
+  }
+  var d = {labels:labels, total:total, cancel:cancel, net:net, py:py, yoy:yoy};
+  // 표 렌더 (changeDailyRange와 동일 구성: 행=지표 / 열=일자 + 합)
+  var thead = document.getElementById('dt-thead');
+  thead.innerHTML = '<tr><th></th>'+d.labels.map(function(l){return '<th>'+l+'</th>';}).join('')+'<th>합계</th></tr>';
+  function row(name, arr, cls, isPct){
+    var sum = arr.reduce(function(s,v){ return s+(typeof v==='number'?v:parseInt(v)||0); },0);
+    var tds = arr.map(function(v){
+      var nn = (typeof v==='number')?v:parseInt(v)||0;
+      var neg = nn<0 ? ' class="neg"' : '';
+      return '<td'+neg+'>'+v+'</td>';
+    }).join('');
+    var sumNeg = sum<0?' class="neg"':'';
+    var sumDisp = isPct ? '' : ('<b>'+sum+'</b>');
+    return '<tr'+(cls?' class="'+cls+'"':'')+'><th class="rowh">'+name+'</th>'+tds+'<td'+sumNeg+'>'+sumDisp+'</td></tr>';
+  }
+  document.getElementById('dt-tbody').innerHTML =
+    row('총예약', d.total) +
+    row('총취소', d.cancel) +
+    row('순예약', d.net, 'net') +
+    row('전년도 순예약', d.py) +
+    '<tr><th class="rowh">순예약 YoY</th>'+d.yoy.map(function(v){ var neg=String(v).indexOf('-')===0?' class="neg"':''; return '<td'+neg+'>'+v+'</td>'; }).join('')+'<td></td></tr>';
+  // 일자 수가 많으므로 구분/합계 컬럼 고정 + 가로 스크롤
+  if(lastDay > 10){ wrap.classList.add('scroll-x'); cwrap.classList.add('scroll-x'); }
+  else { wrap.classList.remove('scroll-x'); cwrap.classList.remove('scroll-x'); }
+  // 차트 갱신
+  buildDailyChart(d);
+}
+
 
 function changeDailyRange(range){
   const d = DT_DATA[range];
   if(!d) return;
+  document.getElementById('card-dailytrend').classList.remove('localnd');
   // 헤더 갱신
   var thead = document.getElementById('dt-thead');
-  var thHtml = '<tr><th></th>'+d.labels.map(l=>'<th>'+l+'</th>').join('')+'<th>합</th></tr>';
+  var thHtml = '<tr><th></th>'+d.labels.map(l=>'<th>'+l+'</th>').join('')+'<th>합계</th></tr>';
   thead.innerHTML = thHtml;
   // 본문 갱신
   function row(name, arr, cls, isPct){
@@ -2114,6 +2252,7 @@ const CH_DATA = {
 function changeChannelRange(range){
   const d = CH_DATA[range];
   if(!d) return;
+  document.getElementById('card-dailychannel').classList.remove('localnd');
   const n = d.labels.length;
   // 헤더
   var thead = document.getElementById('ch-thead');
@@ -2150,6 +2289,90 @@ function changeChannelRange(range){
   var wrap = document.getElementById('ch-scroll-wrap');
   if(range==='30'){ wrap.classList.add('scroll-x'); }
   else { wrap.classList.remove('scroll-x'); }
+}
+
+// ============ [추가] 일자별 예약 채널 현황 - 일별/월별 모드 전환 ============
+function changeChannelMode(mode){
+  var dayWrap = document.getElementById('ch-day-wrap');
+  var monthWrap = document.getElementById('ch-month-wrap');
+  var btnDay = document.getElementById('ch-mode-day');
+  var btnMonth = document.getElementById('ch-mode-month');
+  if(mode==='month'){
+    dayWrap.style.display = 'none';
+    monthWrap.style.display = '';
+    if(btnDay){ btnDay.classList.remove('on'); btnDay.setAttribute('aria-pressed','false'); }
+    if(btnMonth){ btnMonth.classList.add('on'); btnMonth.setAttribute('aria-pressed','true'); }
+    renderChannelMonth();
+  } else {
+    monthWrap.style.display = 'none';
+    dayWrap.style.display = '';
+    if(btnMonth){ btnMonth.classList.remove('on'); btnMonth.setAttribute('aria-pressed','false'); }
+    if(btnDay){ btnDay.classList.add('on'); btnDay.setAttribute('aria-pressed','true'); }
+    // 최근 7일 자동 적용
+    changeChannelRange('7');
+  }
+}
+// 선택한 년/월의 일자별 데이터를 채널별로 동일하게 렌더
+function renderChannelMonth(){
+  // 기준일: 2026-06-16 / 예약은 전일자 기준이므로 당월은 전일(15일)까지만 노출
+  var CUR = {y:2026, m:6, lastDay:15};
+  var year = parseInt(document.getElementById('ch-year').value, 10);
+  var month = parseInt(document.getElementById('ch-month').value, 10);
+  var daysInMonth = new Date(year, month, 0).getDate();
+  var dn = ['일','월','화','수','목','금','토'];
+  // 노출 가능한 마지막 일자 산출
+  var lastDay = daysInMonth;
+  if(year > CUR.y || (year===CUR.y && month > CUR.m)){ lastDay = 0; }       // 미래월: 데이터 없음
+  else if(year===CUR.y && month===CUR.m){ lastDay = CUR.lastDay; }          // 당월: 전일자까지
+  var scrollWrap = document.getElementById('ch-scroll-wrap');
+  document.getElementById('card-dailychannel').classList.remove('localnd');
+  // 데이터 없음(미래월) 처리
+  if(lastDay <= 0){
+    document.getElementById('card-dailychannel').classList.add('localnd');
+    scrollWrap.classList.remove('scroll-x');
+    return;
+  }
+  // 일자 라벨
+  var labels = [];
+  for(var i=1;i<=lastDay;i++){
+    var d = new Date(year, month-1, i);
+    labels.push(String(month).padStart(2,'0')+'/'+String(i).padStart(2,'0')+'('+dn[d.getDay()]+')');
+  }
+  // 채널별 기본값(일별 7일 표와 동일한 채널 기준) 기반 일자별 데이터 생성
+  var base = [10,5,6,3,2,1];
+  var rows = base.map(function(b, ri){
+    var arr = [];
+    for(var i=1;i<=lastDay;i++){
+      // 년/월/일/채널 기준 결정적(deterministic) 값 산출
+      var seed = (year*10000 + month*100 + i)*(ri+3);
+      var v = Math.max(0, Math.round(b + ((seed % 7) - 3)));
+      arr.push(v);
+    }
+    return arr;
+  });
+  var n = labels.length;
+  // 헤더
+  document.getElementById('ch-thead').innerHTML =
+    '<tr><th rowspan="2">채널</th><th colspan="'+n+'">일자별 예약건수</th><th rowspan="2">합계</th></tr>' +
+    '<tr>'+labels.map(function(l){return '<th>'+l+'</th>';}).join('')+'</tr>';
+  // 본문 + 열 합계
+  var colSum = new Array(n).fill(0);
+  var grand = 0;
+  var tbodyHtml = '';
+  rows.forEach(function(arr, ri){
+    var rowSum = 0;
+    var tds = arr.map(function(v,ci){ rowSum+=v; colSum[ci]+=v; return '<td>'+v+'</td>'; }).join('');
+    grand += rowSum;
+    tbodyHtml += '<tr><td class="l">'+CH_CHANNELS[ri]+'</td>'+tds+'<td><b>'+rowSum+'</b></td></tr>';
+  });
+  document.getElementById('ch-tbody').innerHTML = tbodyHtml;
+  document.getElementById('ch-tfoot').innerHTML =
+    '<tr><td class="c">합계</td>'+colSum.map(function(v){return '<td>'+v+'</td>';}).join('')+'<td>'+grand+'</td></tr>';
+  // 부제
+  var sub = document.getElementById('ch-subtitle');
+  if(sub){ sub.textContent = year+'년 '+month+'월'; }
+  // 월별은 일자 수가 많으므로 채널 컬럼 고정 + 가로 스크롤 적용
+  scrollWrap.classList.add('scroll-x');
 }
 
 // ============ [추가] 예약현황(상세) 대리점별 상세 조회 (7/10/30일 + 채널) ============
@@ -2217,17 +2440,92 @@ function agcSortMark(key){
   if(agcSort.key !== key){ return '<span class="agc-sort">\u21d5</span>'; }
   return '<span class="agc-sort on">'+(agcSort.dir==='asc'?'\u25b2':'\u25bc')+'</span>';
 }
-function searchAgency(){
-  var range = (document.getElementById('agc-range')||{}).value || '10';
-  var channel = (document.getElementById('agc-channel')||{}).value || '전체';
-  var n = parseInt(range,10);
-  // 행별 일자 배열 구성
+// [수정] 대리점별 상세 조회기간: 일별/월별 토글 (일자별 예약 채널 현황과 동일 방식)
+function agcMode(){
+  var b = document.getElementById('agc-mode-month');
+  return (b && b.classList.contains('on')) ? 'month' : 'day';
+}
+function agcParseDate(str){
+  var p = String(str||'').split('-');
+  if(p.length < 3) return null;
+  var d = new Date(parseInt(p[0],10), parseInt(p[1],10)-1, parseInt(p[2],10));
+  return isNaN(d.getTime()) ? null : d;
+}
+// 시작~종료 구간으로 일자 라벨/채널별 건수 산출 (기준 종료일 2026-05-15 앵커, 최대 30일)
+function agcBuild(start, end){
+  var DAY = 86400000;
+  var s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  var e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  if(e < s){ var t = s; s = e; e = t; }
+  var n = Math.round((e - s) / DAY) + 1;
+  if(n > 30){ s = new Date(e); s.setDate(e.getDate() - 29); n = 30; }
+  if(n < 1){ n = 1; }
+  var anchorEnd = new Date(2026, 4, 15);
+  var labels = [];
+  for(var i=0;i<n;i++){
+    var d = new Date(s); d.setDate(s.getDate() + i);
+    labels.push(String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0'));
+  }
+  var g30 = agcGen30();
   var rows = AGC_BASE.map(function(r, idx){
-    var arr;
-    if(range==='30'){ arr = agcGen30()[idx]; }
-    else if(range==='7'){ arr = r.d.slice(3); }   // 뒤 7개 (05/09~05/15)
-    else { arr = r.d.slice(); }                    // 10일 전체
+    var arr = [];
+    for(var i=0;i<n;i++){
+      var d = new Date(s); d.setDate(s.getDate() + i);
+      var off = Math.round((anchorEnd - d) / DAY);
+      var ai = 29 - off;
+      var v;
+      if(ai >= 0 && ai < 30){ v = g30[idx][ai]; }
+      else { v = r.d[(d.getDate()) % r.d.length]; }
+      arr.push(v);
+    }
     return {ch:r.ch, code:r.code, name:r.name, arr:arr};
+  });
+  return {labels:labels, rows:rows};
+}
+// 현재 토글/입력값 기준으로 라벨·행 데이터 확정
+function agcResolve(){
+  if(agcMode() === 'month'){
+    var y = parseInt((document.getElementById('agc-year')||{}).value, 10);
+    var m = parseInt((document.getElementById('agc-month')||{}).value, 10);
+    var CUR = {y:2026, m:6, lastDay:15};
+    if(y > CUR.y || (y === CUR.y && m > CUR.m)){ return {labels:[], rows:[]}; } // 미래월: 데이터 없음
+    var lastDay = (y === CUR.y && m === CUR.m) ? CUR.lastDay : new Date(y, m, 0).getDate();
+    return agcBuild(new Date(y, m-1, 1), new Date(y, m-1, lastDay));
+  }
+  var s = agcParseDate((document.getElementById('agc-start')||{}).value) || new Date(2026,4,9);
+  var e = agcParseDate((document.getElementById('agc-end')||{}).value) || new Date(2026,4,15);
+  return agcBuild(s, e);
+}
+// 토글 전환
+function changeAgencyMode(mode){
+  var dayWrap = document.getElementById('agc-day-wrap');
+  var monthWrap = document.getElementById('agc-month-wrap');
+  var btnDay = document.getElementById('agc-mode-day');
+  var btnMonth = document.getElementById('agc-mode-month');
+  if(mode === 'month'){
+    if(dayWrap) dayWrap.style.display = 'none';
+    if(monthWrap) monthWrap.style.display = '';
+    if(btnDay){ btnDay.classList.remove('on'); btnDay.setAttribute('aria-pressed','false'); }
+    if(btnMonth){ btnMonth.classList.add('on'); btnMonth.setAttribute('aria-pressed','true'); }
+  } else {
+    if(monthWrap) monthWrap.style.display = 'none';
+    if(dayWrap) dayWrap.style.display = '';
+    if(btnMonth){ btnMonth.classList.remove('on'); btnMonth.setAttribute('aria-pressed','false'); }
+    if(btnDay){ btnDay.classList.add('on'); btnDay.setAttribute('aria-pressed','true'); }
+    // 일별 기본값: 최근 7일
+    var s = document.getElementById('agc-start'); if(s) s.value = '2026-05-09';
+    var e = document.getElementById('agc-end'); if(e) e.value = '2026-05-15';
+  }
+  searchAgency();
+}
+function searchAgency(){
+  var channel = (document.getElementById('agc-channel')||{}).value || '전체';
+  // [수정] 조회기간: 일별(달력 직접 선택, 기본 최근 7일)·월별(연/월 셀렉트) 토글 기준
+  var built = agcResolve();
+  var labels = built.labels;
+  var n = labels.length;
+  var rows = built.rows.map(function(r){
+    return {ch:r.ch, code:r.code, name:r.name, arr:r.arr};
   });
   // 채널 필터
   if(channel!=='전체'){ rows = rows.filter(function(r){ return r.ch===channel; }); }
@@ -2251,8 +2549,7 @@ function searchAgency(){
     if(el){ el.innerHTML = '조회 결과 <b>'+cnt+'</b>개 대리점 \u00b7 기간 합계 <b>'+gd.toLocaleString()+'</b>건'; }
     requestAnimationFrame(agcFixSticky);
   })();
-  // 라벨
-  var labels = agcLabels(range);
+  // 라벨/행은 agcResolve()에서 산출
   // 헤더
   var thead = document.getElementById('agc-thead');
   if(thead){
@@ -2307,6 +2604,8 @@ function openTrendPopup(){
   // 90 day labels (월/일)
   const lbl=[]; const today=new Date(2026,4,15);
   for(let i=89;i>=0;i--){const d=new Date(today); d.setDate(d.getDate()-i); lbl.push((d.getMonth()+1)+'/'+d.getDate());}
+  // [추가] 최근 3개월 정확한 일자(기간) 별도 노출
+  (function(){var s=new Date(today); s.setDate(s.getDate()-89);var f=function(dd){return dd.getFullYear()+'.'+('0'+(dd.getMonth()+1)).slice(-2)+'.'+('0'+dd.getDate()).slice(-2);};var rg=document.getElementById('trend-3m-range'); if(rg){ rg.textContent='최근 3개월 ('+f(s)+' ~ '+f(today)+')'; }})();
   // synthetic seasonal series
   function gen(base,amp,phase,noiseAmp){
     return lbl.map((_,i)=>{
@@ -2319,7 +2618,7 @@ function openTrendPopup(){
   trendPopupChart=new Chart(cv,{type:'line',data:{labels:lbl,datasets:[
     {label:'순예약 (당해)',data:cur,borderColor:'#1a3a5f',backgroundColor:'rgba(26,58,95,0.08)',fill:false,tension:0.3,pointRadius:0,borderWidth:2},
     {label:'순예약 (전년)',data:prev,borderColor:'#c0392b',borderDash:[5,4],fill:false,tension:0.3,pointRadius:0,borderWidth:1.8}
-  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',labels:{boxWidth:14,font:{size:11}}},tooltip:{mode:'index',intersect:false}},interaction:{mode:'index',intersect:false},scales:{x:{ticks:{maxTicksLimit:12,font:{size:10}}},y:{title:{display:true,text:'건수',font:{size:10}}}}}});
+  ]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'top',onClick:function(){},labels:{boxWidth:14,font:{size:11}}},tooltip:{mode:'index',intersect:false}},interaction:{mode:'index',intersect:false},scales:{x:{ticks:{maxTicksLimit:12,font:{size:10}}},y:{title:{display:true,text:'건수',font:{size:10}}}}}});
 }
 function closeTrendPopup(){
   document.getElementById('trend-popup-ov').classList.remove('show');
@@ -2881,7 +3180,9 @@ selectHcsiMonth('2026-04');
   <template id="desc-tpl-dailychannel" data-title="일자별 예약 채널 현황">
     <div class="notice-box">
       - 예약 데이터는 전일자 기준으로 산출합니다.<br>
-      - 기본 조회기간은 7일이며 10일/30일 선택 시 일자 컬럼이 변경됩니다. 30일 선택 시 가로 스크롤을 적용합니다.
+      - 조회기간은 [최근 7일]·[월별] 토글 버튼으로 선택합니다. [최근 7일]은 최근 7일이 자동 적용됩니다.<br>
+      - [월별] 선택 시 년/월 셀렉트로 해당 월을 지정하면 그 달의 일자별 데이터가 채널별로 동일하게 노출되며, 가로 스크롤을 적용합니다.<br>
+      - 당월(현재월) 선택 시 예약 전일자(어제)까지의 일자만 노출하며, 미래 월은 데이터가 없습니다.
     </div>
     <h5>영역 개요</h5>
     <ul>
@@ -2899,20 +3200,22 @@ selectHcsiMonth('2026-04');
       <li>행: 채널 구분 6종</li>
       <li>열: 조회기간 내 일자 + 합계</li>
       <li>값: 채널/일자별 순예약 인원</li>
-      <li>30일 조회 시 채널 컬럼과 합계 컬럼은 고정하고 일자 영역만 가로 스크롤합니다.</li>
+      <li>월별 조회 시 채널 컬럼과 합계 컬럼은 고정하고 일자 영역만 가로 스크롤합니다.</li>
     </ul>
   </template>
 
   <template id="desc-tpl-dailytrend" data-title="일자별 예약 현황">
     <div class="notice-box">
       - 총예약/총취소/순예약과 전년도 순예약을 같은 기간 기준으로 비교합니다.<br>
-      - 기본 조회기간은 7일이며 10일/30일 선택이 가능합니다.
+      - 조회기간은 [최근 7일]·[월별] 토글 버튼으로 선택합니다. [최근 7일]은 최근 7일이 자동 적용됩니다.<br>
+      - [월별] 선택 시 년/월 셀렉트로 해당 월을 지정하면 그 달의 일자별 실적이 동일하게 노출되며, 가로 스크롤을 적용합니다.<br>
+      - 당월(현재월) 선택 시 예약 전일자(어제)까지의 일자만 노출하며, 미래 월은 데이터가 없습니다.
     </div>
     <h5>영역 개요</h5>
     <ul>
       <li>상단 공통 필터의 담당자 구분 기준으로 일자별 예약 실적을 조회합니다.</li>
-      <li>최근 N일(7/10/30일)의 예약 실적을 표와 그래프로 동시에 노출합니다.</li>
-      <li>30일 선택 시 표/그래프 영역에 가로 스크롤을 적용합니다.</li>
+      <li>[최근 7일]은 최근 7일, [월별]은 선택한 년/월의 일자별 예약 실적을 표와 그래프로 동시에 노출합니다.</li>
+      <li>월별 등 일자 수가 많은 경우 표/그래프 영역에 가로 스크롤을 적용합니다.</li>
       <li>표의 첫 열(구분)과 마지막 열(합계)은 스크롤 시 고정합니다.</li>
     </ul>
     <h5>지표 정의</h5>
@@ -2965,14 +3268,14 @@ selectHcsiMonth('2026-04');
       <li>조회월은 연도 셀렉트와 월 셀렉트로 선택하며, <b>최초 진입 시 조회 시점의 전월</b>이 기본값으로 설정됩니다.</li>
       <li>조회 가능 범위는 <b>2024년 1월부터 전월까지</b>이며, 당해 연도는 전월까지만 선택할 수 있습니다.</li>
       <li>연/월을 변경한 뒤 <b>[조회]</b> 버튼을 클릭해야 지표와 순위가 갱신됩니다.</li>
-      <li>선택한 월에 데이터가 없는 경우 요약 지표는 <code>-</code>, 상위/하위 TOP5는 <b>데이터 없음</b>으로 표시됩니다.</li>
+      <li>선택한 월에 데이터가 없는 경우 요약 지표는 <code>-</code>, 상위/하위 대리점은 <b>데이터 없음</b>으로 표시됩니다.</li>
     </ul>
     <h5>노출 항목</h5>
     <ul>
       <li>종합만족도, 전반적만족도, 원활성, 전문성, 표현성, 첫안내소요시간, 개런티 준수율</li>
       <li>요약 지표는 <b>전체 대리점 평균</b> 단일 값으로 노출 합니다. </li>
       <li>표본수 항목은 노출하지 않습니다.</li>
-      <li>상위/하위 대리점 TOP5는 <b>로그인한 담당자가 담당하는 대리점</b>을 대상으로 <b>종합만족도 점수 기준</b> 상위 5개소 / 하위 5개소를 노출하며, <b>선택한 조회월 기준으로 함께 갱신</b>됩니다.</li>
+      <li>상위/하위 대리점은 <b>로그인한 담당자가 담당하는 대리점</b>을 대상으로 <b>종합만족도 점수 기준</b> 상위 5개소 / 하위 5개소를 노출하며, <b>대리점명 좌측에 순번(No 1~5)</b>을 표기하고 <b>선택한 조회월 기준으로 함께 갱신</b>됩니다.</li>
     </ul>
   </template>
 
@@ -2984,8 +3287,8 @@ selectHcsiMonth('2026-04');
     <h5>진입 및 기본 조회</h5>
     <ul>
       <li>직전 화면의 담당자 구분 기준을 유지합니다.</li>
-      <li>직전 화면에서 선택한 조회기간(7/10/30일)을 연동합니다.</li>
-      <li>직전 조회기간이 없는 경우 기본값은 7일입니다.</li>
+      <li>직전 화면(일자별 예약 채널 현황)에서 선택한 조회기간(일별·월별)을 연동합니다.</li>
+      <li>직전 조회기간이 없는 경우 기본값은 일별 최근 7일입니다.</li>
     </ul>
     <h5>대리점별 상세</h5>
     <ul>
@@ -2994,7 +3297,9 @@ selectHcsiMonth('2026-04');
       <li>채널 셀렉트로 특정 채널만 조회할 수 있으며 전체 옵션을 제공합니다.</li>
       <li>대리점 검색으로 특정 대리점만 조회할 수 있습니다.</li>
       <li>조회기간 내 예약이 발생한 대리점만 노출하며, 예약 0건 대리점은 제외합니다.</li>
-      <li>조회기간은 7/10/30일 선택이 가능하고, 달력 직접 선택 시 최대 30일까지 조회합니다.</li>
+      <li>조회기간은 일자별 예약 채널 현황과 동일하게 <b>[일별]·[월별]</b> 토글로 선택합니다.</li>
+      <li><b>[일별]</b>은 기본값으로 최근 7일이 적용되며, 시작일·종료일을 달력에서 직접 선택해 수정할 수 있습니다(최대 30일).</li>
+      <li><b>[월별]</b>은 일자별 예약 채널 현황과 동일하게 연/월 셀렉트로 해당 월을 지정하며, 당월 선택 시 예약 전일자까지만 노출합니다.</li>
     </ul>
     <h5>장기 추이</h5>
     <ul>
@@ -3133,8 +3438,18 @@ document.addEventListener('keydown', function(e){
     }
     if(body){ body.innerHTML = html; body.scrollTop = 0; }
     if(title){ title.textContent = getTplTitle(tplId); }
+    var side = document.getElementById('descSide');
+    if(side){ side.classList.add('show'); side.classList.remove('collapsed'); }
+    document.body.classList.add('desc-open');
+    document.body.classList.remove('desc-collapsed');
   };
-  window.closeDescPanel = function(){ /* no-op: 고정 패널이므로 닫지 않음 */ };
+  // 안내 패널 닫기(미노출) — 기본 상태로 복귀
+  window.hideDescSide = function(){
+    var side = document.getElementById('descSide');
+    if(side){ side.classList.remove('show'); }
+    document.body.classList.remove('desc-open');
+  };
+  window.closeDescPanel = function(){ window.hideDescSide(); };
 
   // LNB '영업대시보드' 클릭 시 메인 안내 재조회
   document.addEventListener('DOMContentLoaded', function(){
@@ -3230,16 +3545,16 @@ function renderHcsiPreRank(m){
   if(!topB||!botB) return;
   var data=hcsiPreRankData(m);
   if(!data){
-    var empty='<tr><td class="l" colspan="3" style="color:#999">데이터 없음</td></tr>';
+    var empty='<tr><td class="l" colspan="4" style="color:#999">데이터 없음</td></tr>';
     topB.innerHTML=empty; botB.innerHTML=empty; return;
   }
-  topB.innerHTML=data.top.map(function(r){
-    return '<tr><td class="l">'+r.n+'</td><td style="color:#1f8a4c;font-weight:700">'+r.gen+'</td><td>'+r.guar+'</td></tr>';
+  topB.innerHTML=data.top.map(function(r,i){
+    return '<tr><td class="c">'+(i+1)+'</td><td class="l">'+r.n+'</td><td style="color:#1f8a4c;font-weight:700">'+r.gen+'</td><td>'+r.guar+'</td></tr>';
   }).join('');
-  botB.innerHTML=data.bottom.map(function(r){
+  botB.innerHTML=data.bottom.map(function(r,i){
     var gc=' class="neg"';
     var hc=(r.guar<70)?' class="neg"':'';
-    return '<tr><td class="l">'+r.n+'</td><td'+gc+'>'+r.gen+'</td><td'+hc+'>'+r.guar+'</td></tr>';
+    return '<tr><td class="c">'+(i+1)+'</td><td class="l">'+r.n+'</td><td'+gc+'>'+r.gen+'</td><td'+hc+'>'+r.guar+'</td></tr>';
   }).join('');
 }
 function searchHcsiPreview(){
