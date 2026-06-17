@@ -869,6 +869,17 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
   margin-top:6px;
   padding-top:6px;
 }
+
+/* [추가] 예약현황(상세) > 대리점별 상세: 조회 전/데이터 없음 상태 (필터는 항상 상단 유지) */
+#ctab-agency .agc-msg{display:none}
+body.pre-query #ctab-agency .notice,
+body.pre-query #ctab-agency .agc-summary,
+body.pre-query #ctab-agency .agc-scroll,
+body.no-data #ctab-agency .notice,
+body.no-data #ctab-agency .agc-summary,
+body.no-data #ctab-agency .agc-scroll{display:none !important}
+body.pre-query #ctab-agency .pre-query-msg.agc-msg{display:flex}
+body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
 </style>
 
 </head>
@@ -1352,6 +1363,17 @@ body.role-admin .top-filter .admin-only-label{display:inline-block}
               <label>대리점 검색</label>
               <input type="text" placeholder="대리점명/코드" style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px">
               <button class="btn" onclick="searchAgency()">조회</button>
+            </div>
+            <!-- [추가] 대리점별 상세: 조회 전 / 데이터 없음 안내 (필터 하단 배치) -->
+            <div class="pre-query-msg agc-msg">
+              <div class="pq-icon">i</div>
+              <div class="pq-title">조회 전 상태입니다</div>
+              <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>대리점별 일자별 예약 현황이 표시됩니다.</div>
+            </div>
+            <div class="no-data-msg agc-msg" aria-hidden="true">
+              <div class="nd-icon">i</div>
+              <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+              <div class="nd-desc">선택한 담당자 기준 해당 조건에 조회 가능한 예약 데이터가 없습니다.<br>담당자 또는 조회기간·채널 조건을 변경한 뒤 다시 확인해 주세요.</div>
             </div>
             <div class="notice"><b>[안내]</b> <br>조회기간 내 <b>예약발생 대리점만 노출됩니다.</b> (예약 0건 대리점은 자동 제외)</div>
             <div class="agc-summary" id="agc-summary">조회 결과 <b>0</b>개 대리점</div>
