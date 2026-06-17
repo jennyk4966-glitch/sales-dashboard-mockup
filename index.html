@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>영업사원 대시보드_0616</title>
+<title>영업사원 대시보드_0617</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'맑은 고딕','Malgun Gothic',sans-serif;font-size:12px;color:#333;background:#f4f5f7}
@@ -880,6 +880,23 @@ body.no-data #ctab-agency .agc-summary,
 body.no-data #ctab-agency .agc-scroll{display:none !important}
 body.pre-query #ctab-agency .pre-query-msg.agc-msg{display:flex}
 body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
+/* [추가] 예약현황(상세) > 대리점별 상세: 담당자 '전체' 조회 시 개별 조회 안내 (특정 팀 담당 대리점 다수) */
+#ctab-agency .team-all-msg{display:none;flex-direction:column;align-items:center;justify-content:center;padding:48px 16px;gap:8px;min-height:180px}
+#ctab-agency .team-all-msg .ta-icon{width:30px;height:30px;border-radius:50%;background:#fdecea;color:#c0392b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+#ctab-agency .team-all-msg .ta-title{font-size:13px;font-weight:700;color:#374151}
+#ctab-agency .team-all-msg .ta-desc{font-size:12px;color:#6b7280;text-align:center;line-height:1.7}
+body.agc-team-all:not(.pre-query) #ctab-agency .notice,
+body.agc-team-all:not(.pre-query) #ctab-agency .agc-summary,
+body.agc-team-all:not(.pre-query) #ctab-agency .agc-scroll,
+body.agc-team-all:not(.pre-query) #ctab-agency .no-data-msg.agc-msg{display:none !important}
+body.agc-team-all:not(.pre-query) #ctab-agency .team-all-msg.agc-msg{display:flex}
+/* [추가] 부서예약현황 다운로드 버튼: 관리권한에서만 노출 */
+.dept-dl-btn{display:none}
+body.role-admin .dept-dl-btn{display:inline-block}
+/* [추가] 부서예약현황 다운로드 안내 토스트 */
+#deptDlToast{position:fixed;left:50%;bottom:40px;transform:translateX(-50%) translateY(20px);background:#1a3a5f;color:#fff;font-size:12.5px;line-height:1.6;padding:14px 20px;border-radius:6px;box-shadow:0 6px 22px rgba(0,0,0,.25);z-index:99999;max-width:420px;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:pre-line}
+#deptDlToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#deptDlToast b{color:#ffd24d}
 </style>
 
 </head>
@@ -891,7 +908,7 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
     <a>호텔</a><a>항공</a><a>패키지</a><a>통합정산</a><a>고객</a><a>업무공통</a><a>시스템</a>
     <a class="active">영업지원관리</a><a>BI포탈</a>
   </div>
-  <div class="gnb-right"><span>Update 20260616</span></div>
+  <div class="gnb-right"><span>Update 20260617</span></div>
 </div>
 <div class="wrap">
   <aside class="lnb collapsed" id="lnb">
@@ -932,10 +949,9 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
       <!-- 공통 팀/담당자 필터 -->
       <!-- [추가] 권한 선택 (목업: 조회권한/관리권한 전환) -->
       <div class="role-switch-row">
-        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br><b>조회권한_팀원·조회권한_팀장</b>은 IAM 권한 구분이 아니라, 조회권한 사용자가 접근했을 때 <b>직책(팀원/팀장)별 노출 차이</b>를 목업 참고용으로 구분한 표기입니다.<br>· <b>조회권한_팀원</b>: 로그인 사용자(본인) 기준으로 조직/담당자가 고정 조회됩니다.<br>· <b>조회권한_팀장</b>: 소속 부서/팀은 고정되고 담당자만 선택 가능하며, 담당자 <b>전체</b> 선택 시 팀 전체 실적 합계가 조회됩니다.<br>· <b>관리권한</b>: 본부/부서/팀/담당자를 직접 선택하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계가 조회됩니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
+        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br>· <b>조회권한</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자 <b>전체</b> 선택 시 팀 전체 실적 합계가, 동일 팀 내 팀원 선택 시 해당 팀원 실적이 조회됩니다. (직책 구분 없이 <b>팀 전체 및 동일 팀 팀원 데이터</b>를 동일하게 조회할 수 있습니다.)<br>· <b>관리권한</b>: 본부/부서/팀/담당자를 직접 선택하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계가 조회됩니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
         <div class="role-switch" id="roleSwitch">
-          <label class="on"><input type="radio" name="role" value="view_member" checked onchange="switchRole('view_member')">조회권한_팀원</label>
-          <label><input type="radio" name="role" value="view_lead" onchange="switchRole('view_lead')">조회권한_팀장</label>
+          <label class="on"><input type="radio" name="role" value="view" checked onchange="switchRole('view')">조회권한</label>
           <label><input type="radio" name="role" value="admin" onchange="switchRole('admin')">관리권한</label>
         </div>
       </div>
@@ -1130,68 +1146,12 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
 
             </div>
 
-      <!-- 영역 2 (신규): 채널별 예약 현 -->
-      <div class="card" id="card-dailychannel">
-        <div class="card-head">
-          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span class="desc-ico" tabindex="0" role="img" aria-label="일자별 예약 채널 현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>일자별 예약 채널 현황</b><br>채널 6종(인증센터·브랜드몰·대리점 등)의 일자별 순예약 인원을 표로 제공합니다.<br>조회기간은 [최근 7일]·[월별] 버튼으로 구분하며(최근 7일 자동 적용, 월별은 년/월 선택), [상세보기]로 대리점 단위까지 확인합니다.</span></span></h3>
-          <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
-        </div>
-        <div class="card-body">
-                    <div class="pre-query-msg">
-            <div class="pq-icon">i</div>
-            <div class="pq-title">조회 전 상태입니다</div>
-            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>최근 7일 일자별 예약 채널 현황이 표시됩니다.</div>
-          </div>
-          <div class="top-filter" style="margin-bottom:8px">
-            <label>조회기간</label>
-            <span id="ch-toggle" class="ch-toggle" role="group" aria-label="조회기간 구분">
-              <button type="button" id="ch-mode-day" class="on" aria-pressed="true" onclick="changeChannelMode('day')">최근 7일</button>
-              <button type="button" id="ch-mode-month" aria-pressed="false" onclick="changeChannelMode('month')">월별</button>
-            </span>
-            <span id="ch-day-wrap">
-              <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-              <span>~</span>
-              <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
-            </span>
-            <span id="ch-month-wrap" style="display:none">
-              <select id="ch-year" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
-                <option value="2024">2024년</option><option value="2025">2025년</option><option value="2026" selected>2026년</option>
-              </select>
-              <select id="ch-month" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
-                <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
-              </select>
-            </span>
-          </div>
-          <div class="no-data-msg" aria-hidden="true">
-            <div class="nd-icon">i</div>
-            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
-            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 구분(최근 7일·월별)을 변경한 뒤 다시 확인해 주세요.</div>
-          </div>
-          <div id="ch-scroll-wrap" class="ch-scroll-wrap">
-            <table class="data">
-              <thead id="ch-thead">
-                <tr><th rowspan="2">채널</th><th colspan="7">일자별 예약건수</th><th rowspan="2">합계</th></tr>
-                <tr><th>05/09(토)</th><th>05/10(일)</th><th>05/11(월)</th><th>05/12(화)</th><th>05/13(수)</th><th>05/14(목)</th><th>05/15(금)</th></tr>
-              </thead>
-              <tbody id="ch-tbody">
-                <tr><td class="l">공식인증예약센터</td><td>7</td><td>6</td><td>11</td><td>9</td><td>8</td><td>10</td><td>12</td><td><b>63</b></td></tr>
-                <tr><td class="l">브랜드몰</td><td>7</td><td>4</td><td>5</td><td>6</td><td>4</td><td>5</td><td>6</td><td><b>37</b></td></tr>
-                <tr><td class="l">일반대리점</td><td>8</td><td>5</td><td>4</td><td>7</td><td>6</td><td>5</td><td>9</td><td><b>44</b></td></tr>
-                <tr><td class="l">제휴사</td><td>3</td><td>1</td><td>2</td><td>3</td><td>2</td><td>3</td><td>4</td><td><b>18</b></td></tr>
-                <tr><td class="l">자회사</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>14</b></td></tr>
-                <tr><td class="l">직판</td><td>1</td><td>0</td><td>2</td><td>1</td><td>1</td><td>2</td><td>2</td><td><b>9</b></td></tr>
-              </tbody>
-              <tfoot id="ch-tfoot"><tr><td class="c">합계</td><td>28</td><td>18</td><td>26</td><td>27</td><td>23</td><td>27</td><td>36</td><td>185</td></tr></tfoot>
-            </table>
-          </div>
-        </div>
-      </div>
-
       <!-- 영역 4 (신규): 일자별 모객 현황 추이 -->
       <div class="card" id="card-dailytrend">
         <div class="card-head">
           <h3 class="desc-trigger" data-desc="dailytrend" onclick="openDescPanel('dailytrend')">일자별 예약 현황  <span style="font-weight:400;color:#666;margin-left:6px;font-size:11.5px">총예약 / 총취소 / 순예약 + 전년도 순예약 YoY</span> <span class="desc-ico" tabindex="0" role="img" aria-label="일자별 예약 현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>일자별 예약 현황</b><br>조회기간은 [최근 7일]·[월별] 버튼으로 구분하며(최근 7일 자동 적용, 월별은 년/월 선택), 총예약·총취소·순예약과 전년도 순예약(YoY)을 표·그래프로 비교합니다.<br>순예약 음수 구간을 구분 표시하고, 최근 3개월 추이 팝업을 제공합니다.</span></span></h3>
           <div class="tools">
+            <button class="btn ghost sm dept-dl-btn" onclick="downloadDeptReservations()" title="최근 7일 기준 선택 부서의 일자별 예약건수를 Excel로 다운로드(관리권한 전용)">부서예약현황 다운로드</button>
             <button class="btn ghost sm" onclick="openTrendPopup()">최근 3개월 추이 보기</button>
           </div>
         </div>
@@ -1257,6 +1217,63 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
           </div>
           <div class="trend-modal-body">
             <div class="chart-wrap" style="height:360px"><canvas id="chart-trend-3m"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 영역 2 (신규): 채널별 예약 현 -->
+      <div class="card" id="card-dailychannel">
+        <div class="card-head">
+          <h3 class="desc-trigger" data-desc="dailychannel" onclick="openDescPanel('dailychannel')">일자별 예약 채널 현황 <span class="desc-ico" tabindex="0" role="img" aria-label="일자별 예약 채널 현황 도움말" onclick="event.stopPropagation()">ⓘ<span class="desc-tip"><b>일자별 예약 채널 현황</b><br>채널 6종(인증센터·브랜드몰·대리점 등)의 일자별 순예약 인원을 표로 제공합니다.<br>조회기간은 [최근 7일]·[월별] 버튼으로 구분하며(최근 7일 자동 적용, 월별은 년/월 선택), [상세보기]로 대리점 단위까지 확인합니다.</span></span></h3>
+          <div class="tools"><button class="btn ghost sm" onclick="switchPage('channel')">상세보기</button></div>
+        </div>
+        <div class="card-body">
+                    <div class="pre-query-msg">
+            <div class="pq-icon">i</div>
+            <div class="pq-title">조회 전 상태입니다</div>
+            <div class="pq-desc">상단 구분을 선택한 뒤 조회 버튼을 클릭하면<br>최근 7일 일자별 예약 채널 현황이 표시됩니다.</div>
+          </div>
+          <div class="top-filter" style="margin-bottom:8px">
+            <label>조회기간</label>
+            <span id="ch-toggle" class="ch-toggle" role="group" aria-label="조회기간 구분">
+              <button type="button" id="ch-mode-day" class="on" aria-pressed="true" onclick="changeChannelMode('day')">최근 7일</button>
+              <button type="button" id="ch-mode-month" aria-pressed="false" onclick="changeChannelMode('month')">월별</button>
+            </span>
+            <span id="ch-day-wrap">
+              <input type="date" id="ch-start" value="2026-05-09" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+              <span>~</span>
+              <input type="date" id="ch-end" value="2026-05-15" disabled style="height:28px;border:1px solid #c9ccd1;padding:0 8px;border-radius:3px;font-size:12px;background:#f4f5f7;color:#666">
+            </span>
+            <span id="ch-month-wrap" style="display:none">
+              <select id="ch-year" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="2024">2024년</option><option value="2025">2025년</option><option value="2026" selected>2026년</option>
+              </select>
+              <select id="ch-month" onchange="renderChannelMonth()" style="height:28px;border:1px solid #c9ccd1;padding:0 6px;border-radius:3px;font-size:12px;background:#fff;color:#333">
+                <option value="1">1월</option><option value="2">2월</option><option value="3">3월</option><option value="4">4월</option><option value="5">5월</option><option value="6" selected>6월</option><option value="7">7월</option><option value="8">8월</option><option value="9">9월</option><option value="10">10월</option><option value="11">11월</option><option value="12">12월</option>
+              </select>
+            </span>
+          </div>
+          <div class="no-data-msg" aria-hidden="true">
+            <div class="nd-icon">i</div>
+            <div class="nd-title">조회된 예약 데이터가 없습니다</div>
+            <div class="nd-desc">선택한 담당자 기준 해당 기간에 조회 가능한 예약 데이터가 없습니다.<br>위 <b>조회기간</b> 구분(최근 7일·월별)을 변경한 뒤 다시 확인해 주세요.</div>
+          </div>
+          <div id="ch-scroll-wrap" class="ch-scroll-wrap">
+            <table class="data">
+              <thead id="ch-thead">
+                <tr><th rowspan="2">채널</th><th colspan="7">일자별 예약건수</th><th rowspan="2">합계</th></tr>
+                <tr><th>05/09(토)</th><th>05/10(일)</th><th>05/11(월)</th><th>05/12(화)</th><th>05/13(수)</th><th>05/14(목)</th><th>05/15(금)</th></tr>
+              </thead>
+              <tbody id="ch-tbody">
+                <tr><td class="l">공식인증예약센터</td><td>7</td><td>6</td><td>11</td><td>9</td><td>8</td><td>10</td><td>12</td><td><b>63</b></td></tr>
+                <tr><td class="l">브랜드몰</td><td>7</td><td>4</td><td>5</td><td>6</td><td>4</td><td>5</td><td>6</td><td><b>37</b></td></tr>
+                <tr><td class="l">일반대리점</td><td>8</td><td>5</td><td>4</td><td>7</td><td>6</td><td>5</td><td>9</td><td><b>44</b></td></tr>
+                <tr><td class="l">제휴사</td><td>3</td><td>1</td><td>2</td><td>3</td><td>2</td><td>3</td><td>4</td><td><b>18</b></td></tr>
+                <tr><td class="l">자회사</td><td>2</td><td>2</td><td>2</td><td>1</td><td>2</td><td>2</td><td>3</td><td><b>14</b></td></tr>
+                <tr><td class="l">직판</td><td>1</td><td>0</td><td>2</td><td>1</td><td>1</td><td>2</td><td>2</td><td><b>9</b></td></tr>
+              </tbody>
+              <tfoot id="ch-tfoot"><tr><td class="c">합계</td><td>28</td><td>18</td><td>26</td><td>27</td><td>23</td><td>27</td><td>36</td><td>185</td></tr></tfoot>
+            </table>
           </div>
         </div>
       </div>
@@ -1375,6 +1392,10 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
               <div class="nd-title">조회된 예약 데이터가 없습니다</div>
               <div class="nd-desc">선택한 담당자 기준 해당 조건에 조회 가능한 예약 데이터가 없습니다.<br>담당자 또는 조회기간·채널 조건을 변경한 뒤 다시 확인해 주세요.</div>
             </div>
+            <div class="team-all-msg agc-msg" aria-hidden="true">
+              <div class="ta-icon">!</div>
+              <div class="ta-title">담당자 개별 조회가 필요합니다</div>
+            </div>
             <div class="notice"><b>[안내]</b> <br>조회기간 내 <b>예약발생 대리점만 노출됩니다.</b> (예약 0건 대리점은 자동 제외)</div>
             <div class="agc-summary" id="agc-summary">조회 결과 <b>0</b>개 대리점</div>
             <div class="agc-scroll" id="agc-scroll">
@@ -1413,16 +1434,21 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
               <div class="pq-desc">조회기간을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 장기 추이가 표시됩니다.</div>
             </div>
             <div id="long-result" style="display:none">
+              <div style="font-weight:700;color:#1a3a5f;font-size:12px;line-height:1.35;border-left:3px solid #1565c0;padding-left:8px;margin:2px 0 6px">채널별 예약 추이</div>
               <table class="data">
                 <thead id="long-thead"></thead>
                 <tbody id="long-tbody"></tbody>
+              </table>
+              <div style="font-weight:700;color:#1a3a5f;font-size:12px;line-height:1.35;border-left:3px solid #1565c0;padding-left:8px;margin:20px 0 4px">속성별 예약 추이</div>
+              <table class="data">
+                <thead id="long-attr-thead"></thead>
+                <tbody id="long-attr-tbody"></tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
     </section>
-
     <!-- =================== HCSI 상세 =================== -->
     <section id="page-hcsi" class="hidden">
 
@@ -1668,10 +1694,9 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
 
   <h4>공통 조회 정책</h4>
   <ul>
-    <li><b>조회권한_팀원</b>: 로그인 사용자(본인) 기준으로 소속 본부/부서/팀/담당자가 고정 선택되어 본인 실적만 조회합니다.</li>
-    <li><b>조회권한_팀장</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자에서 <b>전체</b> 선택 시 소속 팀 전체 실적 합계를 조회합니다.</li>
+    <li><b>조회권한</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자에서 <b>전체</b> 선택 시 소속 팀 전체 실적 합계를, 동일 팀 내 팀원 선택 시 해당 팀원 실적을 조회합니다. (팀원·팀장 직책 구분 없이 팀 전체 및 동일 팀 팀원 데이터를 동일하게 조회할 수 있습니다.)</li>
     <li><b>관리권한</b>: 본부/부서/팀/담당자 조건을 직접 선택하여 조회하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계를 조회합니다.</li>
-    <li>※ <b>조회권한_팀원·조회권한_팀장</b>은 IAM 권한 구분이 아니라, 조회권한 사용자의 직책(팀원/팀장)에 따른 노출 차이를 목업에서 참고용으로 구분한 표기입니다. (실제 권한은 IAM으로 자동 관리)</li>
+    <li>※ <b>조회권한</b>은 IAM으로 자동 관리되는 권한이며, 화면의 권한 버튼은 목업에서 권한 개념의 이해를 돕기 위한 표기입니다. 조회권한과 관리권한을 모두 보유한 경우 관리권한이 우선 적용됩니다.</li>
     <li>필터 변경만으로는 자동 조회하지 않으며, <b>[조회]</b> 클릭 시 전체 카드 데이터가 일괄 갱신됩니다.</li>
     <li>데이터가 없는 경우 영역별 정책에 따라 <code>0건</code>, <code>-</code>, 또는 No Data 안내를 노출합니다.</li>
   </ul>
@@ -1687,8 +1712,8 @@ body.no-data #ctab-agency .no-data-msg.agc-msg{display:flex}
   <ul>
     <li><b>나의 업무관리</b>: 예약관리 및 온라인견적서 처리 필요 건수 요약</li>
     <li><b>출발월별 상품 예약현황</b>: 출발월 기준 인원/판매금액/수익/수익률 현황</li>
-    <li><b>일자별 예약 채널 현황</b>: 일자와 채널별 순예약 현황</li>
     <li><b>일자별 예약 현황</b>: 총예약/총취소/순예약 및 전년도 순예약 비교</li>
+    <li><b>일자별 예약 채널 현황</b>: 일자와 채널별 순예약 현황</li>
     <li><b>HCSI 요약 미리보기</b>: 하나담당자 조회 기준, 전체 대리점 HCSI 평균 및 담당 대리점 상·하위 대리점 현황</li>
   </ul>
 
@@ -1751,12 +1776,30 @@ document.querySelectorAll('[data-ctab]').forEach(t=>t.addEventListener('click',(
 // ============ 장기 추이 조회 (조회기간: 6/12개월) ============
 var LONG_MONTHS = ['2025-06','2025-07','2025-08','2025-09','2025-10','2025-11','2025-12','2026-01','2026-02','2026-03','2026-04','2026-05'];
 var LONG_DATA = [
-  {ch:'공식인증예약센터', v:[210,218,225,230,236,232,240,252,238,261,278,290]},
-  {ch:'브랜드몰',         v:[120,128,132,138,140,145,148,156,142,161,168,172]},
-  {ch:'일반대리점',       v:[205,200,196,188,194,201,192,185,178,190,198,185]},
-  {ch:'제휴사',           v:[60,63,66,68,70,71,72,78,74,82,85,88]},
-  {ch:'자회사',           v:[48,50,52,54,55,57,58,62,60,65,67,70]},
-  {ch:'직판',             v:[30,32,33,35,36,37,38,42,40,44,46,48]}
+  {ch:'공식인증예약센터', v:[360,373,388,397,406,400,418,440,429,451,475,508]},
+  {ch:'브랜드몰',         v:[206,219,227,238,241,250,258,273,256,278,287,301]},
+  {ch:'일반대리점',       v:[351,342,338,325,334,346,334,323,321,329,338,324]},
+  {ch:'제휴사',           v:[103,108,114,117,121,122,125,136,133,142,145,154]},
+  {ch:'자회사',           v:[82,85,89,93,95,98,101,108,108,112,115,123]},
+  {ch:'직판',             v:[51,55,57,61,62,64,66,74,72,76,79,84]}
+];
+// [추가] 속성별 예약 장기추이 (최초예약일 기준·취소자 제외, 월 단위 예약인원)
+// 대시보드홈 '출발월별 상품 예약현황 > 속성별'과 동일한 14개 속성 (기타 미통합)
+var LONG_ATTR_DATA = [
+  {at:'[P]패키지',       v:[642,655,668,676,690,701,712,735,718,752,778,805]},
+  {at:'[Q]인센티브',     v:[108,112,116,118,121,124,126,132,128,135,140,146]},
+  {at:'[M]AD투어',       v:[38,39,40,41,42,42,43,45,44,46,48,50]},
+  {at:'[F]패스/입장권',  v:[26,27,28,28,29,30,30,32,31,33,34,36]},
+  {at:'[B]결합상품',     v:[22,23,24,24,25,25,26,27,26,28,29,30]},
+  {at:'[E]박람회/전시회',v:[15,15,16,16,17,17,18,19,18,19,20,21]},
+  {at:'[G]골프',         v:[42,43,44,45,46,46,47,49,48,50,52,54]},
+  {at:'[J]종교',         v:[12,12,13,13,13,14,14,15,14,15,16,16]},
+  {at:'[K]액티비티',     v:[18,19,20,20,21,21,22,23,22,24,25,26]},
+  {at:'[U]우리끼리',     v:[30,31,32,32,33,34,34,36,35,37,38,40]},
+  {at:'[X]현지투어플러스',v:[44,45,47,48,49,50,51,53,52,55,57,59]},
+  {at:'[W]허니문',       v:[76,78,80,82,83,85,86,90,88,93,96,100]},
+  {at:'[Z]제우스',       v:[52,54,55,57,58,59,60,63,61,65,68,71]},
+  {at:'[C]크루즈',       v:[28,29,30,31,32,32,33,35,34,36,38,40]}
 ];
 function searchLongTrend(){
   var n = parseInt((document.getElementById('long-range')||{}).value||'6',10);
@@ -1783,6 +1826,26 @@ function searchLongTrend(){
                '<td class="sumc"><b>'+grand.toLocaleString()+'</b></td>'+
                '<td class="ratec"><b>100.0%</b></td></tr>';
   document.getElementById('long-tbody').innerHTML = bodyRows + totRow;
+  // [추가] 속성별 예약 장기추이 렌더링 (채널 테이블과 동일 구조)
+  var aRowSums = LONG_ATTR_DATA.map(function(r){ return r.v.slice(-n).reduce(function(a,b){return a+b;},0); });
+  var aGrand   = aRowSums.reduce(function(a,b){return a+b;},0);
+  document.getElementById('long-attr-thead').innerHTML =
+    '<tr><th>속성</th>' + months.map(function(m){return '<th>'+m+'</th>';}).join('') + '<th class="sumc">합계</th><th class="ratec">비율</th></tr>';
+  var aBodyRows = LONG_ATTR_DATA.map(function(r, ri){
+    var arr  = r.v.slice(-n);
+    var sum  = aRowSums[ri];
+    var rate = aGrand ? (sum/aGrand*100) : 0;
+    var tds  = arr.map(function(x){return '<td>'+x+'</td>';}).join('');
+    var sumCell  = '<td class="sumc"><b>'+sum.toLocaleString()+'</b></td>';
+    var rateCell = '<td class="ratec"><b>'+rate.toFixed(1)+'%</b></td>';
+    return '<tr><td class="l">'+r.at+'</td>'+tds+sumCell+rateCell+'</tr>';
+  }).join('');
+  var aColTot = months.map(function(_,ci){ return LONG_ATTR_DATA.reduce(function(a,r){return a + (r.v.slice(-n)[ci]||0);},0); });
+  var aColTds = aColTot.map(function(v){return '<td><b>'+v.toLocaleString()+'</b></td>';}).join('');
+  var aTotRow = '<tr class="totrow"><td class="l">월별 합계</td>'+aColTds+
+               '<td class="sumc"><b>'+aGrand.toLocaleString()+'</b></td>'+
+               '<td class="ratec"><b>100.0%</b></td></tr>';
+  document.getElementById('long-attr-tbody').innerHTML = aBodyRows + aTotRow;
   document.getElementById('long-prequery').style.display='none';
   document.getElementById('long-result').style.display='';
 }
@@ -2541,6 +2604,13 @@ function changeAgencyMode(mode){
   searchAgency();
 }
 function searchAgency(){
+  // [추가] 특정 팀의 담당자 '전체' 조회 시: 담당 대리점 수가 많아 대리점별 상세 데이터를 제공하지 않고 개별 조회 안내
+  var agcUser = (document.getElementById('f-user')||{}).value || '';
+  if(agcUser === '전체'){
+    document.body.classList.add('agc-team-all');
+    return;
+  }
+  document.body.classList.remove('agc-team-all');
   var channel = (document.getElementById('agc-channel')||{}).value || '전체';
   // [수정] 조회기간: 일별(달력 직접 선택, 기본 최근 7일)·월별(연/월 셀렉트) 토글 기준
   var built = agcResolve();
@@ -2839,6 +2909,8 @@ function saveFilter(){
   var s=document.getElementById('f-saved'); if(s){ s.style.opacity='1'; setTimeout(()=>s.style.opacity='0',1600); }
   // [추가] 조회 완료 → pre-query 상태 해제하여 데이터 노출
   document.body.classList.remove('pre-query');
+  // [추가] 예약현황(상세) 대리점별 상세: 담당자 '전체' 조회 시 개별 조회 안내 상태 동기화
+  document.body.classList.toggle('agc-team-all', user === '전체');
   // [추가] HCSI 영역 노출 제어: 구분이 '하나담당자'(hana)일 때만 노출
   document.body.classList.toggle('non-hana', attr !== 'hana');
   // [추가] 데이터 없음(no-data) 상태: 담당자=김영업 + 구분=하나담당자 조회 시 빈 상태 노출
@@ -2902,8 +2974,8 @@ function onDeptChange(){
   onTeamChange();
 }
 function onTeamChange(){
-  // 관리권한 / 조회권한_팀장 모드에서만 담당자 동적 변경
-  if(!document.body.classList.contains('role-admin') && !document.body.classList.contains('role-lead')) return;
+  // 관리권한 / 조회권한 모드에서만 담당자 동적 변경
+  if(!document.body.classList.contains('role-admin') && !document.body.classList.contains('role-view')) return;
   var hq = document.getElementById('f-hq').value;
   var dept = document.getElementById('f-dept').value;
   var team = document.getElementById('f-team').value;
@@ -2924,9 +2996,9 @@ function switchRole(role){
     l.classList.toggle('on', input && input.value === role);
   });
   var isAdmin = (role === 'admin');
-  var isLead  = (role === 'view_lead');
+  var isView  = (role === 'view');
   document.body.classList.toggle('role-admin', isAdmin);
-  document.body.classList.toggle('role-lead', isLead);
+  document.body.classList.toggle('role-view', isView);
 
   var hq = document.getElementById('f-hq');
   var dept = document.getElementById('f-dept');
@@ -2938,36 +3010,46 @@ function switchRole(role){
     hq.disabled = false; dept.disabled = false; team.disabled = false; user.disabled = false;
     hq.value = 'sales';
     onHqChange(); // 부서/팀/담당자('전체'+팀원) 재구성
-  } else if(isLead){
-    // 조회권한_팀장: 소속 본부/부서/팀 고정, 담당자만 선택 가능('전체'=팀 전체 실적 합)
+  } else {
+    // 조회권한(통합): 소속 본부/부서/팀 고정, 담당자만 선택 가능
+    //  - 담당자 '전체'  = 소속 팀 전체 실적 합계
+    //  - 동일 팀 팀원 선택 = 해당 팀원 실적 (직책 구분 없이 동일 권한)
     hq.value = 'sales';
     onHqChange();
     dept.value = 'sales1';
     onDeptChange();
     team.value = '영업1팀';
-    onTeamChange(); // 담당자 '전체'+팀원 재구성
+    onTeamChange(); // 담당자 '전체'+동일 팀 팀원 재구성
     user.value = '전체'; // 기본: 팀 전체 실적 합
     hq.disabled = true; dept.disabled = true; team.disabled = true;
     user.disabled = false; // 담당자 셀렉트만 활성화
-  } else {
-    // 조회권한_팀원: 로그인 사용자(=강영업) 고정, 부/팀/담당자 disabled
-    // 영업본부 > 영업1부 > 영업1팀 > 강영업 으로 고정
-    hq.value = 'sales';
-    onHqChange();
-    // onHqChange 가 user 를 재구성하므로 강영업으로 고정
-    dept.value = 'sales1';
-    onDeptChange();
-    team.value = '영업1팀';
-    // 담당자: 강영업 고정
-    user.innerHTML = '<option value="강영업" selected>강영업</option>';
-    hq.disabled = true; dept.disabled = true; team.disabled = true; user.disabled = true;
   }
 }
 
 // 초기화: 기본 조회권한
 document.addEventListener('DOMContentLoaded', function(){
-  switchRole('view_member');
+  switchRole('view');
 });
+
+// [추가] 부서예약현황 다운로드 (관리권한 전용, 목업: 실제 파일 미생성 → 안내 토스트)
+function downloadDeptReservations(){
+  var deptSel = document.getElementById('f-dept');
+  var deptName = '선택 부서';
+  if(deptSel){
+    var opt = deptSel.options[deptSel.selectedIndex];
+    deptName = (opt && opt.text) ? opt.text : (deptSel.value || deptName);
+  }
+  var toast = document.getElementById('deptDlToast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'deptDlToast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = '<b>조회기간</b> 기준 \u2018' + deptName + '\u2019 일자별 예약현황 데이터를\nExcel 파일로 다운로드합니다.\n(목업 화면이므로 실제 파일은 생성되지 않습니다.)';
+  toast.classList.add('show');
+  clearTimeout(window.__deptDlTimer);
+  window.__deptDlTimer = setTimeout(function(){ toast.classList.remove('show'); }, 3200);
+}
 
 // [추가] 디스크립션 사이드 패널 접기/펼치기
 function toggleDescSide(){
@@ -3263,6 +3345,12 @@ selectHcsiMonth('2026-04');
       <li>X축은 일자, Y축은 건수이며 당해 순예약과 전년도 순예약을 함께 표시합니다.</li>
       <li>동일 날짜 hover 시 당해/전년도 값을 하나의 툴팁에서 비교 노출합니다.</li>
     </ul>
+    <h5>부서예약현황 다운로드 (관리권한 전용)</h5>
+    <ul>
+      <li><b>관리권한</b>으로 조회한 경우에만 [최근 3개월 추이 보기] 버튼 좌측에 <b>[부서예약현황 다운로드]</b> 버튼이 노출됩니다.</li>
+      <li>버튼 클릭 시 <b>조회기간</b> 기준으로 선택한 부서의 일자별 예약건수 데이터를 Excel 파일로 다운로드합니다.</li>
+      <li>본 화면은 목업이므로 실제 파일은 생성되지 않으며, 다운로드 동작을 안내 토스트 메시지로 대체합니다.</li>
+    </ul>
   </template>
 
   <template id="desc-tpl-hcsi-pre" data-title="HCSI 요약 미리보기">
@@ -3314,6 +3402,7 @@ selectHcsiMonth('2026-04');
     </ul>
     <h5>대리점별 상세</h5>
     <ul>
+      <li><b>특정 팀의 담당자를 전체로 조회</b>하면 담당 대리점 수가 많아 대리점별 상세 데이터를 제공하지 않으며, 담당자를 개별로 선택해 조회하도록 안내 메시지를 노출합니다.</li>
       <li>채널 기준으로 소속 대리점을 묶어 노출하며, 최초 조회 시 채널 기준 오름차순으로 정렬합니다.</li>
       <li>채널 / 대리점코드 / 대리점 헤더 클릭 시 해당 기준으로 정렬되며, 다시 클릭할 때마다 오름차순(▲)과 내림차순(▼)이 전환됩니다.</li>
       <li>채널 셀렉트로 특정 채널만 조회할 수 있으며 전체 옵션을 제공합니다.</li>
@@ -3325,10 +3414,21 @@ selectHcsiMonth('2026-04');
     </ul>
     <h5>장기 추이</h5>
     <ul>
-      <li>최근 6개월 또는 최근 12개월 기준으로 채널별 월 단위 순예약 추이를 노출합니다.</li>
+      <li>최근 6개월 또는 최근 12개월 기준으로 <b>채널별</b>과 <b>속성별</b> 두 개의 월 단위 예약 추이 테이블을 노출합니다.</li>
+      <li>12개월 선택 시 월 컬럼 증가로 가로 스크롤을 적용할 수 있습니다.</li>
+    </ul>
+    <h6 style="margin:6px 0 2px;font-size:12px;color:#1a3a5f">① 채널별 예약 장기추이</h6>
+    <ul>
+      <li>채널별 월 단위 순예약 추이를 노출합니다.</li>
       <li>행 기준은 공식인증예약센터, 브랜드몰, 일반대리점, 제휴사, 자회사, 직판입니다.</li>
       <li>월별 예약건수, 채널별 합계, 전체 합계를 표시합니다.</li>
-      <li>12개월 선택 시 월 컬럼 증가로 가로 스크롤을 적용할 수 있습니다.</li>
+    </ul>
+    <h6 style="margin:6px 0 2px;font-size:12px;color:#1a3a5f">② 속성별 예약 장기추이</h6>
+    <ul>
+      <li><b>최초예약일 기준(취소자 제외)</b>으로 속성별 월 단위 예약인원을 노출합니다.</li>
+      <li>대시보드홈 <b>출발월별 상품 예약현황 &gt; 속성별</b>과 동일한 <b>14개 속성</b>으로 구분합니다(단, 해당 화면은 출발일 기준, 본 추이는 최초예약일 기준).</li>
+      <li>속성은 <b>기타로 통합하지 않고 전체 속성으로 나누어</b> 노출합니다.</li>
+      <li>월별 예약인원, 속성별 합계, 전체 합계 및 비율을 표시합니다.</li>
     </ul>
   </template>
 
