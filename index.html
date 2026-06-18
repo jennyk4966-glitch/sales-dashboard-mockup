@@ -949,7 +949,7 @@ body.role-admin .dept-dl-btn{display:inline-block}
       <!-- 공통 팀/담당자 필터 -->
       <!-- [추가] 권한 선택 (목업: 조회권한/관리권한 전환) -->
       <div class="role-switch-row">
-        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br>· <b>조회권한</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자 <b>전체</b> 선택 시 팀 전체 실적 합계가, 동일 팀 내 팀원 선택 시 해당 팀원 실적이 조회됩니다. (직책 구분 없이 <b>팀 전체 및 동일 팀 팀원 데이터</b>를 동일하게 조회할 수 있습니다.)<br>· <b>관리권한</b>: 본부/부서/팀/담당자를 직접 선택하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계가 조회됩니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
+        <span class="role-label">권한</span><span class="role-info" tabindex="0" aria-label="권한 안내">&#9432;<span class="role-tip">권한은 <b>IAM을 통해 로그인 사용자별로 자동 관리</b>됩니다.<br>화면에 표시되는 권한 버튼은 실제 동작용이 아니라, <b>목업에서 권한 개념의 이해를 돕기 위해</b> 노출한 것입니다.<br>· <b>조회권한</b>: 소속 본부/부서/팀은 로그인 사용자 기준으로 자동 선택·고정되고 담당자만 선택할 수 있습니다. 기본값은 <b>로그인 사용자 본인</b>이며, 담당자 <b>전체</b> 선택 시 팀 전체 실적 합계가, 동일 팀 내 팀원 선택 시 해당 팀원 실적이 조회됩니다. (직책 구분 없이 <b>팀 전체 및 동일 팀 팀원 데이터</b>를 동일하게 조회할 수 있습니다.)<br>· <b>관리권한</b>: 본부/부서/팀/구분의 기본값은 <b>선택(미선택)</b> 상태이며, 본부 선택 시 하위 부서·팀이 순차적으로 채워집니다. 담당자는 전체로 두어도 무방하며, 본부/부서/팀/구분을 선택하지 않고 조회 시 <b>선택 안내 알럿</b>이 노출됩니다.<br>조회권한과 관리권한을 <b>모두 보유한 사용자는 관리권한이 우선</b> 적용됩니다.</span></span>
         <div class="role-switch" id="roleSwitch">
           <label class="on"><input type="radio" name="role" value="view" checked onchange="switchRole('view')">조회권한</label>
           <label><input type="radio" name="role" value="admin" onchange="switchRole('admin')">관리권한</label>
@@ -959,6 +959,7 @@ body.role-admin .dept-dl-btn{display:inline-block}
     <div class="top-filter">
       <label class="admin-only-label">본부</label>
       <select id="f-hq" class="admin-only" onchange="onHqChange()">
+        <option value="" selected>선택</option>
         <option value="sales">영업본부</option>
         <option value="local">지방사업본부</option>
       </select>
@@ -1434,16 +1435,26 @@ body.role-admin .dept-dl-btn{display:inline-block}
               <div class="pq-desc">조회기간을 선택한 뒤 조회 버튼을 클릭하면<br>채널별 장기 추이가 표시됩니다.</div>
             </div>
             <div id="long-result" style="display:none">
-              <div style="font-weight:700;color:#1a3a5f;font-size:12px;line-height:1.35;border-left:3px solid #1565c0;padding-left:8px;margin:2px 0 6px">채널별 예약 추이</div>
-              <table class="data">
-                <thead id="long-thead"></thead>
-                <tbody id="long-tbody"></tbody>
-              </table>
-              <div style="font-weight:700;color:#1a3a5f;font-size:12px;line-height:1.35;border-left:3px solid #1565c0;padding-left:8px;margin:20px 0 4px">속성별 예약 추이</div>
-              <table class="data">
-                <thead id="long-attr-thead"></thead>
-                <tbody id="long-attr-tbody"></tbody>
-              </table>
+              <!-- ① 채널별 예약 추이 카드 -->
+              <div class="card">
+                <div class="card-head"><h3>채널별 예약 추이</h3></div>
+                <div class="card-body" style="overflow-x:auto">
+                  <table class="data">
+                    <thead id="long-thead"></thead>
+                    <tbody id="long-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+              <!-- ② 속성별 예약 추이 카드 -->
+              <div class="card" style="margin-bottom:0">
+                <div class="card-head"><h3>속성별 예약 추이</h3></div>
+                <div class="card-body" style="overflow-x:auto">
+                  <table class="data">
+                    <thead id="long-attr-thead"></thead>
+                    <tbody id="long-attr-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1694,8 +1705,8 @@ body.role-admin .dept-dl-btn{display:inline-block}
 
   <h4>공통 조회 정책</h4>
   <ul>
-    <li><b>조회권한</b>: 소속 본부/부서/팀은 고정되고 담당자만 선택할 수 있습니다. 담당자에서 <b>전체</b> 선택 시 소속 팀 전체 실적 합계를, 동일 팀 내 팀원 선택 시 해당 팀원 실적을 조회합니다. (팀원·팀장 직책 구분 없이 팀 전체 및 동일 팀 팀원 데이터를 동일하게 조회할 수 있습니다.)</li>
-    <li><b>관리권한</b>: 본부/부서/팀/담당자 조건을 직접 선택하여 조회하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계를 조회합니다.</li>
+    <li><b>조회권한</b>: 소속 본부/부서/팀은 로그인 사용자 기준으로 자동 선택·고정되고 담당자만 선택할 수 있습니다. 기본값은 <b>로그인 사용자 본인</b>이며, 담당자에서 <b>전체</b> 선택 시 소속 팀 전체 실적 합계를, 동일 팀 내 팀원 선택 시 해당 팀원 실적을 조회합니다. (팀원·팀장 직책 구분 없이 팀 전체 및 동일 팀 팀원 데이터를 동일하게 조회할 수 있습니다.)</li>
+    <li><b>관리권한</b>: 본부/부서/팀/구분의 기본값은 <b>선택(미선택)</b> 상태이며, 본부를 선택하면 하위 부서·팀이 순차적으로 채워집니다. 담당자는 전체로 두어도 무방하며, 담당자 <b>전체</b> 선택 시 선택한 팀 전체 실적 합계를 조회합니다. 본부/부서/팀/구분을 선택하지 않고 <b>[조회]</b> 시 선택 안내 알럿을 노출합니다.</li>
     <li>※ <b>조회권한</b>은 IAM으로 자동 관리되는 권한이며, 화면의 권한 버튼은 목업에서 권한 개념의 이해를 돕기 위한 표기입니다. 조회권한과 관리권한을 모두 보유한 경우 관리권한이 우선 적용됩니다.</li>
     <li>필터 변경만으로는 자동 조회하지 않으며, <b>[조회]</b> 클릭 시 전체 카드 데이터가 일괄 갱신됩니다.</li>
     <li>데이터가 없는 경우 영역별 정책에 따라 <code>0건</code>, <code>-</code>, 또는 No Data 안내를 노출합니다.</li>
@@ -2897,9 +2908,17 @@ renderAgList();
   }catch(e){}
 })();
 function saveFilter(){
+  var hq=document.getElementById('f-hq').value;
+  var dept=document.getElementById('f-dept').value;
   var team=document.getElementById('f-team').value;
   var user=document.getElementById('f-user').value;
   var attr=document.getElementById('f-attr').value;
+  // [수정] 관리권한: 본부/부서/팀 미선택 시 조회 차단(선택 후 조회 안내)
+  if(document.body.classList.contains('role-admin')){
+    if(!hq){ alert('본부를 선택하고 조회해 주세요.'); document.getElementById('f-hq').focus(); return; }
+    if(!dept){ alert('부서를 선택하고 조회해 주세요.'); document.getElementById('f-dept').focus(); return; }
+    if(!team){ alert('팀을 선택하고 조회해 주세요.'); document.getElementById('f-team').focus(); return; }
+  }
   if(!attr){
     alert('구분을 선택해 주세요.');
     document.getElementById('f-attr').focus();
@@ -2960,17 +2979,24 @@ function fillSelect(sel, items, asObj){
 function onHqChange(){
   var hq = document.getElementById('f-hq').value;
   var deptSel = document.getElementById('f-dept');
-  var depts = ORG[hq] ? ORG[hq].depts : {};
-  var items = Object.keys(depts).map(function(k){ return {value:k, label: depts[k].name }; });
-  fillSelect(deptSel, items, true);
+  // [수정] 본부 미선택('선택') 시 하위는 '선택' 플레이스홀더만, 선택 시 하위 부서 캐스케이드
+  var depts = (hq && ORG[hq]) ? ORG[hq].depts : {};
+  deptSel.innerHTML = '<option value="">선택</option>';
+  Object.keys(depts).forEach(function(k){
+    var o = document.createElement('option'); o.value = k; o.textContent = depts[k].name; deptSel.appendChild(o);
+  });
   onDeptChange();
 }
 function onDeptChange(){
   var hq = document.getElementById('f-hq').value;
   var dept = document.getElementById('f-dept').value;
   var teamSel = document.getElementById('f-team');
-  var teams = (ORG[hq] && ORG[hq].depts[dept]) ? ORG[hq].depts[dept].teams : {};
-  fillSelect(teamSel, Object.keys(teams), false);
+  // [수정] 부서 미선택('선택') 시 하위는 '선택' 플레이스홀더만, 선택 시 하위 팀 캐스케이드
+  var teams = (hq && dept && ORG[hq] && ORG[hq].depts[dept]) ? ORG[hq].depts[dept].teams : {};
+  teamSel.innerHTML = '<option value="">선택</option>';
+  Object.keys(teams).forEach(function(k){
+    var o = document.createElement('option'); o.value = k; o.textContent = k; teamSel.appendChild(o);
+  });
   onTeamChange();
 }
 function onTeamChange(){
@@ -2979,16 +3005,19 @@ function onTeamChange(){
   var hq = document.getElementById('f-hq').value;
   var dept = document.getElementById('f-dept').value;
   var team = document.getElementById('f-team').value;
-  var users = (ORG[hq] && ORG[hq].depts[dept] && ORG[hq].depts[dept].teams[team]) ? ORG[hq].depts[dept].teams[team] : [];
+  // [수정] 본부/부서/팀 미선택 시 담당자는 '전체'만 노출(관리권한은 전체로 두어도 무방)
+  var users = (hq && dept && team && ORG[hq] && ORG[hq].depts[dept] && ORG[hq].depts[dept].teams[team]) ? ORG[hq].depts[dept].teams[team] : [];
   var userSel = document.getElementById('f-user');
   if(users.length === 0){
-    userSel.innerHTML = '<option value="">담당자 없음</option>';
+    userSel.innerHTML = '<option value="전체">전체</option>';
   } else {
     // 담당자 '전체'(팀 전체 실적 합) + 팀원 목록
     fillSelect(userSel, ['전체'].concat(users), false);
   }
 }
 
+// [추가] 로그인 사용자(목업): 조회권한 기본 담당자 = 본인
+var LOGIN_USER = '강영업';
 function switchRole(role){
   var labels = document.querySelectorAll('#roleSwitch label');
   labels.forEach(function(l){
@@ -3006,13 +3035,16 @@ function switchRole(role){
   var user = document.getElementById('f-user');
 
   if(isAdmin){
-    // 관리권한: 모두 활성, 본부=영업본부/부서=영업1부/팀=영업1팀 기본
+    // [수정] 관리권한: 모두 활성, 본부/부서/팀/구분 기본값은 '선택'(미선택) 상태
+    //  - 본부 선택 시 하위 부서→팀→담당자 캐스케이드, 담당자는 '전체'로 두어도 무방
     hq.disabled = false; dept.disabled = false; team.disabled = false; user.disabled = false;
-    hq.value = 'sales';
-    onHqChange(); // 부서/팀/담당자('전체'+팀원) 재구성
+    hq.value = '';                // 본부 '선택'
+    onHqChange();                 // 부서/팀 '선택' 플레이스홀더로 초기화
+    document.getElementById('f-attr').value = ''; // 구분 '선택'
+    user.value = '전체';          // 담당자 기본 전체(무방)
   } else {
     // 조회권한(통합): 소속 본부/부서/팀 고정, 담당자만 선택 가능
-    //  - 담당자 '전체'  = 소속 팀 전체 실적 합계
+    //  - 기본: 로그인 사용자 본인 실적 (담당자 '전체' 선택 시 소속 팀 전체 실적 합계)
     //  - 동일 팀 팀원 선택 = 해당 팀원 실적 (직책 구분 없이 동일 권한)
     hq.value = 'sales';
     onHqChange();
@@ -3020,7 +3052,7 @@ function switchRole(role){
     onDeptChange();
     team.value = '영업1팀';
     onTeamChange(); // 담당자 '전체'+동일 팀 팀원 재구성
-    user.value = '전체'; // 기본: 팀 전체 실적 합
+    user.value = LOGIN_USER; // [수정] 기본: 로그인 사용자 본인('전체'도 선택 가능)
     hq.disabled = true; dept.disabled = true; team.disabled = true;
     user.disabled = false; // 담당자 셀렉트만 활성화
   }
